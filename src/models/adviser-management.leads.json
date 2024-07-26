@@ -1,0 +1,54 @@
+[{
+  "_id": {
+    "$oid": "66a38d97b531ded2f76ff7b9"
+  },
+  "Adviser": {
+    "$oid": "66a37d72d4f98b9e3d86c573"
+  },
+  "lead_name": "myself",
+  "mobile_no": 1231231230,
+  "email_id": "muself@gmail.com",
+  "plan": "pro",
+  "desc": "testing",
+  "associates": {
+    "associates_name": "John Doe",
+    "associates_No": 123456789
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66a38dd6b531ded2f76ff7bb"
+  },
+  "Adviser": {
+    "$oid": "66a37dcb4dc070773cf0e5f7"
+  },
+  "lead_name": "lead testing1",
+  "mobile_no": 1231231230,
+  "email_id": "leadtesting@gmail.com",
+  "plan": "pro",
+  "desc": "Add a new lead testing",
+  "associates": {
+    "associates_name": "John Doe",
+    "associates_No": 123456789
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66a38de8b531ded2f76ff7bd"
+  },
+  "Adviser": {
+    "$oid": "66a37dcb4dc070773cf0e5f7"
+  },
+  "lead_name": "lead testing 2",
+  "mobile_no": 1231231230,
+  "email_id": "leadtesting2@gmail.com",
+  "plan": "pro",
+  "desc": "Add a new lead testing2",
+  "associates": {
+    "associates_name": "John Doe",
+    "associates_No": 123456789
+  },
+  "__v": 0
+}]

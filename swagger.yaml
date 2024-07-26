@@ -1,0 +1,225 @@
+openapi: 3.0.0
+info:
+  title: Adviser Management API
+  version: 1.0.0
+  description: API documentation for Adviser Management
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: []
+
+paths:
+  /:
+    get:
+      tags:
+        - Home
+      description: Home Page
+      responses:
+        '200':
+          description: Home Page
+        '401':
+          description: Unauthorized
+
+  /adviser/:
+    get:
+      tags:
+        - Adviser API
+      description: Get all advisers
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+  /adviser/getSearchedadviser:
+    post:
+      tags:
+        - Adviser API
+      description: Search for advisers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                search:
+                  type: string
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+  /adviser/login:
+    post:
+      tags:
+        - Adviser API
+      description: Adviser login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email_id:
+                  type: string
+                Password:
+                  type: string
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+  /adviser/register:
+    post:
+      tags:
+        - Adviser API
+      description: Register a new adviser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Adviser_code:
+                  type: string
+                Adviser_name:
+                  type: string
+                email_id:
+                  type: string
+                mobile_no:
+                  type: number
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+  /adviser/update/{id}:
+    patch:
+      tags:
+        - Adviser API
+      description: Update an adviser
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Adviser_name:
+                  type: string
+                email_id:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+  /adviser/delete/{id}:
+    delete:
+      tags:
+        - Adviser API
+      description: Delete an adviser
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+        '404':
+          description: Adviser not found
+        '500':
+          description: Internal server error
+
+  /lead/addLead:
+    post:
+      tags:
+        - Lead API
+      description: Add a new lead
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Adviser:
+                  type: string
+                lead_name:
+                  type: string
+                mobile_no:
+                  type: number
+                email_id:
+                  type: string
+                plan:
+                  type: string
+                desc:
+                  type: string
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+  /lead/getLeadsByAdviser/{adviserId}:
+    get:
+      tags:
+        - Lead API
+      description: Get leads by adviser
+      parameters:
+        - in: path
+          name: adviserId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+        '404':
+          description: No leads found
+        '500':
+          description: Internal server error
+
+  /lead/getAdditionalData/{leadId}:
+    get:
+      tags:
+        - Lead API
+      description: Get additional data for a lead
+      parameters:
+        - in: path
+          name: leadId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+        '404':
+          description: No additional data found
+        '500':
+          description: Internal server error
