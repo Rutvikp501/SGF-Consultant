@@ -1,44 +1,48 @@
 
 const jwt = require('jsonwebtoken');
-const AdviserModel = require('../models/adviser.models');
+const UserModel = require('../models/user.models');
+const { calculateCycle, parseDate } = require('../helpers/sample');
+const { SendOTP } = require('../helpers/email');
 const token = process.env.token
 
 
-exports.GetAllAdviser = async (req, res) => {
+exports.GetAllUser = async (req, res) => {
     try {
-        const Adviser  = await AdviserModel.find();
-        if (Adviser.length>0){
-        res.status(200).send(Adviser)
+        const User  = await UserModel.find();
+        if (User.length>0){
+        res.status(200).send(User)
         }else{
-        res.status(200).send("Dont have Advisers To Show...")
+        res.status(200).send("Dont have Users To Show...")
         }
     } catch (error) {
         console.log(error);
     }
 };
 
-exports.GetSearchedAdviser = async (req, res,next) => {
+exports.GetSearchedUser = async (req, res,next) => {
     try {
         const params = req.body || '';
+        console.log(params);
         const searchParam = params.search;
         const filter = {};
 
         if (searchParam) {
             filter.$or = [
-                { Adviser_code: { $regex: searchParam, $options: 'i' } }, // Case-insensitive search
-                { Adviser_name: { $regex: searchParam, $options: 'i' } }
+                { code: { $regex: searchParam, $options: 'i' } }, // Case-insensitive search
+                { name: { $regex: searchParam, $options: 'i' } },
+                { email_id: { $regex: searchParam, $options: 'i' } }
             ];
         }
 
-        const AllSearchedAdviser = await AdviserModel.aggregate([
+        const AllSearchedUser = await UserModel.aggregate([
             { $match: filter },
             {
                 $addFields: {
-                    name: { $concat: ["$Adviser_name", " - ", "$email_id"] },
-                    value: "$Adviser_name"
+                    name: { $concat: ["$name", " - ", "$email_id"] },
+                    value: "$name"
                 }
             },
-            { $unset: ["Adviser_name", "email_id"] }, // Remove original fields if needed
+            { $unset: ["name", "email_id"] }, // Remove original fields if needed
             {
                 $project: {
                     _id: 0,
@@ -48,7 +52,7 @@ exports.GetSearchedAdviser = async (req, res,next) => {
             }
         ]);
 
-        return res.status(200).json(AllSearchedAdviser);
+        return res.status(200).json(AllSearchedUser);
     } catch (error) {
         console.log(error);
         next(error);
@@ -57,32 +61,33 @@ exports.GetSearchedAdviser = async (req, res,next) => {
 
 exports.Login = async (req, res) => {
     let {email_id,password}=req.body;
-    const Adviser  = await AdviserModel.find({email_id});
-    console.log(Adviser);
-    var getData = JSON.stringify(Adviser);
+    const User  = await UserModel.find({email_id});
+    console.log(User);
+    var getData = JSON.stringify(User);
     var data = JSON.parse(getData);
     console.log(req.body);
     try{
-        if (Adviser.length>0){
+        if (User.length>0){
             const pass = data[0]["password"];
             console.log(pass);
             // let npass = Enc_Dec.DecryptPass(pass);            
                 if (password == pass){
-                    let keyToken= jwt.sign({AdviserId:Adviser[0]._id},token)//setting up a token using the '_id' in Adviser model
+                    let keyToken= jwt.sign({UserId:User[0]._id},token)//setting up a token using the '_id' in User model
                     data={
                         keyToken:keyToken,
-                        Adviser_code:Adviser[0].Adviser_code,
-                        Adviser_name:Adviser[0].Adviser_name,
-                        email_id:Adviser[0].email_id
+                        User_code:User[0].User_code,
+                        User_name:User[0].User_name,
+                        email_id:User[0].email_id
                     }
                     console.log(data);
                     res.send(data)
+                    res.redirect('/dashboard');
                 }else{
                     res.status(500).send("Enter Valid Password ")
                 }    
         }
         else{
-            res.status(500).send("Adviser not found ...!")
+            res.status(500).send("User not found ...!")
         }
     }catch(error){
         console.log(error);
@@ -91,28 +96,37 @@ exports.Login = async (req, res) => {
 };
 
 exports.Register = async (req, res) => {
-    const {Adviser_code, Adviser_name , email_id ,mobile_no,password }=req.body
-    const getExistingAdviser = await AdviserModel.find({ email_id: email_id });   
+    const {User_code, User_name , email_id ,mobile_no,password,dateOfJoining ,isAdmin }=req.body
+    const getExistingUser = await UserModel.find({ email_id: email_id });  
+    const duplicatecode = await UserModel.find({ code: User_code });  
     // const valid = validatePassword(Password)
     // if(valid){
     //     return res.status(400).send({message:valid[0]})
     // }
+         if(duplicatecode!=""){
+         return res.status(400).send({status: "failed", message: "Consultant code already exist." })
+     }
     try{
-
-        if (getExistingAdviser != "") {
+        if (getExistingUser != "") {
             return res.send({ status: "failed", message: "Email already exist." });
           }else{
             // console.log("Password",Password);
             //     var Encpass = Enc_Dec.EncryptPass(Password);
-                const Adviser = new AdviserModel({
-                    Adviser_code:Adviser_code,
-                    Adviser_name:Adviser_name,
+            const date = parseDate(dateOfJoining);
+
+            const {cycleLabel,cycleNumber} = calculateCycle(date);
+                const User = new UserModel({
+                    code:User_code,
+                    name:User_name,
                     email_id:email_id,
                     mobile_no:mobile_no,
-                    password:password
-                })//the password from the body and hashed password is different
-                await Adviser.save();
-                res.send("Adviser Registered Successfully");          
+                    isAdmin:isAdmin,
+                    password:password,
+                    dateOfJoining: date,  // Month of joining
+                    cycle: {label: cycleLabel,number:cycleNumber},
+                })
+                await User.save();
+                res.send("User Registered Successfully");          
             }
         
     
@@ -122,11 +136,10 @@ exports.Register = async (req, res) => {
     }
 };
 
-
 exports.Edit = async (req, res) => {
     const { id } = request.body;
     try {
-      const result = await AdviserModel.findById(id);
+      const result = await UserModel.findById(id);
       response.send({
         status: "success",
         data: result,
@@ -136,27 +149,26 @@ exports.Edit = async (req, res) => {
     }
 };
 
-
 exports.Update = async (req, res) => {
-    const {Password, Adviser_name , email_id }=req.body
-    const getExistingAdviser = await AdviserModel.find({ email_id: email_id });   
-    // console.log(getExistingAdviser);
+    const {Password, User_name , email_id }=req.body
+    const getExistingUser = await UserModel.find({ email_id: email_id });   
+    // console.log(getExistingUser);
     const valid = validatePassword(Password)
     if(valid){
         return res.status(400).send({message:valid[0]})
     }
     try{
        
-        if (getExistingAdviser != "") {
+        if (getExistingUser != "") {
             return res.send({ status: "failed", message: "Email already exist." });
           }else{
                 // var Encpass = Enc_Dec.EncryptPass(Password);
-                const Adviser = new AdviserModel({
+                const User = new UserModel({
                     Password:Password,
-                    Adviser_name:Adviser_name,
+                    User_name:User_name,
                     email_id:email_id})//the password from the body and hashed password is different
-                await Adviser.save();
-                res.send("Adviser Updated Successfully");          
+                await User.save();
+                res.send("User Updated Successfully");          
             }
     
     
@@ -169,13 +181,13 @@ exports.Update = async (req, res) => {
 exports.Delete = async (req, res) => {
     console.log(req.params.id);
     try {
-        let Adviser = await AdviserModel.findById(req.params.id);
-        console.log(Adviser); // Check what Adviser object is returned
-        if (!Adviser) {
-            return res.status(404).json({ message: 'Adviser not found' });
+        let User = await UserModel.findById(req.params.id);
+        console.log(User); // Check what User object is returned
+        if (!User) {
+            return res.status(404).json({ message: 'User not found' });
         }
-        let delete1 = await AdviserModel.findByIdAndDelete({_id:req.params.id});
-        res.status(200).json({ message: 'Adviser deleted' });
+        let delete1 = await UserModel.findByIdAndDelete({_id:req.params.id});
+        res.status(200).json({ message: 'User deleted' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: error.message });
@@ -198,3 +210,59 @@ exports.Logout = async (req, res) => {
     });
 }
 
+exports.forgotPassword = async (req, res) => {
+    const { email_id } = req.body;
+    try {
+      const user = await UserModel.findOne({ email_id });
+      if (!user) {
+        return res.status(400).send({ message: 'No user found with that email address.' });
+      }
+  
+      // Generate OTP and set expiration
+      const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+      user.otp = otp;
+      user.otpExpires = Date.now() + 3600000; // 1 hour expiration
+  
+      await user.save();
+  
+      // Send the OTP via email
+      const OTPMail = await SendOTP(user.email_id,otp)
+
+  
+      res.status(200).send({ message: 'OTP sent to your email.' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: 'Error sending OTP.' });
+    }
+  };
+
+exports.resetPassword = async (req, res) => {
+  const { otp,email_id,newPassword } = req.body;
+    // const valid = validatePassword(Password)
+    // if(valid){
+    //     return res.status(400).send({message:valid[0]})
+    // }
+  try {
+    const user = await UserModel.findOne({
+      email_id,
+      otp,
+      otpExpires: { $gt: Date.now() } // Check if OTP is valid and not expired
+    });
+
+    if (!user) {
+      return res.status(400).send({ message: 'OTP is invalid or has expired.' });
+    }
+// console.log("Password",Password);
+            //     var Encpass = Enc_Dec.EncryptPass(Password)
+      user.password = newPassword;
+      user.otp = undefined;
+      user.otpExpires = undefined;
+
+      await user.save();
+      res.status(200).send({ message: 'Password has been updated.' });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Error resetting password.' });
+  }
+};

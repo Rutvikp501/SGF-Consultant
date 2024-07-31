@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
-  title: Adviser Management API
+  title: User Management API
   version: 1.0.0
-  description: API documentation for Adviser Management
+  description: API documentation for User Management and Lead Management
 
 components:
   securitySchemes:
@@ -26,22 +26,22 @@ paths:
         '401':
           description: Unauthorized
 
-  /adviser/:
+  /user/:
     get:
       tags:
-        - Adviser API
-      description: Get all advisers
+        - User API
+      description: Get all users
       responses:
         '200':
           description: Success
         '400':
           description: Bad Request
 
-  /adviser/getSearchedadviser:
+  /user/getSearcheduser:
     post:
       tags:
-        - Adviser API
-      description: Search for advisers
+        - User API
+      description: Search for users
       requestBody:
         required: true
         content:
@@ -57,11 +57,11 @@ paths:
         '400':
           description: Bad Request
 
-  /adviser/login:
+  /user/login:
     post:
       tags:
-        - Adviser API
-      description: Adviser login
+        - User API
+      description: User login
       requestBody:
         required: true
         content:
@@ -71,34 +71,6 @@ paths:
               properties:
                 email_id:
                   type: string
-                Password:
-                  type: string
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad Request
-
-  /adviser/register:
-    post:
-      tags:
-        - Adviser API
-      description: Register a new adviser
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                Adviser_code:
-                  type: string
-                Adviser_name:
-                  type: string
-                email_id:
-                  type: string
-                mobile_no:
-                  type: number
                 password:
                   type: string
       responses:
@@ -107,11 +79,43 @@ paths:
         '400':
           description: Bad Request
 
-  /adviser/update/{id}:
+  /user/register:
+    post:
+      tags:
+        - User API
+      description: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                User_code:
+                  type: string
+                User_name:
+                  type: string
+                email_id:
+                  type: string
+                mobile_no:
+                  type: number
+                password:
+                  type: string
+                isAdmin:
+                  type: boolean
+                dateOfJoining:
+                  type: string
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+  /user/update/{id}:
     patch:
       tags:
-        - Adviser API
-      description: Update an adviser
+        - User API
+      description: Update a user
       parameters:
         - in: path
           name: id
@@ -125,7 +129,7 @@ paths:
             schema:
               type: object
               properties:
-                Adviser_name:
+                User_name:
                   type: string
                 email_id:
                   type: string
@@ -137,11 +141,11 @@ paths:
         '400':
           description: Bad Request
 
-  /adviser/delete/{id}:
+  /user/delete/{id}:
     delete:
       tags:
-        - Adviser API
-      description: Delete an adviser
+        - User API
+      description: Delete a user
       parameters:
         - in: path
           name: id
@@ -152,9 +156,54 @@ paths:
         '200':
           description: Success
         '404':
-          description: Adviser not found
+          description: User not found
         '500':
           description: Internal server error
+
+  /user/forgotPassword:
+    post:
+      tags:
+        - User API
+      description: User forgotPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email_id:
+                  type: string
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+  /user/resetPassword:
+    post:
+      tags:
+        - User API
+      description: User resetPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email_id:
+                  type: string
+                otp:
+                  type: string
+                newPassword:
+                  type: string
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
 
   /lead/addLead:
     post:
@@ -170,30 +219,49 @@ paths:
               properties:
                 Adviser:
                   type: string
-                lead_name:
+                name:
                   type: string
-                mobile_no:
+                email:
+                  type: string
+                phone:
+                  type: string
+                eventName:
+                  type: string
+                eventDate:
+                  type: string
+                  format: date
+                eventLocation:
+                  type: string
+                pincode:
+                  type: string
+                eventSpecialsName:
+                  type: string
+                specialCode:
+                  type: string
+                leadType:
+                  type: string
+                status:
+                  type: string
+                  enum: ['Pending', 'Converted', 'Junk']
+                cycle:
                   type: number
-                email_id:
+                conversionDate:
                   type: string
-                plan:
-                  type: string
-                desc:
-                  type: string
+                  format: date
       responses:
         '200':
           description: Success
         '400':
           description: Bad Request
 
-  /lead/getLeadsByAdviser/{adviserId}:
+  /lead/getLeadsByuser/{userId}:
     get:
       tags:
         - Lead API
-      description: Get leads by adviser
+      description: Get leads by user
       parameters:
         - in: path
-          name: adviserId
+          name: userId
           required: true
           schema:
             type: string

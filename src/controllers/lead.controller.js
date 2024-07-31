@@ -1,24 +1,28 @@
 const LeadModel = require('../models/lead.models');
-const AdviserModel = require('../models/adviser.models');
+const AdviserModel = require('../models/user.models');
 
 exports.addLead = async (req, res) => {
-    const { Adviser, lead_name, mobile_no, email_id, plan, desc, associates } = req.body;
+    const {
+        consultant, name, email, phone, eventName, eventDate,eventLocation,pincode,eventSpecialsName,specialCode,leadType,status,cycle,conversionDate} = req.body;
     
     try {
-        // Simulate external API call to get associates details
-        const apiResponse = { associates_name: 'John Doe', associates_No: 123456789 };
 
         const lead = new LeadModel({
-            Adviser,
-            lead_name,
-            mobile_no,
-            email_id,
-            plan,
-            desc,
-            associates: {
-                associates_name: apiResponse.associates_name,
-                associates_No: apiResponse.associates_No
-            }
+            consultant:consultant,
+            name:name,
+            email:email,
+            phone:phone,
+            eventName:eventName,
+            eventDate:eventDate,
+            eventLocation:eventLocation,
+            pincode:pincode,
+            eventSpecialsName:eventSpecialsName,
+            specialCode:specialCode,
+            leadType:leadType,
+            status:status,
+            leadID:leadID,
+            cycle:cycle,
+            conversionDate:conversionDate,
         });
 
         await lead.save();
