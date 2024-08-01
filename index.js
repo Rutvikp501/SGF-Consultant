@@ -38,3 +38,11 @@ app.listen(PORT,()=>{
         console.log(e);
     }
 })
+
+// PORT = 3333 
+// DB_URL='mongodb+srv://patilrutvik501:patilrutvik501@smallprojects.1bzonhg.mongodb.net/'
+// token="R@U#V$I%K&",
+// USERS=rutvik.gainn@gmail.com
+// APP_PASS=uxzc tuzs dlkq awvw
+// RUTVIK=patilrutvik501@gmail.com
+// RAPP_PASS=mnzt tvan wirp byum

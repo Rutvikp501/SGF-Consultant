@@ -113,7 +113,6 @@ exports.Register = async (req, res) => {
             // console.log("Password",Password);
             //     var Encpass = Enc_Dec.EncryptPass(Password);
             const date = parseDate(dateOfJoining);
-
             const {cycleLabel,cycleNumber} = calculateCycle(date);
                 const User = new UserModel({
                     code:User_code,
@@ -122,8 +121,8 @@ exports.Register = async (req, res) => {
                     mobile_no:mobile_no,
                     isAdmin:isAdmin,
                     password:password,
-                    dateOfJoining: date,  // Month of joining
-                    cycle: {label: cycleLabel,number:cycleNumber},
+                    dateOfJoining: date,
+                    currentcycle: {label: cycleLabel,number:cycleNumber},
                 })
                 await User.save();
                 res.send("User Registered Successfully");          
