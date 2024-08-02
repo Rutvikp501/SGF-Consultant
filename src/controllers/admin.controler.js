@@ -10,9 +10,17 @@ exports.GetAllUser = async (req, res) => {
     try {
         const User  = await UserModel.find();
         if (User.length>0){
-        res.status(200).send(User)
+        res.send({
+            success: true,
+            statusCode: 200,
+            data:User
+        })
         }else{
-        res.status(200).send("Dont have Users To Show...")
+        res.send({
+            success: false,
+            statusCode: 200,
+            message:"Dont have Users To Show..."
+        })
         }
     } catch (error) {
         console.log(error);
@@ -104,11 +112,11 @@ exports.Register = async (req, res) => {
     //     return res.status(400).send({message:valid[0]})
     // }
          if(duplicatecode!=""){
-         return res.status(400).send({status: "failed", message: "Consultant code already exist." })
+         return res.status(400).send({success: "failed", message: "Consultant code already exist." })
      }
     try{
         if (getExistingUser != "") {
-            return res.send({ status: "failed", message: "Email already exist." });
+            return res.send({ success: "failed", message: "Email already exist." });
           }else{
             // console.log("Password",Password);
             //     var Encpass = Enc_Dec.EncryptPass(Password);
@@ -140,7 +148,7 @@ exports.Edit = async (req, res) => {
     try {
       const result = await UserModel.findById(id);
       response.send({
-        status: "success",
+        success: "success",
         data: result,
       });
     } catch (error) {
@@ -159,7 +167,7 @@ exports.Update = async (req, res) => {
     try{
        
         if (getExistingUser != "") {
-            return res.send({ status: "failed", message: "Email already exist." });
+            return res.send({ success: "failed", message: "Email already exist." });
           }else{
                 // var Encpass = Enc_Dec.EncryptPass(Password);
                 const User = new UserModel({
@@ -211,10 +219,15 @@ exports.Logout = async (req, res) => {
 
 exports.forgotPassword = async (req, res) => {
     const { email_id } = req.body;
+    console.log(email_id);
     try {
       const user = await UserModel.findOne({ email_id });
-      if (!user) {
-        return res.status(400).send({ message: 'No user found with that email address.' });
+      if (!user) { 
+        return res.send({
+            success: false,
+            statusCode: 500,
+            message:"No user found with that email address."
+        });
       }
   
       // Generate OTP and set expiration
@@ -226,12 +239,18 @@ exports.forgotPassword = async (req, res) => {
   
       // Send the OTP via email
       const OTPMail = await SendOTP(user.email_id,otp)
-
-  
-      res.status(200).send({ message: 'OTP sent to your email.' });
+      res.send({
+        success: true,
+        statusCode: 200,
+        message: 'OTP sent to your email.'
+    });
     } catch (error) {
       console.error(error);
-      res.status(500).send({ message: 'Error sending OTP.' });
+      res.send({
+        success: false,
+        statusCode: 500,
+        message:'Error sending OTP.'
+    });
     }
   };
 
@@ -257,7 +276,7 @@ exports.resetPassword = async (req, res) => {
       user.otp = undefined;
       user.otpExpires = undefined;
 
-      await user.save();
+      //await user.save();
       res.status(200).send({ message: 'Password has been updated.' });
 
   } catch (error) {

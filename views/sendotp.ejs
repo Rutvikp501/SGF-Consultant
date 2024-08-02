@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Password</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: url(https://i.postimg.cc/nV7VBMYW/bg.jpg) no-repeat;
+            background-size: cover;
+            background-position: center;
+        }
+        .wrapper {
+            width: 420px;
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, .1);
+            backdrop-filter: blur(10px);
+            color: #fff;
+            border-radius: 10px;
+            padding: 30px 40px;
+        }
+        .wrapper h1 {
+            font-size: 36px;
+            text-align: center;
+        }
+        .input-box {
+            position: relative;
+            width: 100%;
+            height: 50px;
+            margin: 30px 0;
+        }
+        .input-box input {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            border: 2px solid rgba(255, 255, 255, .2);
+            border-radius: 40px;
+            font-size: 16px;
+            color: #fff;
+            padding: 20px 45px 20px 20px;
+        }
+        .input-box input::placeholder {
+            color: #fff;
+        }
+        .input-box box-icon {
+            position: absolute;
+            right: 20px;
+            top: 30%;
+            transform: translate(-50%);
+            font-size: 20px;
+        }
+        .btn {
+            width: 100%;
+            height: 45px;
+            background: #fff;
+            border: none;
+            outline: none;
+            border-radius: 40px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+            cursor: pointer;
+            font-size: 20px;
+            color: #333;
+            font-weight: 600;
+        }
+        .btn:disabled {
+            background-color: #aaa;
+        }
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .customNotification {
+            display: none;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            color: white;
+        }
+        .customNotification-p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <form id="reset-form">
+            <h1>Reset Password</h1>
+            <div class="input-box">
+                <input type="text" id="email" placeholder="Email" required>
+                <box-icon type='solid' name='user'></box-icon>
+            </div>
+            <button type="submit" id="send-otp-btn" class="btn" onclick=SendOTP()>Send OTP</button>
+        </form>
+        <form id="otp-form" style="display:none;">
+            <div class="input-box">
+                <input type="text" id="otp" placeholder="Enter OTP" required>
+                <box-icon type='solid' name='lock'></box-icon>
+            </div>
+            <div class="input-box">
+                <input type="password" id="new-password" placeholder="New Password" required>
+                <box-icon name='lock-alt' type='solid'></box-icon>
+            </div>
+            <div class="input-box">
+                <input type="password" id="confirm-password" placeholder="Confirm New Password" required>
+                <box-icon name='lock-alt' type='solid'></box-icon>
+            </div>
+            <button type="submit" id="reset-password-btn" class="btn" onclick=resetPassword()>Reset Password</button>
+        </form>
+        <div class="register-link">
+            <p><a href="/home">Remember Password?</a></p>
+        </div>
+        <div class="customNotification">
+            <p class="customNotification-p">Processing</p>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+    <script>
+function SendOTP() {
+    var email = document.getElementById('email').value;
+    let formdata = {
+        email_id: email
+    }
+    $.ajax({
+        url: "/user/forgotPassword",
+        method: "POST",
+        data: formdata,
+        dataType: 'json',
+        success: function (result) {
+            if (result.success === false) {
+                $('.customNotification').css({ 'background-color': '#F84F4F', 'border': 'none' });
+                document.querySelector('.customNotification-p').innerText = result.message;
+                $('.customNotification').show();
+                document.getElementById('send-otp-btn').disabled = false;
+                document.getElementById('send-otp-btn').innerText = 'Send OTP';
+            } else {
+                $('.customNotification').css({ 'background-color': '#26c281', 'border': '2px solid #1e9563' });
+                document.querySelector('.customNotification-p').innerText = 'Mail sent successfully';
+                $('.customNotification').show();
+                document.getElementById('send-otp-btn').disabled = true;
+                document.getElementById('send-otp-btn').innerText = 'Sending...';
+                setTimeout(function() {
+                    document.getElementById('reset-form').style.display = 'none';
+                    document.getElementById('otp-form').style.display = 'block';
+                }, 2000);
+            }
+            setTimeout(() => {
+                $('.customNotification').hide();
+                document.querySelector('.customNotification-p').innerText = 'Processing';
+            }, 2000);
+        },
+        error: function (error) {
+            console.log(error.responseText);
+            $('.customNotification').css({ 'background-color': '#F84F4F', 'border': 'none' });
+            document.querySelector('.customNotification-p').innerText = error.responseJSON.message || 'An error occurred. Please try again.';
+            $('.customNotification').show();
+            document.getElementById('send-otp-btn').disabled = false;
+            document.getElementById('send-otp-btn').innerText = 'Send OTP';
+            setTimeout(() => {
+                $('.customNotification').hide();
+                document.querySelector('.customNotification-p').innerText = 'Processing';
+            }, 2000);
+        }
+    });
+}
+
+document.getElementById('reset-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    document.getElementById('send-otp-btn').disabled = true;
+    document.getElementById('send-otp-btn').innerText = 'Sending...';
+    SendOTP();
+});
+
+document.getElementById('otp-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    var otp = document.getElementById('otp').value;
+    var newPassword = document.getElementById('new-password').value;
+    var confirmPassword = document.getElementById('confirm-password').value;
+
+    if (newPassword !== confirmPassword) {
+        alert('Passwords do not match!');
+        return;
+    }
+
+    // Simulate an API call to verify OTP and reset password
+    setTimeout(function() {
+        alert('Password reset successful!');
+        window.location.href = '/login';
+    }, 2000);
+});
+    </script>
+
+<script>
+    function resetPassword() {
+    var email = document.getElementById('email').value;
+    var otp = document.getElementById('otp').value;
+    var newPassword = document.getElementById('new-password').value;
+    var confirmPassword = document.getElementById('confirm-password').value;
+
+    if (newPassword !== confirmPassword) {
+        alert('Passwords do not match!');
+        return;
+    }
+
+    document.getElementById('reset-password-btn').disabled = true;
+    document.getElementById('reset-password-btn').innerText = 'Resetting...';
+
+    $.ajax({
+        url: '/user/resetPassword', // Update this URL to your actual reset password endpoint
+        method: 'POST',
+        data: {
+            email_id: email,
+            otp: otp,
+            newPassword: newPassword
+        },
+        dataType: 'json',
+        success: function(result) {
+            if (result.success === false) {
+                $('.customNotification').css({ 'background-color': '#F84F4F', 'border': 'none' });
+                document.querySelector('.customNotification-p').innerText = result.message;
+                $('.customNotification').show();
+                document.getElementById('reset-password-btn').disabled = false;
+                document.getElementById('reset-password-btn').innerText = 'Reset Password';
+            } else {
+                $('.customNotification').css({ 'background-color': '#26c281', 'border': '2px solid #1e9563' });
+                document.querySelector('.customNotification-p').innerText = 'Password reset successful!';
+                $('.customNotification').show();
+                setTimeout(function() {
+                    window.location.href = '/home';
+                }, 2000);
+            }
+        },
+        error: function(error) {
+            console.log(error.responseText);
+            $('.customNotification').css({ 'background-color': '#F84F4F', 'border': 'none' });
+            document.querySelector('.customNotification-p').innerText = 'An error occurred. Please try again.';
+            $('.customNotification').show();
+            document.getElementById('reset-password-btn').disabled = false;
+            document.getElementById('reset-password-btn').innerText = 'Reset Password';
+        }
+    });
+}
+
+</script>
+</body>
+</html>

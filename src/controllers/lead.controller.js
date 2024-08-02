@@ -59,19 +59,46 @@ exports.addLead = async (req, res) => {
     }
 };
 
-exports.getLeadsByAdviser = async (req, res) => {
-    const { adviserId } = req.params;
+exports.getAllLeads = async (req, res) => {
 
     try {
-        const leads = await LeadModel.find({ Adviser: adviserId });
+        const leads = await LeadModel.find();
         if (!leads.length) {
-            return res.status(404).send({ message: 'No leads found for this adviser' });
+            return res.status(404).send({ message: 'No leads found ' });
         }
         res.status(200).send(leads);
     } catch (error) {
         console.error(error);
         res.status(500).send({ message: 'Internal server error' });
     }
+};
+
+exports.getLeadsByAdviser = async (req, res) => {
+    try {
+        const params = req.body || '';
+        const searchParam = params.search;
+        const filter = {};
+    
+        if (searchParam) {
+          filter.$or = [
+            { consultant_code: { $regex: searchParam, $options: 'i' } },
+            { leadID: { $regex: searchParam, $options: 'i' } },
+            { email: { $regex: searchParam, $options: 'i' } },
+            { leadType: { $regex: searchParam, $options: 'i' } },
+            { pincode: { $regex: searchParam, $options: 'i' } },
+            { status: { $regex: searchParam, $options: 'i' } }
+          ];
+        }
+    
+        const allSearchedLeads = await LeadModel.aggregate([
+          { $match: filter }
+        ]);
+    
+        return res.status(200).json(allSearchedLeads);
+      } catch (error) {
+        console.log(error);
+        next(error);
+      }
 };
 
 exports.getAdditionalData = async (req, res) => {

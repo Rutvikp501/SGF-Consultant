@@ -1,8 +1,11 @@
 const express = require('express');
 const router = express.Router();
 
-router.get('/', (req, res) => {
-    res.render('login',);
+router.get('/home', (req, res) => {
+    res.render('loginpage',);
+});
+router.get('/sendotp', (req, res) => {
+    res.render('sendotp',);
 });
 
 router.post('/login', (req, res) => {
@@ -22,7 +25,8 @@ router.get('/dashboard', (req, res) => {
     // if (!req.session.role) {
     //     return res.redirect('/');
     // }
-    res.render('dashboard', { role: req.session.role });
+   // res.render('dashboard', { role: req.session.role });
+    res.render('dashboard', );
 });
 
 // Consultants route

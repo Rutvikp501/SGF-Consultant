@@ -254,24 +254,39 @@ paths:
         '400':
           description: Bad Request
 
-  /lead/getLeadsByuser/{userId}:
+  /lead/getAllLeads:
     get:
       tags:
         - Lead API
-      description: Get leads by user
-      parameters:
-        - in: path
-          name: userId
-          required: true
-          schema:
-            type: string
+      description: Get all leads
       responses:
         '200':
           description: Success
-        '404':
-          description: No leads found
-        '500':
-          description: Internal server error
+        '400':
+          description: Bad Request
+
+  /lead/getSearchedLeads:
+    post:
+      tags:
+        - Lead API
+      description:  Get leads by Search  
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                search:
+                  type: string
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+
+
 
   /lead/getAdditionalData/{leadId}:
     get:
