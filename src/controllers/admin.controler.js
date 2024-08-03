@@ -70,37 +70,47 @@ exports.GetSearchedUser = async (req, res,next) => {
 exports.Login = async (req, res) => {
     let {email_id,password}=req.body;
     const User  = await UserModel.find({email_id});
-    console.log(User);
     var getData = JSON.stringify(User);
     var data = JSON.parse(getData);
-    console.log(req.body);
     try{
         if (User.length>0){
             const pass = data[0]["password"];
-            console.log(pass);
             // let npass = Enc_Dec.DecryptPass(pass);            
                 if (password == pass){
                     let keyToken= jwt.sign({UserId:User[0]._id},token)//setting up a token using the '_id' in User model
                     data={
                         keyToken:keyToken,
-                        User_code:User[0].User_code,
-                        User_name:User[0].User_name,
+                        User_code:User[0].code,
+                        User_name:User[0].name,
                         email_id:User[0].email_id
                     }
-                    console.log(data);
-                    res.send(data)
-                    res.redirect('/dashboard');
+                    res.send({
+                        success: true,
+                        statusCode: 200,
+                        data:data
+                    })
                 }else{
-                    res.status(500).send("Enter Valid Password ")
+                    res.send({
+                        success: false,
+                        statusCode: 500,
+                        message:`Enter Valid Password `
+                    })
                 }    
         }
         else{
-            res.status(500).send("User not found ...!")
+            res.send({
+                success: false,
+                statusCode: 500,
+                message:`User not found ...!`
+            })
         }
     }catch(error){
         console.log(error);
-        res.status(500).send("invalid Credentials3 ")
-    }
+        res.send({
+            success: false,
+            statusCode: 500,
+            message:`invalid Credentials3 `
+    })}
 };
 
 exports.Register = async (req, res) => {
@@ -133,13 +143,21 @@ exports.Register = async (req, res) => {
                     currentcycle: {label: cycleLabel,number:cycleNumber},
                 })
                 await User.save();
-                res.send("User Registered Successfully");          
+                res.send({
+                    success: true,
+                    statusCode: 200,
+                    message:"User Registered Successfully"
+                })       
             }
         
     
     }catch(err){
         console.log(err);
-        res.send("Error...");
+        res.send({
+            success: false,
+            statusCode: 500,
+            message:"Error"
+        });
     }
 };
 
@@ -175,7 +193,9 @@ exports.Update = async (req, res) => {
                     User_name:User_name,
                     email_id:email_id})//the password from the body and hashed password is different
                 await User.save();
-                res.send("User Updated Successfully");          
+                res.send({success: false,
+                    statusCode: 500,
+                    message:"User Updated Successfully"});          
             }
     
     
