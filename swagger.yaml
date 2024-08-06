@@ -26,7 +26,7 @@ paths:
         '401':
           description: Unauthorized
 
-  /api/user/:
+  /api/adminapi/:
     get:
       tags:
         - User API
@@ -37,7 +37,7 @@ paths:
         '400':
           description: Bad Request
 
-  /api/user/getSearcheduser:
+  /api/adminapi/getSearcheduser:
     post:
       tags:
         - User API
@@ -57,7 +57,7 @@ paths:
         '400':
           description: Bad Request
 
-  /api/user/login:
+  /api/adminapi/login:
     post:
       tags:
         - User API
@@ -79,7 +79,7 @@ paths:
         '400':
           description: Bad Request
 
-  /api/user/register:
+  /api/adminapi/register:
     post:
       tags:
         - User API
@@ -111,7 +111,7 @@ paths:
         '400':
           description: Bad Request
 
-  /api/user/update/{id}:
+  /api/adminapi/update/{id}:
     patch:
       tags:
         - User API
@@ -141,7 +141,7 @@ paths:
         '400':
           description: Bad Request
 
-  /api/user/delete/{id}:
+  /api/adminapi/delete/{id}:
     delete:
       tags:
         - User API
@@ -160,7 +160,7 @@ paths:
         '500':
           description: Internal server error
 
-  /api/user/forgotPassword:
+  /api/adminapi/forgotPassword:
     post:
       tags:
         - User API
@@ -180,7 +180,7 @@ paths:
         '400':
           description: Bad Request
 
-  /api/user/resetPassword:
+  /api/adminapi/resetPassword:
     post:
       tags:
         - User API
@@ -205,7 +205,7 @@ paths:
           description: Bad Request
 
 
-  /api/lead/addLead:
+  /api/leadapi/addLead:
     post:
       tags:
         - Lead API
@@ -254,7 +254,7 @@ paths:
         '400':
           description: Bad Request
 
-  /api/lead/getAllLeads:
+  /api/leadapi/getAllLeads:
     get:
       tags:
         - Lead API
@@ -265,7 +265,7 @@ paths:
         '400':
           description: Bad Request
 
-  /api/lead/getSearchedLeads:
+  /api/leadapi/getSearchedLeads:
     post:
       tags:
         - Lead API
@@ -288,7 +288,7 @@ paths:
 
 
 
-  /api/lead/getAdditionalData/{leadId}:
+  /api/leadapi/getAdditionalData/{leadId}:
     get:
       tags:
         - Lead API
