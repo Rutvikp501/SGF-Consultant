@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const middleware = require("../middleware/index.js");
-const User = require("../models/user.models.js");
+const User = require("../models/user.js");
 const LeadModel = require("../models/lead.models.js");
 const { calculateCycle, calculateLeadCycle, generateLeadID } = require("../helpers/sample.js");
 

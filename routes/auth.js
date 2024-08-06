@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
-const User = require("../models/user.models.js");
+const User = require("../models/user.js");
 const passport = require("passport");
 const middleware = require("../middleware/index.js")
 

@@ -1,0 +1,41 @@
+<main>
+	<%- include('../partials/agentSidebar') %>
+	
+	<div id="main-wrapper">
+		
+		<div class="bg-white shadow-sm p-3">
+			<span class="me-3" id="sidebar-toggler-btn"><i class="fas fa-bars"></i></span>
+			<h5 class="m-0 color-theme d-inline-block">Previous Collections</h5>
+		</div>
+		
+		<div class="col col-sm-10 col-12 m-auto my-4" style="max-height: 75%; overflow: auto;">
+			<table class="table table-info table-striped table-hover m-0 bg-white">
+				<thead>
+					<tr>
+						<th scope="col">Lead ID</th>
+						<th scope="col">consultant code</th>
+						<th scope="col">Name</th>
+						<th scope="col">Type</th>
+						<th scope="col">Event Location</th>
+						<th scope="col">Status</th>
+						<th scope="col">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					<% for(let i=0; i<ConvertedLeads.length; i++) { %>
+						<tr>
+							<th scope="row"> <%= ConvertedLeads[i].leadID %> </th>
+							<td> <%= ConvertedLeads[i].consultant_code %> </td>
+							<td> <%= ConvertedLeads[i].name %> </td>
+							<td> <%= ConvertedLeads[i].leadType %> </td>
+							<td> <%= ConvertedLeads[i].eventLocation + " " + ConvertedLeads[i].pincode%> </td>
+							<td class="fw-bold text-<%= ConvertedLeads[i].status %>"> <%= ConvertedLeads[i].status %> </td>
+							<td><a href="/admin/Leads/view/<%= ConvertedLeads[i]._id %>" class="btn">View</a></td>
+						</tr>
+					<% } %>
+				</tbody>
+			</table>
+		</div>
+		
+	</div>
+</main>

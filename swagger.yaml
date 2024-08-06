@@ -26,7 +26,7 @@ paths:
         '401':
           description: Unauthorized
 
-  /user/:
+  /api/user/:
     get:
       tags:
         - User API
@@ -37,7 +37,7 @@ paths:
         '400':
           description: Bad Request
 
-  /user/getSearcheduser:
+  /api/user/getSearcheduser:
     post:
       tags:
         - User API
@@ -57,7 +57,7 @@ paths:
         '400':
           description: Bad Request
 
-  /user/login:
+  /api/user/login:
     post:
       tags:
         - User API
@@ -79,7 +79,7 @@ paths:
         '400':
           description: Bad Request
 
-  /user/register:
+  /api/user/register:
     post:
       tags:
         - User API
@@ -111,7 +111,7 @@ paths:
         '400':
           description: Bad Request
 
-  /user/update/{id}:
+  /api/user/update/{id}:
     patch:
       tags:
         - User API
@@ -141,7 +141,7 @@ paths:
         '400':
           description: Bad Request
 
-  /user/delete/{id}:
+  /api/user/delete/{id}:
     delete:
       tags:
         - User API
@@ -160,7 +160,7 @@ paths:
         '500':
           description: Internal server error
 
-  /user/forgotPassword:
+  /api/user/forgotPassword:
     post:
       tags:
         - User API
@@ -180,7 +180,7 @@ paths:
         '400':
           description: Bad Request
 
-  /user/resetPassword:
+  /api/user/resetPassword:
     post:
       tags:
         - User API
@@ -205,7 +205,7 @@ paths:
           description: Bad Request
 
 
-  /lead/addLead:
+  /api/lead/addLead:
     post:
       tags:
         - Lead API
@@ -254,7 +254,7 @@ paths:
         '400':
           description: Bad Request
 
-  /lead/getAllLeads:
+  /api/lead/getAllLeads:
     get:
       tags:
         - Lead API
@@ -265,7 +265,7 @@ paths:
         '400':
           description: Bad Request
 
-  /lead/getSearchedLeads:
+  /api/lead/getSearchedLeads:
     post:
       tags:
         - Lead API
@@ -288,7 +288,7 @@ paths:
 
 
 
-  /lead/getAdditionalData/{leadId}:
+  /api/lead/getAdditionalData/{leadId}:
     get:
       tags:
         - Lead API

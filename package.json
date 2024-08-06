@@ -1,28 +1,37 @@
 {
-  "name": "adviser-management-b",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "prajaahar_rakshak",
+  "version": "0.0.1",
+  "description": "A Food waste management system in which donors can donate the food and this food can be fed to the needy people",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "start": "nodemon app.js",
+    "dev": "nodemon app.js -e html,css,js,ejs"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "Food",
+    "Waste",
+    "management"
+  ],
+  "author": "atharva",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "body-parser": "^1.20.2",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "ejs": "^3.1.10",
-    "express": "^4.19.2",
+    "connect-flash": "^0.1.1",
+    "dotenv": "^10.0.0",
+    "ejs": "^3.1.6",
+    "express": "^4.17.2",
+    "express-ejs-layouts": "^2.5.1",
+    "express-session": "^1.17.2",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.5.1",
+    "method-override": "^3.0.0",
+    "mongoose": "^6.1.2",
     "nodemailer": "^6.9.14",
-    "nodemon": "^3.1.4",
-    "path": "^0.12.7",
+    "passport": "^0.5.2",
+    "passport-local": "^1.0.0",
     "swagger-ui-express": "^5.0.1",
     "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
   }
 }

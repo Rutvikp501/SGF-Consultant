@@ -11,14 +11,19 @@
 		<div class="d-flex gap-3 flex-wrap m-4 text-white">
 			
 			<div class="bg-primary rounded p-3" style="width: 300px;">
-				<div class="fs-1"><%= numAssignedDonations %></div>
-				<div class="fs-5">donations not collected yet</div>
+				<div class="fs-1"><%= numAllLeads %></div>
+				<div class="fs-5">All Time Leads</div>
 			</div>
-			
+			<div class="bg-primary rounded p-3" style="width: 300px;">
+				<div class="fs-1"><%= numPendingLeads %></div>
+				<div class="fs-5">Total Pending Leads</div>
+			</div>
 			<div class="bg-success rounded p-3" style="width: 300px;">
-				<div class="fs-1"><%= numCollectedDonations %></div>
-				<div class="fs-5">donations collected by you</div>
+				<div class="fs-1"><%= numConvertedLeads %></div>
+				<div class="fs-5">Total Converted Leads</div>
 			</div>
+
+
 			
 		</div>
 		

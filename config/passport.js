@@ -1,6 +1,6 @@
 const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcryptjs");
-const User = require("../models/user.models.js");
+const User = require("../models/user.js");
 
 module.exports = function(passport) {
 	console.log();
