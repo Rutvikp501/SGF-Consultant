@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const leadSchema = new mongoose.Schema(
+const ConvertedleadSchema = new mongoose.Schema(
     {
   consultant: { type: mongoose.Schema.Types.ObjectId, ref: 'users' },
   consultant_code: {  type: String, required: true },
@@ -15,7 +15,7 @@ const leadSchema = new mongoose.Schema(
   eventSpecialsName: { type: String,  },
   specialCode: { type: String, },
   leadType: { type: String, required: true },
-  status: { type: String, enum: ['Pending', 'Converted', 'Junk'], default: 'Pending' },  
+  status: { type: String,  default: 'Converted' },  
   cycle:  {
     label: { type: String },
     number: { type: Number },
@@ -30,6 +30,6 @@ packages :  {
   conversionDate: { type: Date ,default: null},
 }, { timestamps: true });
 
-const LeadModel = mongoose.model('lead', leadSchema);
+const ConvertedLeadModel = mongoose.model('converted_lead', ConvertedleadSchema);
 
-module.exports = LeadModel;
+module.exports = ConvertedLeadModel;

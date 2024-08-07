@@ -5,7 +5,7 @@
 		
 		<div class="bg-white shadow-sm p-3">
 			<span class="me-3" id="sidebar-toggler-btn"><i class="fas fa-bars"></i></span>
-			<h5 class="m-0 color-theme d-inline-block">Previous Collections</h5>
+			<h5 class="m-0 color-theme d-inline-block">All Leads</h5>
 		</div>
 		
 		<div class="col col-sm-10 col-12 m-auto my-4" style="max-height: 75%; overflow: auto;">
@@ -22,20 +22,21 @@
 					</tr>
 				</thead>
 				<tbody>
-					<% for(let i=0; i<ConvertedLeads.length; i++) { %>
+					<% for(let i=0; i<AllLeads.length; i++) { %>
 						<tr>
-							<th scope="row"> <%= ConvertedLeads[i].leadID %> </th>
-							<td> <%= ConvertedLeads[i].consultant_code %> </td>
-							<td> <%= ConvertedLeads[i].name %> </td>
-							<td> <%= ConvertedLeads[i].leadType %> </td>
-							<td> <%= ConvertedLeads[i].eventLocation + " " + ConvertedLeads[i].pincode%> </td>
-							<td class="fw-bold text-<%= ConvertedLeads[i].status %>"> <%= ConvertedLeads[i].status %> </td>
-							<td><a href="/admin/Leads/view/<%= ConvertedLeads[i]._id %>" class="btn">View</a></td>
+							<th scope="row"> <%= AllLeads[i].leadID %> </th>
+							<td> <%= AllLeads[i].consultant_code %> </td>
+							<td> <%= AllLeads[i].name %> </td>
+							<td> <%= AllLeads[i].leadType %> </td>
+							<td> <%= AllLeads[i].eventLocation + " " + AllLeads[i].pincode%> </td>
+							<td class="fw-bold text-<%= AllLeads[i].status %>"> <%= AllLeads[i].status %> </td>
+							<td><a href="/consultant/Leads/view/<%= AllLeads[i]._id %>" class="btn">View</a></td>
 						</tr>
 					<% } %>
 				</tbody>
 			</table>
 		</div>
+		
 		
 	</div>
 </main>

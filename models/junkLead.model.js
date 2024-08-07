@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const leadSchema = new mongoose.Schema(
+const JunkleadSchema = new mongoose.Schema(
     {
   consultant: { type: mongoose.Schema.Types.ObjectId, ref: 'users' },
   consultant_code: {  type: String, required: true },
@@ -15,21 +15,16 @@ const leadSchema = new mongoose.Schema(
   eventSpecialsName: { type: String,  },
   specialCode: { type: String, },
   leadType: { type: String, required: true },
-  status: { type: String, enum: ['Pending', 'Converted', 'Junk'], default: 'Pending' },  
+  status: { type: String,  default: 'Junk'},  
   cycle:  {
     label: { type: String },
     number: { type: Number },
     year: { type: String }
 },  
-packages :  {
-    name: { type: String , default: ''},
-    subname: { type: String , default: ''},
-    addonS:  [{ type: String , default: ''}],
-    amount: { type: Number , default: ''}
-},  
-  conversionDate: { type: Date ,default: null},
+rejectionMark:{type:String},  
+rejectionDate: { type: Date ,default: null},
 }, { timestamps: true });
 
-const LeadModel = mongoose.model('lead', leadSchema);
+const JunkLeadModel = mongoose.model('junk_lead', JunkleadSchema);
 
-module.exports = LeadModel;
+module.exports = JunkLeadModel;

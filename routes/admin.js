@@ -36,8 +36,8 @@ router.get("/admin/Leads/pending", middleware.ensureAdminLoggedIn, async (req,re
 router.get("/admin/Leads/previous", middleware.ensureAdminLoggedIn, async (req,res) => {
 	try
 	{
-		const previousLeads = await LeadModel.find({ status: "collected" }).populate("donor");
-		res.render("admin/previousLeads", { title: "Previous Leads", previousLeads });
+		const ConvertedLeads = await LeadModel.find({ status: "Converted" }).populate("consultant");
+		res.render("admin/convertedLeads", { title: "Converted Leads ", ConvertedLeads });
 	}
 	catch(err)
 	{

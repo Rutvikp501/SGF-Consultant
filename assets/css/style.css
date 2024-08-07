@@ -46,20 +46,6 @@ header .navbar-toggler:focus
 {
 	box-shadow: none;
 }
-
-.bg-img-1
-{
-	min-height: calc(50vh - 50px);
-	background: url("/assets/images/img-1.jpg") no-repeat center;
-	background-size: cover;
-}
-.bg-img-2
-{
-	min-height: calc(50vh - 50px);
-	background: url("/assets/images/img-2.jpg") no-repeat center;
-	background-size: cover;
-}
-
 .color-theme
 {
 	color: var(--theme-color);

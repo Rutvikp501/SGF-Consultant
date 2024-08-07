@@ -1,11 +1,11 @@
 <main>
-	<%- include('../partials/agentSidebar') %>
+	<%- include('../partials/adminSidebar') %>
 	
 	<div id="main-wrapper">
 		
 		<div class="bg-white shadow-sm p-3">
 			<span class="me-3" id="sidebar-toggler-btn"><i class="fas fa-bars"></i></span>
-			<h5 class="m-0 color-theme d-inline-block">Pending Leads</h5>
+			<h5 class="m-0 color-theme d-inline-block">Converted Leads</h5>
 		</div>
 		
 		<div class="col col-sm-10 col-12 m-auto my-4" style="max-height: 75%; overflow: auto;">
@@ -22,21 +22,20 @@
 					</tr>
 				</thead>
 				<tbody>
-					<% for(let i=0; i<pendingLeads.length; i++) { %>
+					<% for(let i=0; i<ConvertedLeads.length; i++) { %>
 						<tr>
-							<th scope="row"> <%= pendingLeads[i].leadID %> </th>
-							<td> <%= pendingLeads[i].consultant_code %> </td>
-							<td> <%= pendingLeads[i].name %> </td>
-							<td> <%= pendingLeads[i].leadType %> </td>
-							<td> <%= pendingLeads[i].eventLocation + " " + pendingLeads[i].pincode%> </td>
-							<td class="fw-bold text-<%= pendingLeads[i].status %>"> <%= pendingLeads[i].status %> </td>
-							<td><a href="/consultant/Leads/view/<%= pendingLeads[i]._id %>" class="btn">View</a></td>
+							<th scope="row"> <%= convertedLeads[i].leadID %> </th>
+							<td> <%= convertedLeads[i].consultant_code %> </td>
+							<td> <%= ConvertedLeads[i].name %> </td>
+							<td> <%= ConvertedLeads[i].leadType %> </td>
+							<td> <%= ConvertedLeads[i].eventLocation + " " + ConvertedLeads[i].pincode%> </td>
+							<td class="fw-bold text-<%= ConvertedLeads[i].status %>"> <%= ConvertedLeads[i].status %> </td>
+							<td><a href="/admin/Leads/view/<%= ConvertedLeads[i]._id %>" class="btn">View</a></td>
 						</tr>
 					<% } %>
 				</tbody>
 			</table>
 		</div>
-		
 		
 	</div>
 </main>
