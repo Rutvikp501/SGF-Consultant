@@ -16,7 +16,7 @@ main
 {
 	height: 100%;
 	width: 228px;	flex-shrink: 0;
-	background-color: #2c3e50;
+	background-image: linear-gradient(#90c3fd, #ba71ff, #ff71b8);
 	overflow-y: auto;
 	transition: 0.15s linear;
 }
@@ -59,11 +59,13 @@ main
 }
 #sidebar ul li a.active
 {
-	color: white;
-	background-color: #595963;
-	border-left: 4px solid var(--theme-color);
+	outline: none;
+  color: #b366fc;
+  background-color: #fff;
 }
 #sidebar ul li a:not(.btn):hover
 {
-	background-color: #656570;
+	outline: none;
+  color: #b366fc;
+  background-color: #fff;
 }
