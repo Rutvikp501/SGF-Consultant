@@ -162,16 +162,19 @@ header .navbar-toggler:focus
 	color: white;
 	background-color: #1fa64e;
 }
+.login-box{
+	margin-top: 100px;
+}
 .login-form {
-	background-color: rgba(255, 255, 255, 0.25);
+	background-color: rgb(181, 230, 135);
 	backdrop-filter: blur(15px);
 	border: 1px solid #fff;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+	border-bottom: 1px solid rgba(104, 255, 4, 0.25);
 	border-right: 1px solid rgba(255, 255, 255, 0.25);
 	border-radius: 20px;
 	box-shadow: 0 25px 50px rgba(255, 255, 255, 0.1);
 	padding: 4rem;
-	width: 25rem;
+	width: 20rem;
 	margin-top: 10rem;
   }
   .login-form h2 {
@@ -187,7 +190,7 @@ header .navbar-toggler:focus
 	border-radius: 5px;
 	color: #8f2c24;
 	/* font-size: 1.6rem; */
-	margin-bottom: 3rem;
+	margin-bottom: 1rem;
 	padding: -0.5rem 2rem;
 	outline: none;
 	width: 100%;

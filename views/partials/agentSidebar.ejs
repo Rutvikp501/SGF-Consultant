@@ -1,12 +1,17 @@
 <div id="sidebar">
 	<ul id="sidebar-nav">
-		<li>Welcome <%= currentUser.name %></li>
-		<li><a href="/consultant/dashboard">Dashboard</a></li>
-		<li><a href="/consultant/Leads/All">My All Leads</a></li>
-		<li><a href="/consultant/Leads/pending">My Pending Leads</a></li>
-		<li><a href="/consultant/Leads/converted">My Converted Leads</a></li>
-		<li><a href="/consultant/addLeads">Add Lead</a></li>
-		<li><a href="/consultant/profile">My Profile</a></li>
-		<li><a href="/auth/logout" class="button">Logout</a></li>
+		<li class="welcome-message">Welcome <%= currentUser.name %></li>
+		<li><a href="/consultant/dashboard"><i class="bx bx-home"></i>Dashboard</a></li>
+		<li><a href="/consultant/Leads/All"><i class="bx bx-list-ul"></i>All Leads</a></li>
+		<li><a href="/consultant/Leads/pending"><i class="bx bx-list-ul"></i>Pending Leads</a></li>
+		<li><a href="/consultant/Leads/converted"><i class="bx bx-check-circle"></i>Converted Leads</a></li>
+		<li><a href="/consultant/addLeads"><i class="bx bx-plus"></i>Add Lead</a></li>
+		<li><a href="/consultant/profile"><i class="bx bx-user-circle"></i>Profile</a></li>
+		<li><a href="/auth/logout" ><i class="bx bx-log-out"></i>Logout</a></li>
+		<li>
+			<a href="#" data-resize-btn>
+			  <i class="bx bx-chevrons-right" style="rotate: 180deg;"></i> Collapse
+			</a>
+		</li>
 	</ul>
 </div>

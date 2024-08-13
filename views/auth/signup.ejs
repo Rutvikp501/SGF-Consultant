@@ -1,5 +1,6 @@
-<div class="m-0 pt-5 w-100">
-	<form action="/auth/signup" method="POST" class="w-50 bg-white p-5 m-auto" style="min-width: 320px;">
+<div class="container">
+	<div class="login-box"> 
+	<form action="/auth/signup" method="POST" class="login-form p-5 m-auto" style="min-width: 320px;">
 		<h3 class="text-center mb-3">User Signup</h3>
 
 		<% if(typeof errors != 'undefined') { %>
@@ -13,42 +14,43 @@
 
 		
 		<div class="mb-3">
-			<label for="user-code" class="form-label">code</label>
+			<!-- <label for="user-code" class="form-label">code</label> -->
 			<input type="text" name="code" class="form-control" id="user-code" placeholder="Enter user code.." value="<%= typeof code != 'undefined' ? code : '' %>" required>
 		</div>
 		<div class="mb-3">
-			<label for="user-name" class="form-label">Name</label>
+			<!-- <label for="user-name" class="form-label">Name</label> -->
 			<input type="text" name="User_name" class="form-control" id="user-name" placeholder="Enter user name.." value="<%= typeof User_name != 'undefined' ? User_name : '' %>" required>
 		</div>
 		
 		<div class="mb-3">
-			<label for="email" class="form-label">Email Address</label>
+			<!-- <label for="email" class="form-label">Email Address</label> -->
 			<input type="email" name="email_id" class="form-control" id="email" placeholder="Enter email.." value="<%= typeof email_id != 'undefined' ? email_id : '' %>" required>
 		</div>
 		
 		<div class="mb-3">
-			<label for="password1" class="form-label">Password</label>
+			<!-- <label for="password1" class="form-label">Password</label> -->
 			<input type="password" name="password1" class="form-control" id="password1" placeholder="Enter password.." value="<%= typeof password1 != 'undefined' ? password1 : '' %>" required>
 		</div>
 		<div class="mb-3">
-			<label for="password2" class="form-label">Confirm Password</label>
+			<!-- <label for="password2" class="form-label">Confirm Password</label> -->
 			<input type="password" name="password2" class="form-control" id="password2" placeholder="Re-enter password.." value="<%= typeof password2 != 'undefined' ? password2 : '' %>" required>
 		</div>
 		
 		<div class="mb-3">
-			<label for="role" class="form-label">Signup as</label>
-			<select class="form-select" name="role" id="role">
+			<!-- <label for="role" class="form-label">Signup as</label> -->
+			<select class="form-select" name="role" id="role" placeholder="Signup as..">
 				<option value="admin">Admin</option>
 			</select>
 		</div>
 		
-		<button type="submit" class="btn d-block m-auto mt-4">Submit</button>
+		<button type="submit" class="button">Submit</button>
 		
 		
 		<div class="mt-3">
 			<span>Already have an account?</span>
-			<a href="/auth/login">Login here</a>
+			<a href="/auth/login">Login</a>
 		</div>
 		
 	</form>
+</div>
 </div>

@@ -52,6 +52,7 @@ app.use(adminRoutes);
 app.use(consultantRoutes);
 app.use('/api/user',require('./routes/user.route'));
 app.use('/api/lead', require('./routes/lead.route'));
+app.use('/api', require('./routes/index.routes.js'));
 app.use((req,res) => {
 	res.status(404).render("404page", { title: "Page not found" });
 });

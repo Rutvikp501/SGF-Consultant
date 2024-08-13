@@ -1,10 +1,12 @@
 
 const jwt = require('jsonwebtoken');
+const token = process.env.token
 const UserModel = require('../models/user');
 const { calculateCycle, parseDate } = require('../helpers/sample');
+const Enc_Dec = require('../helpers/Enc_Dec');
+const validatePassword = require('../helpers/PassValidation');
 const { SendOTP } = require('../helpers/email');
-const token = process.env.token
-
+const bcrypt = require("bcryptjs");
 
 exports.GetAllUser = async (req, res) => {
     try {
@@ -75,7 +77,29 @@ exports.Login = async (req, res) => {
     try{
         if (User.length>0){
             const pass = data[0]["password"];
-            // let npass = Enc_Dec.DecryptPass(pass);            
+            bcrypt.compare(password, User.password, (err, isMatch) => {
+                let keyToken= jwt.sign({UserId:User[0]._id},token)//setting up a token using the '_id' in User model
+
+                if(err)	throw err;
+                if(!isMatch)
+                    res.send({
+                        success: false,
+                        statusCode: 500,
+                        message:`Enter Valid Password `
+                    })
+                else
+                data={
+                    keyToken:keyToken,
+                    User_code:User[0].code,
+                    User_name:User[0].name,
+                    email_id:User[0].email_id
+                }
+                res.send({
+                    success: true,
+                    statusCode: 200,
+                    data:data
+                })
+            })         
                 if (password == pass){
                     let keyToken= jwt.sign({UserId:User[0]._id},token)//setting up a token using the '_id' in User model
                     data={
@@ -117,7 +141,7 @@ exports.Register = async (req, res) => {
     const {User_code, User_name , email_id ,mobile_no,password,dateOfJoining ,isAdmin }=req.body
     const getExistingUser = await UserModel.find({ email_id: email_id });  
     const duplicatecode = await UserModel.find({ code: User_code });  
-    // const valid = validatePassword(Password)
+    // const valid = validatePassword(password)
     // if(valid){
     //     return res.status(400).send({message:valid[0]})
     // }
@@ -128,8 +152,8 @@ exports.Register = async (req, res) => {
         if (getExistingUser != "") {
             return res.send({ success: "failed", message: "Email already exist." });
           }else{
-            // console.log("Password",Password);
-            //     var Encpass = Enc_Dec.EncryptPass(Password);
+            const salt = bcrypt.genSaltSync(10);
+            const hashPASS = bcrypt.hashSync(password, salt);
             const date = parseDate(dateOfJoining);
             const {cycleLabel,cycleNumber} = calculateCycle(date);
                 const User = new UserModel({
@@ -138,7 +162,7 @@ exports.Register = async (req, res) => {
                     email_id:email_id,
                     mobile_no:mobile_no,
                     isAdmin:isAdmin,
-                    password:password,
+                    password:hashPASS,
                     dateOfJoining: date,
                     currentcycle: {label: cycleLabel,number:cycleNumber},
                 })
@@ -187,9 +211,10 @@ exports.Update = async (req, res) => {
         if (getExistingUser != "") {
             return res.send({ success: "failed", message: "Email already exist." });
           }else{
-                // var Encpass = Enc_Dec.EncryptPass(Password);
+            const salt = bcrypt.genSaltSync(10);
+            const hashPASS = bcrypt.hashSync(Password, salt);
                 const User = new UserModel({
-                    Password:Password,
+                    Password:hashPASS,
                     User_name:User_name,
                     email_id:email_id})//the password from the body and hashed password is different
                 await User.save();
@@ -290,9 +315,9 @@ exports.resetPassword = async (req, res) => {
     if (!user) {
       return res.status(400).send({ message: 'OTP is invalid or has expired.' });
     }
-// console.log("Password",Password);
-            //     var Encpass = Enc_Dec.EncryptPass(Password)
-      user.password = newPassword;
+    const salt = bcrypt.genSaltSync(10);
+    const hashPASS = bcrypt.hashSync(newPassword, salt);
+      user.password = hashPASS;
       user.otp = undefined;
       user.otpExpires = undefined;
 

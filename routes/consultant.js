@@ -134,7 +134,7 @@ router.get("/consultant/addLeads", middleware.ensureconsultantLoggedIn, async (r
 	
 	
 });
-router.post("/consultant/addLeads",  async (req,res) => { //middleware.ensureAdminLoggedIn,
+router.post("/consultant/addLeads", middleware.ensureconsultantLoggedIn, async (req,res) => { //middleware.ensureAdminLoggedIn,
 	
 	const { Adviser, name, email, phone, eventName, eventDate, eventLocation, pincode, eventSpecialsName, specialCode, leadType, status } = req.body;
 // 	console.log(req.body);
