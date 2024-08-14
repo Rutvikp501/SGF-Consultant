@@ -22,7 +22,8 @@ main {
 	height: 100%;
 	width: 228px;
 	flex-shrink: 0;
-	background-image: linear-gradient(#90c3fd, #ba71ff, #ff71b8);
+	/* background-image: linear-gradient(#173354, #226fc7, #0ef); */
+	background-image: #173354;
 	overflow-y: auto;
 	transition: 0.15s linear;
 	box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); /* Added shadow */
@@ -61,8 +62,8 @@ main {
 #sidebar a:focus-visible {
 	margin-right: 10px;
 	outline: none;
-	color: #b366fc;
-	background-color: #fff;
+	color: #aed4ff;
+	background-color: #226fc7;
 	transform: scale(1.05); /* Added transformation on hover */
 	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Added shadow on hover */
 }
