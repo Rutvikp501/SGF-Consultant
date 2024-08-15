@@ -101,8 +101,8 @@ paths:
                   type: number
                 password:
                   type: string
-                isAdmin:
-                  type: boolean
+                role:
+                  type: string
                 dateOfJoining:
                   type: string
       responses:

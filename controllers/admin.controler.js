@@ -70,75 +70,65 @@ exports.GetSearchedUser = async (req, res,next) => {
 };
 
 exports.Login = async (req, res) => {
-    let {email_id,password}=req.body;
-    const User  = await UserModel.find({email_id});
-    var getData = JSON.stringify(User);
-    var data = JSON.parse(getData);
-    try{
-        if (User.length>0){
-            const pass = data[0]["password"];
-            bcrypt.compare(password, User.password, (err, isMatch) => {
-                let keyToken= jwt.sign({UserId:User[0]._id},token)//setting up a token using the '_id' in User model
+    let { email_id, password } = req.body;
+    console.log(req.body);
 
-                if(err)	throw err;
-                if(!isMatch)
+    try {
+        const user = await UserModel.findOne({ email_id });
+        
+        if (user) {
+            // Compare the entered password with the stored hashed password
+            bcrypt.compare(password, user.password, (err, isMatch) => {
+                if (err) {
+                    throw err;
+                }
+                
+                if (!isMatch) {
                     res.send({
                         success: false,
                         statusCode: 500,
-                        message:`Enter Valid Password `
-                    })
-                else
-                data={
-                    keyToken:keyToken,
-                    User_code:User[0].code,
-                    User_name:User[0].name,
-                    email_id:User[0].email_id
-                }
-                res.send({
-                    success: true,
-                    statusCode: 200,
-                    data:data
-                })
-            })         
-                if (password == pass){
-                    let keyToken= jwt.sign({UserId:User[0]._id},token)//setting up a token using the '_id' in User model
-                    data={
-                        keyToken:keyToken,
-                        User_code:User[0].code,
-                        User_name:User[0].name,
-                        email_id:User[0].email_id
-                    }
+                        message: `Enter Valid Password`
+                    });
+                } else {
+                    // Generate JWT token
+                    let keyToken = jwt.sign({ UserId: user._id }, token); // Ensure 'token' is defined
+
+                    const data = {
+                        keyToken: keyToken,
+                        role: user.role,
+                        User_code: user.code,
+                        User_name: user.name,
+                        email_id: user.email_id
+                    };
+
                     res.send({
                         success: true,
                         statusCode: 200,
-                        data:data
-                    })
-                }else{
-                    res.send({
-                        success: false,
-                        statusCode: 500,
-                        message:`Enter Valid Password `
-                    })
-                }    
-        }
-        else{
+                        data: data
+                    });
+                }
+            });
+        } else {
             res.send({
                 success: false,
                 statusCode: 500,
-                message:`User not found ...!`
-            })
+                message: `User not found ...!`
+            });
         }
-    }catch(error){
+    } catch (error) {
         console.log(error);
         res.send({
             success: false,
             statusCode: 500,
-            message:`invalid Credentials3 `
-    })}
+            message: `Invalid Credentials`
+        });
+    }
 };
 
 exports.Register = async (req, res) => {
-    const {User_code, User_name , email_id ,mobile_no,password,dateOfJoining ,isAdmin }=req.body
+    const {User_code, User_name , email_id ,mobile_no,password,dateOfJoining ,role }=req.body
+    console.log(req.body);
+    
     const getExistingUser = await UserModel.find({ email_id: email_id });  
     const duplicatecode = await UserModel.find({ code: User_code });  
     // const valid = validatePassword(password)
@@ -161,7 +151,7 @@ exports.Register = async (req, res) => {
                     name:User_name,
                     email_id:email_id,
                     mobile_no:mobile_no,
-                    isAdmin:isAdmin,
+                    role:role,
                     password:hashPASS,
                     dateOfJoining: date,
                     currentcycle: {label: cycleLabel,number:cycleNumber},
