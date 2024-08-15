@@ -8,8 +8,8 @@
 			<h5 class="m-0 color-theme d-inline-block">Previous Collections</h5>
 		</div> -->
 		
-		<div class="col col-sm-10 col-12 m-auto my-4" style="max-height: 75%; overflow: auto;">
-			<table class="table table-info table-striped table-hover m-0 bg-white">
+		<div class="tbl-header" style="max-height: 75%; overflow: auto;">
+			<table  cellpadding="0" cellspacing="0"  border="0">
 				<thead>
 					<tr>
 						<th scope="col">#</th>
@@ -18,7 +18,10 @@
 						<th scope="col">Phone</th>
 						<th scope="col">Actions</th>
 					</tr>
-				</thead>
+				</table>
+			</div>
+			<div class="tbl-content">
+				<table cellpadding="0" cellspacing="0" border="0">
 				<tbody>
 					<% for(let i=0; i<previousCollections.length; i++) { %>
 						<tr>
@@ -26,7 +29,7 @@
 							<td> <%= previousCollections[i].donor.name + " " + previousCollections[i].donor.lastName %> </td>
 							<td> <%= previousCollections[i].address %> </td>
 							<td> <%= previousCollections[i].phone %> </td>
-							<td><a href="/agent/collection/view/<%= previousCollections[i]._id %>" class="btn">View</a></td>
+							<td><a href="/agent/collection/view/<%= previousCollections[i]._id %>" class="custom-btn btn-2">View</a></td>
 						</tr>
 					<% } %>
 				</tbody>

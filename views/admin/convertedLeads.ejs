@@ -8,8 +8,8 @@
 			<h5 class="m-0 color-theme d-inline-block">Converted Leads</h5>
 		</div> -->
 		
-		<div class="col col-sm-10 col-12 m-auto my-4" style="max-height: 75%; overflow: auto;">
-			<table class="table table-info table-striped table-hover m-0 bg-white">
+		<div class="tbl-header" style="max-height: 75%; overflow: auto;">
+			<table  cellpadding="0" cellspacing="0"  border="0">
 				<thead>
 					<tr>
 						<th scope="col">Lead ID</th>
@@ -20,7 +20,10 @@
 						<th scope="col">Status</th>
 						<th scope="col">Actions</th>
 					</tr>
-				</thead>
+				</table>
+			</div>
+			<div class="tbl-content">
+				<table cellpadding="0" cellspacing="0" border="0">
 				<tbody>
 					<% for(let i=0; i<ConvertedLeads.length; i++) { %>
 						<tr>
@@ -30,7 +33,7 @@
 							<td> <%= ConvertedLeads[i].leadType %> </td>
 							<td> <%= ConvertedLeads[i].eventLocation + " " + ConvertedLeads[i].pincode%> </td>
 							<td class="fw-bold text-<%= ConvertedLeads[i].status %>"> <%= ConvertedLeads[i].status %> </td>
-							<td><a href="/admin/Leads/view/<%= ConvertedLeads[i]._id %>" class="btn">View</a></td>
+							<td><a href="/admin/Leads/view/<%= ConvertedLeads[i]._id %>" class="custom-btn btn-2">View</a></td>
 						</tr>
 					<% } %>
 				</tbody>

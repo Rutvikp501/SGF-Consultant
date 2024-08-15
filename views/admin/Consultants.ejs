@@ -8,8 +8,8 @@
 			<h5 class="m-0 color-theme d-inline-block">Dashboard</h5>
 		</div> -->
 		
-		<div class="col col-sm-10 col-12 m-auto my-4" style="max-height: 75%; overflow: auto;">
-			<table class="table table-info table-striped table-hover m-0 bg-white">
+		<div class="tbl-header" style="max-height: 75%; overflow: auto;">
+			<table  cellpadding="0" cellspacing="0"  border="0">
 				<thead>
 					<tr>
 						<th scope="col">#</th>
@@ -21,6 +21,10 @@
 						<th scope="col">Lifetime Cycle</th>
 					</tr>
 				</thead>
+			</table>
+		</div>
+		<div class="tbl-content">
+			<table cellpadding="0" cellspacing="0" border="0">
 				<tbody>
 					<% for(let i=0; i<consultant.length; i++) { %>
 						<tr>
