@@ -120,3 +120,28 @@ exports.getAdditionalData = async (req, res) => {
         res.status(500).send({ message: 'Internal server error' });
     }
 };
+
+exports.getLeadscount = async (req, res) => {
+    const consultantId = req.user._id;
+    const RegularLeads = {};
+    const SeasonalLeads = {};
+    try {
+        RegularLeads.numAllLeads = await LeadModel.countDocuments({consultant: consultantId,});
+        // Regular Leads Counts
+        RegularLeads.numPendingLeads = await LeadModel.countDocuments({ consultant: consultantId,leadType: "Regular",status: "Pending" });
+        RegularLeads.numAllLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Regular" });
+        RegularLeads.numConvertedLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Regular",status: "Converted"  });
+        RegularLeads.numJunkLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Regular",status: "Junk"  });
+    
+        // Seasonal Leads Counts  
+        SeasonalLeads.numPendingLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal",status: "Pending" });   
+        SeasonalLeads.numAllLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal"   });
+        SeasonalLeads.numConvertedLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal",status: "Converted"   });
+        SeasonalLeads.numJunkLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal",status: "Junk"   });
+    
+        res.status(200).send({ RegularLeads, SeasonalLeads });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: 'Internal server error' });
+    }
+};

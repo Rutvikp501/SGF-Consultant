@@ -7,8 +7,29 @@
 			<span class="me-3" id="sidebar-toggler-btn"><i class="fas fa-bars"></i></span>
 			<h5 class="m-0 color-theme d-inline-block">Dashboard</h5>
 		</div> -->
-		
-		<div class="d-flex gap-3 flex-wrap m-4 text-white">
+		<div class="cards">
+			<div class="card red">
+				<p class="tip">admins</p>
+				<p class="second-text"><%= numAdmins %></p>
+			</div>
+			<div class="card blue">
+				<p class="tip">consultant</p>
+				<p class="second-text"><%= numAgents %></p>
+			</div>
+			<div class="card green">
+				<p class="tip">Converted Leads</p>
+				<p class="second-text"><%= numConvertedLeads %></p>
+			</div>
+			<div class="card yellow">
+				<p class="tip">Pending Leads</p>
+				<p class="second-text"><%= numPendingLeads %></p>
+			</div>
+			<div class="card red">
+				<p class="tip">Junk Leads</p>
+				<p class="second-text"><%= numJunkLeads %></p>
+			</div>
+		</div>
+		<!-- <div class="d-flex gap-3 flex-wrap m-4 text-white">
 			
 			<div class="bg-primary rounded p-3" style="width: 250px;">
 				<div class="fs-1"><%= numAdmins %></div>
@@ -35,7 +56,7 @@
 				<div class="fs-5">Converted Leads</div>
 			</div>
 			<div id="piechart"></div>
-		</div>
+		</div> -->
 		
 	</div>
 </main>

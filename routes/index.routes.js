@@ -5,6 +5,7 @@ const leadController = require('../controllers/lead.controller');
 const Admin  = require('../controllers/admin.controler');
 router.post('/leadapi/addLead', leadController.addLead);
 router.get('/leadapi/getAllLeads', leadController.getAllLeads);
+router.get('/leadapi/getLeadscount', leadController.getLeadscount);
 router.post('/leadapi/getSearchedLeads', leadController.getLeadsByAdviser);
 router.get('/leadapi/getAdditionalData/:leadId', leadController.getAdditionalData);
 
