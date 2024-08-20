@@ -20,20 +20,36 @@ router.get("/admin/dashboard", middleware.ensureAdminLoggedIn, async (req,res) =
 		numAdmins, numAgents, numPendingLeads, numConvertedLeads, numJunkLeads,	});
 });
 
-router.get("/admin/Leads/pending", middleware.ensureAdminLoggedIn, async (req,res) => {
-	try
-	{
-		const pendingLeads = await LeadModel.find().populate("consultant");
-		
-		res.render("admin/pendingLeads", { title: "Pending Leads", pendingLeads });
-	}
-	catch(err)
-	{
-		console.log(err);
-		req.flash("error", "Some error occurred on the server.")
-		res.redirect("back");
-	}
+router.get("/admin/Leads/all", middleware.ensureAdminLoggedIn, async (req, res) => {
+    try {
+        const { search, sortBy, order = 'asc' } = req.query; // Get query parameters
+
+        // Build the query object
+        let query = {};
+        if (search) {
+            query = {
+                $or: [
+                    { leadID: new RegExp(search, 'i') },
+                    { consultant_code: new RegExp(search, 'i') },
+                    { leadType: new RegExp(search, 'i') },
+                    { status: new RegExp(search, 'i') }
+                ]
+            };
+        }
+
+        // Fetch the leads with the search and sort criteria
+        const allLeads = await LeadModel.find(query)
+            .populate("consultant")
+            .sort({ [sortBy]: order === 'asc' ? 1 : -1 });
+
+        res.render("admin/allLeads", { title: "Pending Leads", allLeads, search, sortBy, order });
+    } catch (err) {
+        console.log(err);
+        req.flash("error", "Some error occurred on the server.");
+        res.redirect("back");
+    }
 });
+
 
 router.get("/admin/Leads/converted", middleware.ensureAdminLoggedIn, async (req,res) => {
 	try
@@ -111,7 +127,7 @@ router.post("/admin/Leads/converte/:LeadsId", middleware.ensureAdminLoggedIn, as
 });
 
 
-router.get("/admin/Leads/reject/:LeadsId", middleware.ensureAdminLoggedIn, async (req,res) => {
+router.post("/admin/Leads/reject/:LeadsId", middleware.ensureAdminLoggedIn, async (req,res) => {
 	console.log(req.params,req.body);
 	
 	try
@@ -329,44 +345,72 @@ router.get("/admin/addLeads", middleware.ensureAdminLoggedIn, async (req,res) =>
 	
 	
 });
-router.post("/admin/addLeads",  async (req,res) => { //middleware.ensureAdminLoggedIn,
-	
-	const { Adviser, name, email, phone, eventName, eventDate, eventLocation, pincode, eventSpecialsName, specialCode, leadType, status } = req.body;
-  
-    try {
+router.post("/admin/addLeads", async (req, res) => {
+    const { Adviser, name, email, phone, eventName, eventDate, eventLocation, pincode, eventSpecialsName, specialCode, leadType, status } = req.body;
 
+    try {
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear();
         const { cycleLabel, cycleNumber } = calculateCycle(currentDate);
         const consultantDetails = await User.find({ code: Adviser });
-       
-	   
+
+        // Check if consultant exists
         if (!consultantDetails[0]) {
             return res.status(404).send({ message: 'Consultant not found' });
         }
-        const leadcycle = calculateLeadCycle(leadType, currentDate)
+
+        // Initialize lead cycle and lead number
+        const leadcycle = calculateLeadCycle(leadType, currentDate);
         let leadNumber = 1;
         let cycleKey = `${currentYear}-${leadcycle.Label}`;
-		
+
         if (leadType === 'Seasonal') {
             leadNumber = (consultantDetails[0].leadsPerCycle.seasonal.get(cycleKey) || 0) + 1;
             consultantDetails[0].leadsPerCycle.seasonal.set(cycleKey, leadNumber);
         } else {
             leadNumber = (consultantDetails[0].leadsPerCycle.regular.get(cycleKey) || 0) + 1;
             consultantDetails[0].leadsPerCycle.regular.set(cycleKey, leadNumber);
-        }	
-        const leadID = generateLeadID(consultantDetails[0].code, leadType, leadcycle.Label, consultantDetails[0].consultantLifetimeCycleNumber, leadNumber, pincode);
-        const duplicatecode = await LeadModel.find({ leadIDd: leadID }); 
-		if (duplicatecode) {
-			errors.push({ msg: "." });
-			return res.render("/admin/addLeads", {
-				title: "Leads",
-				errors,  Adviser, name, email, phone, eventName, eventDate, eventLocation, pincode, eventSpecialsName, specialCode, leadType, status,
-			});
-		}
+        }
+
+        // Generate lead ID
+        const leadID = generateLeadID(
+            consultantDetails[0].code,
+            leadType,
+            leadcycle.Label,
+            consultantDetails[0].consultantLifetimeCycleNumber,
+            leadNumber,
+            pincode
+        );
+
+        // Check for duplicate leadID
+        const duplicatecode = await LeadModel.findOne({ leadID: leadID }); // Corrected to findOne instead of find
+
+        // Initialize errors array
+        let errors = [];
+
+        if (duplicatecode) {
+            errors.push({ msg: "Lead ID already exists." }); // Provide a meaningful error message
+            return res.render("admin/addLeads", {
+                title: "Leads",
+                errors, // Pass the errors array to the view
+                Adviser,
+                name,
+                email,
+                phone,
+                eventName,
+                eventDate,
+                eventLocation,
+                pincode,
+                eventSpecialsName,
+                specialCode,
+                leadType,
+                status,
+            });
+        }
 
         await consultantDetails[0].save();
 
+        // Create a new lead
         const newlead = new LeadModel({
             consultant: consultantDetails[0]._id,
             consultant_code: consultantDetails[0].code,
@@ -382,16 +426,17 @@ router.post("/admin/addLeads",  async (req,res) => { //middleware.ensureAdminLog
             leadType: leadType,
             status: status,
             leadID: leadID,
-            cycle: { label: leadcycle.Label, number: leadcycle.Number,year:leadcycle.year }
+            cycle: { label: leadcycle.Label, number: leadcycle.Number, year: leadcycle.year }
         });
-		// console.log(newlead);
-		
+
         await newlead.save();
- 		req.flash("success", "Lead  successfully added ");
-		res.redirect("/admin/Leads/pending");
+
+        req.flash("success", "Lead successfully added");
+        res.redirect("/admin/Leads/all");
     } catch (error) {
         console.error(error);
         res.status(500).send({ message: 'Internal server error' });
     }
 });
+
 module.exports = router;

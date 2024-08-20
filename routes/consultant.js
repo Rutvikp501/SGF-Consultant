@@ -196,7 +196,7 @@ router.post("/consultant/addLeads", middleware.ensureconsultantLoggedIn, async (
 		console.log("test2");
         await newlead.save();
  		req.flash("success", "Lead  successfully added ");
-		res.redirect("/admin/Leads/pending");
+		res.redirect("/admin/Leads/all");
     } catch (error) {
         console.error(error);
         res.status(500).send({ message: 'Internal server error' });
