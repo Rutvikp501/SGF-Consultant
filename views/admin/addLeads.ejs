@@ -2,9 +2,9 @@
     <%- include('../partials/adminSidebar') %>
     
     <div id="main-wrapper">
-        
+        <h3 class="title text-center">Add Lead</h3>
         <form action="/admin/addLeads" method="POST" class="form">
-            <h3 class="title text-center">Add Lead</h3>
+            
     
             <% if (typeof errors != 'undefined') { %>
                 <% errors.forEach(function(error) { %>
@@ -15,7 +15,7 @@
                 <% }); %>
             <% } %>
             
-            <div class="flex">
+            <div class="gridf">
                 <label>
                     <input type="text" name="Adviser" class="input" id="adviser"   required autofocus>
                     <span>Adviser</span>
@@ -25,7 +25,6 @@
                     <input type="text" name="name" class="input" id="name"  required>
                     <span>Name</span>
                 </label>
-            </div>
             
             <label>
                 <input type="email" name="email" class="input" id="email"  required>
@@ -75,6 +74,7 @@
                 <span>Lead Type</span>
             </label>
             
+            </div>
             <button type="submit" class="submit d-block m-auto mt-4">Submit</button>
         </form>
         

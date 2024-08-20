@@ -4,6 +4,8 @@ const bcrypt = require("bcryptjs");
 const middleware = require("../middleware/index.js");
 const User = require("../models/user.js");
 const LeadModel = require("../models/lead.models.js");
+const ConvertedLeadModel = require("../models/convertedLead.model.js");
+const JunkLeadModel = require("../models/junkLead.model.js");
 const { calculateCycle, calculateLeadCycle, generateLeadID } = require("../helpers/sample.js");
 
 
@@ -33,10 +35,11 @@ router.get("/admin/Leads/pending", middleware.ensureAdminLoggedIn, async (req,re
 	}
 });
 
-router.get("/admin/Leads/previous", middleware.ensureAdminLoggedIn, async (req,res) => {
+router.get("/admin/Leads/converted", middleware.ensureAdminLoggedIn, async (req,res) => {
 	try
 	{
 		const ConvertedLeads = await LeadModel.find({ status: "Converted" }).populate("consultant");
+		
 		res.render("admin/convertedLeads", { title: "Converted Leads ", ConvertedLeads });
 	}
 	catch(err)
@@ -52,9 +55,9 @@ router.get("/admin/Leads/view/:LeadsId", middleware.ensureAdminLoggedIn, async (
 	{
 		const LeadsId = req.params.LeadsId;
 		const Leads = await LeadModel.findById(LeadsId).populate("consultant");
-		// console.log(Leads);
+		const ConvertedLeads = await ConvertedLeadModel.find({leadID:Leads.leadID});
 		
-		res.render("admin/leads", { title: "Leads details", Leads });
+		res.render("admin/leads", { title: "Leads details", Leads:Leads ,ConvertedLeads: ConvertedLeads });
 	}
 	catch(err)
 	{
@@ -64,26 +67,80 @@ router.get("/admin/Leads/view/:LeadsId", middleware.ensureAdminLoggedIn, async (
 	}
 });
 
-router.get("/admin/Leads/accept/:LeadsId", middleware.ensureAdminLoggedIn, async (req,res) => {
-	try
-	{
-		const LeadsId = req.params.LeadsId;
-		await LeadModel.findByIdAndUpdate(LeadsId, { status: "accepted" });
-		req.flash("success", "Leads accepted successfully");
-		res.redirect(`/admin/Leads/view/${LeadsId}`);
-	}
-	catch(err)
-	{
-		console.log(err);
-		req.flash("error", "Some error occurred on the server.")
-		res.redirect("back");
-	}
+router.post("/admin/Leads/converte/:LeadsId", middleware.ensureAdminLoggedIn, async (req, res) => {
+    try {
+        const LeadsId = req.params.LeadsId;
+		const lead = await LeadModel.findById(LeadsId);
+        
+
+        // Create a new converted lead with additional package details
+        const newConvertedLead = new ConvertedLeadModel({
+            consultant: req.user._id,
+            consultant_code: lead.consultant_code,
+            leadID: lead.leadID,
+            name: lead.name,
+            email: lead.email,
+            phone: lead.phone,
+            eventName: lead.eventName,
+            eventDate: lead.eventDate,
+            eventLocation: lead.eventLocation,
+            pincode: lead.pincode,
+            eventSpecialsName: lead.eventSpecialsName || '',
+            specialCode: lead.specialCode || '',
+            leadType: lead.leadType,
+            status: "Converted",
+            cycle: lead.cycle,
+            packages: {
+                name: req.body.packageName || '', // Optional
+                subname: req.body.packageSubname || '', // Optional
+                addonS: req.body.packageAddons ? req.body.packageAddons.split(',').map(addon => addon.trim()) : [], // Optional
+                amount: req.body.packageAmount || 0, // Optional
+            },
+            conversionDate: new Date(),
+        });
+
+         await newConvertedLead.save();
+		 await LeadModel.findByIdAndUpdate(LeadsId, { status: "Converted" });
+        req.flash("success", "Lead converted and saved successfully");
+        res.redirect(`/admin/Leads/view/${LeadsId}`);
+    } catch (err) {
+        console.log(err);
+        req.flash("error", "An error occurred while converting the lead.");
+        res.redirect("back");
+    }
 });
+
 
 router.get("/admin/Leads/reject/:LeadsId", middleware.ensureAdminLoggedIn, async (req,res) => {
+	console.log(req.params,req.body);
+	
 	try
 	{
 		const LeadsId = req.params.LeadsId;
+		const { rejectionMark } = req.body;
+		const lead = await LeadModel.findById(LeadsId);
+		
+		const junkLead = new JunkLeadModel({
+			consultant: lead.consultant,
+			consultant_code: lead.consultant_code,
+			leadID: lead.leadID,
+			name: lead.name,
+			email: lead.email,
+			phone: lead.phone,
+			eventName: lead.eventName,
+			eventDate: lead.eventDate,
+			eventLocation: lead.eventLocation,
+			pincode: lead.pincode,
+			eventSpecialsName: lead.eventSpecialsName,
+			specialCode: lead.specialCode,
+			leadType: lead.leadType,
+			cycle: lead.cycle,
+			rejectionMark: rejectionMark,
+			rejectionDate: new Date(),
+		});
+		
+		// await junkLead.save();
+		// await LeadModel.findByIdAndDelete(LeadsId);
 		await LeadModel.findByIdAndUpdate(LeadsId, { status: "rejected" });
 		req.flash("success", "Leads rejected successfully");
 		res.redirect(`/admin/Leads/view/${LeadsId}`);
@@ -94,6 +151,7 @@ router.get("/admin/Leads/reject/:LeadsId", middleware.ensureAdminLoggedIn, async
 		req.flash("error", "Some error occurred on the server.")
 		res.redirect("back");
 	}
+
 });
 
 router.get("/admin/Leads/assign/:LeadsId", middleware.ensureAdminLoggedIn, async (req,res) => {

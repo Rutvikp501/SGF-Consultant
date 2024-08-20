@@ -8,8 +8,8 @@
             <h5 class="m-0 color-theme d-inline-block">Assign Agent</h5>
         </div> -->
         
+        <p class="title">Add User</p>
         <form action="/admin/addConsultant" method="POST" class="form">
-            <p class="title">Add User</p>
     
             <% if (typeof errors != 'undefined') { %>
                 <% errors.forEach(function(error) { %>
@@ -20,7 +20,7 @@
                 <% }); %>
             <% } %>
             
-            <div class="flex">
+            <div class="gridf">
                 <label>
                     <input type="text" name="User_code" class="input" id="user-code" value="<%= typeof User_code != 'undefined' ? User_code : '' %>" required>
                     <span>User Code</span>
@@ -30,8 +30,8 @@
                     <input type="text" name="User_name" class="input" id="user-name" value="<%= typeof User_name != 'undefined' ? User_name : '' %>" required>
                     <span>Name</span>
                 </label>
-            </div>
-            
+          
+
             <label>
                 <input type="email" name="email_id" class="input" id="email" value="<%= typeof email_id != 'undefined' ? email_id : '' %>" required>
                 <span>Email Address</span>
@@ -59,8 +59,8 @@
                 </select>
                 <span>Signup as</span>
             </label>
-            
-            <button type="submit" class="submit">Submit</button>
+              </div>
+            <button type="submit" class="submit d-block m-auto mt-4">Submit</button>
            
         </form>
         

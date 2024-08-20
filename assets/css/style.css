@@ -113,7 +113,7 @@ header .navbar-toggler:focus
 { color: rgb(243, 172, 18) !important; }
 .text-rejected
 { color: red !important; }
-.text-accepted
+.text-Converted
 { color: green !important; }
 .text-assigned
 { color: blue !important; }
@@ -479,7 +479,7 @@ section{
   display: flex;
   flex-direction: column;
   gap: 15px; /* Increased gap for more space between elements */
-  max-width: 500px; /* Increased width for a wider form */
+  max-width: 100%; /* Increased width for a wider form */
   padding: 30px; /* Increased padding for more space inside the form */
   border-radius: 20px;
   position: relative;
@@ -487,8 +487,14 @@ section{
   color: #fff;
   border: 1px solid #333;
   margin: auto; /* Centering the form horizontally */
-}
+  grid-template-columns: repeat(2, 1fr);
 
+}
+.gridf{
+  display: grid; 
+  grid-template-columns: repeat(2,1fr); 
+  gap: 15px;
+}
 .title {
   font-size: 32px;
   font-weight: 600;
@@ -592,9 +598,10 @@ section{
 }
 
 .submit {
+  width: 27%;
   border: none;
   outline: none;
-  padding: 15px; /* Increased padding for the submit button */
+  padding: 6px; /* Increased padding for the submit button */
   border-radius: 10px;
   color: #fff;
   font-size: 18px; /* Increased font size for the submit button */
@@ -771,3 +778,172 @@ section{
   filter: blur(10px);
   transform: scale(0.9, 0.9);
 } */
+
+
+/* Card Style */
+.lead-info .card {
+  border-radius: 10px;
+  background-color: #f9f9f9; /* Light grey background */
+  border: 1px solid #e0e0e0b9; /* Soft border */
+}
+
+.lead-info .card .card-header {
+  background-color: #0b5fb9be; /* Dark blue header */
+  color: #fff; /* White text */
+  padding: 15px;
+  border-bottom: 1px solid #ccc; /* Border for the header */
+}
+
+.lead-info .card .card-header h3 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 0;
+  color: #000000; 
+}
+
+.lead-info .card .profile_img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  margin: 10px auto;
+  border: 5px solid #00ccffd7; /* Blue border */
+  border-radius: 50%;
+}
+
+.lead-info .table th,
+.lead-info .table td {
+  font-size: 14px;
+  padding: 10px;
+  color: #333; /* Dark text for better readability */
+}
+
+.lead-info .table th {
+  background-color: #007bff; /* Blue background for headers */
+  color: #fff; /* White text */
+}
+
+.lead-info .table td {
+  background-color: #f1f1f1; /* Light grey background for table cells */
+}
+
+/* Button Styles */
+.mt-4 .btn {
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.mt-4 .btn-success {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.mt-4 .btn-danger {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.mt-4 .btn-primary {
+  background-color: #007bff;
+  color: #fff;
+}
+.modal-header {
+  background-color: #007bff;
+  color: #fff;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  border-top: 1px solid #dee2e6;
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.btn-success:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+}
+/* General Modal Styling */
+.modal-content {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  background-color: #f44336; /* Red color for junk (reject) modal header */
+  color: white;
+  padding: 16px;
+  border-bottom: none;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.modal-header .btn-close {
+  color: white;
+  opacity: 1;
+  font-size: 1.2rem;
+}
+
+.modal-body {
+  padding: 20px;
+  background-color: #f5f5f5; /* Light grey background */
+}
+
+.modal-body label {
+  font-weight: 500;
+  color: #333;
+}
+
+.modal-body textarea {
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  resize: none;
+  background-color: #fff;
+}
+
+.modal-footer {
+  padding: 16px;
+  border-top: none;
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal-footer .btn {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 5px;
+}
+
+.modal-footer .btn-secondary {
+  background-color: #9e9e9e;
+  color: white;
+}
+
+.modal-footer .btn-danger {
+  background-color: #f44336;
+  color: white;
+  font-weight: 600;
+}
+
+.modal-footer .btn:hover {
+  opacity: 0.9;
+}

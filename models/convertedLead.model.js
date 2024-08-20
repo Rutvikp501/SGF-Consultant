@@ -25,7 +25,7 @@ packages :  {
     name: { type: String , default: ''},
     subname: { type: String , default: ''},
     addonS:  [{ type: String , default: ''}],
-    amount: { type: Number , default: ''}
+    amount: { type: String , default: ''}
 },  
   conversionDate: { type: Date ,default: null},
 }, { timestamps: true });

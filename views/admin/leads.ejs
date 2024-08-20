@@ -2,67 +2,166 @@
 	<%- include('../partials/adminSidebar') %>
 	
 	<div id="main-wrapper">
-<!-- 		
-		<div class="bg-white shadow-sm p-3">
-			<span class="me-3" id="sidebar-toggler-btn"><i class="fas fa-bars"></i></span>
-			<h5 class="m-0 color-theme d-inline-block">Leads</h5>
-		</div>
-		 -->
-		<div class="border m-4 my-3 p-4 bg-white rounded-2 shadow-sm">
-			<div class="mb-2">
-				<span>Lead ID:</span>
-				<span><%= Leads.leadID %></span>
-			</div>
-			
-			<div class="mb-2">
-				<span>Lead type:</span>
-				<span><%= Leads.leadType %></span>
-			</div>
-			
-			<div class="mb-2">
-				<span>eventName:</span>
-				<span><%= Leads.eventName %></span>
-			</div>
-			
-			<div class="mb-2">
-				<span>Time of eventDate:</span>
-				<span><%= Leads.eventDate.toLocaleString("en-IN", { dateStyle: "medium", }) %></span>
-			</div>
-			
-			<div class="mb-2">
-				<span>Address to collect:</span>
-				<span><%= Leads.eventLocation %></span>
-			</div>
-			
-			<div class="mb-2">
-				<span>Phone:</span>
-				<span><%= Leads.phone %></span>
-			</div>
-			
-			<% if(Leads.cycle != "") { %>
-				<div class="mb-2">
-					<span>Cycle label:</span>
-					<div class="ms-3"><%= Leads.cycle.label %></div>
-					<span>Cycle number:</span>
-					<div class="ms-3"><%= Leads.cycle.number %></div>
-					<span>Cycle year:</span>
-					<div class="ms-3"><%= Leads.cycle.year %></div>
+		<div class="lead-info py-4">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-8">
+						<div class="card shadow-sm">
+							<div class="card-header bg-transparent border-0">
+								<h3 class="mb-0"></i>Lead Information</h3>
+							</div>
+							<div class="card-body pt-0">
+								<table class="table table-bordered">
+									<tr>
+										<th width="30%">Lead ID:</th>
+										<td width="2%">:</td>
+										<td><%= Leads.leadID %></td>
+									</tr>
+									<tr>
+										<th width="30%">Lead type</th>
+										<td width="2%">:</td>
+										<td><%= Leads.leadType %></td>
+									</tr>
+									<tr>
+										<th width="30%">Event Name</th>
+										<td width="2%">:</td>
+										<td><%= Leads.eventName %></td>
+									</tr>
+									<tr>
+										<th width="30%">Date of event</th>
+										<td width="2%">:</td>
+										<td><%= Leads.eventDate.toLocaleString("en-IN", { dateStyle: "medium", }) %></td>
+									</tr>
+									<tr>
+										<th width="30%">Event Location</th>
+										<td width="2%">:</td>
+										<td><%= Leads.eventLocation %></td>
+									</tr>
+									<tr>
+										<th width="30%">Phone</th>
+										<td width="2%">:</td>
+										<td><%= Leads.phone %></td>
+									</tr>
+									<tr>
+										<th width="30%">Email</th>
+										<td width="2%">:</td>
+										<td><%= Leads.email %></td>
+									</tr>
+									<% if(Leads.cycle != "") { %>
+									<tr>
+										<th width="30%">Cycle label</th>
+										<td width="2%">:</td>
+										<td><%= Leads.cycle.label %></td>
+									</tr>
+									<tr>
+										<th width="30%">Cycle number</th>
+										<td width="2%">:</td>
+										<td><%= Leads.cycle.number %></td>
+									</tr>
+									<tr>
+										<th width="30%">Cycle year</th>
+										<td width="2%">:</td>
+										<td><%= Leads.cycle.year %></td>
+									</tr>
+									<% } %>
+									<% if(Leads.status == "Converted") { %>
+										<% ConvertedLeads.forEach(function(convertedLead) { %>
+										  <tr>
+											<th width="30%">Package Name</th>
+											<td width="2%">:</td>
+											<td><%= convertedLead.packages.name %></td>
+										  </tr>
+										  <tr>
+											<th width="30%">Package Subname</th>
+											<td width="2%">:</td>
+											<td><%= convertedLead.packages.subname %></td>
+										  </tr>
+										  <tr>
+											<th width="30%">Amount</th>
+											<td width="2%">:</td>
+											<td><%= convertedLead.packages.amount %></td>
+										  </tr>
+										  <tr>
+											<th width="30%">Addons</th>
+											<td width="2%">:</td>
+											<td><%= convertedLead.packages.addonS.join(', ') %></td>
+										  </tr>
+										<% }) %>
+									  <% } %>
+								</table>
+								<div class="mt-4">
+									<% if(Leads.status == "Pending") { %>
+										<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#convertModal">Convert</button>
+										<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">Junk</button>
+									<% } else if(Leads.status == "Converted") { %>
+										<!-- <a href="/admin/Leads/assign/<%= Leads._id %>" class="btn btn-primary">Assign agent</a> -->
+									<% } %>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
-			<% } %>
-				
-
-			
-			
-			<div class="mt-4">
-				<% if(Leads.status == "Pending") { %>
-					<a href="/admin/Leads/accept/<%= Leads._id %>" class="btn">Convered</a>
-					<a href="/admin/Leads/reject/<%= Leads._id %>" class="btn btn-danger">Junk</a>
-				<% } else if(Leads.status == "Convered") { %>
-					<a href="/admin/Leads/assign/<%= Leads._id %>" class="btn">Assign agent</a>
-				<% } %>
 			</div>
-			
 		</div>
-		
+
+		<!-- Convert Lead Modal -->
+		<div class="modal fade" id="convertModal" tabindex="-1" aria-labelledby="convertModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="convertModalLabel">Convert Lead</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<form action="/admin/Leads/converte/<%= Leads._id %>" method="POST">
+						<div class="modal-body">
+							<div class="mb-3">
+								<label for="packageName" class="form-label">Package Name</label>
+								<input type="text" class="form-control" id="packageName" name="packageName" required>
+							</div>
+							<div class="mb-3">
+								<label for="packageSubname" class="form-label">Package Subname</label>
+								<input type="text" class="form-control" id="packageSubname" name="packageSubname">
+							</div>
+							<div class="mb-3">
+								<label for="addonS" class="form-label">Add-ons</label>
+								<input type="text" class="form-control" id="addonS" name="addonS" placeholder="Comma-separated values">
+							</div>
+							<div class="mb-3">
+								<label for="amount" class="form-label">Amount</label>
+								<input type="number" class="form-control" id="amount" name="amount" required>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+							<button type="submit" class="btn btn-success">Convert Lead</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<!-- Reject Lead Modal -->
+		<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="rejectModalLabel">Reject Lead</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<form action="/admin/Leads/reject/<%= Leads._id %>" method="POST">
+						<div class="modal-body">
+							<div class="mb-3">
+								<label for="rejectionMark" class="form-label">Reason for Rejection</label>
+								<textarea class="form-control" id="rejectionMark" name="rejectionMark" required></textarea>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+							<button type="submit" class="btn btn-danger">Reject Lead</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
 	</div>
 </main>
