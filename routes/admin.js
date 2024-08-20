@@ -155,8 +155,8 @@ router.post("/admin/Leads/reject/:LeadsId", middleware.ensureAdminLoggedIn, asyn
 			rejectionDate: new Date(),
 		});
 		
-		// await junkLead.save();
-		// await LeadModel.findByIdAndDelete(LeadsId);
+		await junkLead.save();
+		//await LeadModel.findByIdAndDelete(LeadsId);
 		await LeadModel.findByIdAndUpdate(LeadsId, { status: "rejected" });
 		req.flash("success", "Leads rejected successfully");
 		res.redirect(`/admin/Leads/view/${LeadsId}`);
