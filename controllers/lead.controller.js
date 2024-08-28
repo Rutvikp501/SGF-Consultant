@@ -1,7 +1,7 @@
 const { calculateCycle, calculateLeadCycle, generateLeadID } = require('../helpers/sample');
 const LeadModel = require('../models/lead.models');
 const UserModel = require('../models/user');
-
+const token = process.env.token
 exports.addLead = async (req, res) => {
     const { Adviser, name, email, phone, eventName, eventDate, eventLocation, pincode, eventSpecialsName, specialCode, leadType, status, } = req.body;
     // console.log(req.body);
@@ -13,7 +13,11 @@ exports.addLead = async (req, res) => {
         const consultantDetails = await UserModel.findById(Adviser);
        
         if (!consultantDetails) {
-            return res.status(404).send({ message: 'Consultant not found' });
+            return res.send({
+                success: false,
+                statusCode: 404,
+                message: 'Consultant not found'
+            });
         }
         consultantDetails.calculateLifetimeCycleNumber();
         const leadcycle = calculateLeadCycle(leadType, currentDate)
@@ -30,7 +34,11 @@ exports.addLead = async (req, res) => {
         const leadID = generateLeadID(consultantDetails.code, leadType, leadcycle.Label, consultantDetails.consultantLifetimeCycleNumber, leadNumber, pincode);
         const duplicatecode = await LeadModel.find({ leadIDd: leadID }); 
         if(duplicatecode!=""){
-            return res.status(400).send({status: "failed", message: "leadID already exist." })
+            return res.send({
+                success: false,
+                statusCode: 400,
+                message: "leadID already exist."
+            }); 
         }
         await consultantDetails.save();
 
@@ -52,10 +60,19 @@ exports.addLead = async (req, res) => {
             cycle: { label: leadcycle.Label, number: leadcycle.Number,year:leadcycle.year }
         });
         await lead.save();
-        res.status(201).send({ message: 'Lead added successfully', lead });
+        res.send({
+            success: true,
+            statusCode: 201,
+             message: 'Lead added successfully',
+            data:lead
+        });
     } catch (error) {
         console.error(error);
-        res.status(500).send({ message: 'Internal server error' });
+        res.send({
+            success: false,
+            statusCode: 500,
+             message: 'Internal server error'
+        });
     }
 };
 
@@ -64,12 +81,24 @@ exports.getAllLeads = async (req, res) => {
     try {
         const leads = await LeadModel.find();
         if (!leads.length) {
-            return res.status(404).send({ message: 'No leads found ' });
+            return res.send({
+                success: false,
+                statusCode: 404,
+                 message: 'No leads found '
+            });
         }
-        res.status(200).send(leads);
+        res.send({
+            success: true,
+            statusCode: 200,
+           data:leads
+        });
     } catch (error) {
         console.error(error);
-        res.status(500).send({ message: 'Internal server error' });
+        res.send({
+            success: false,
+            statusCode: 500,
+            message: 'Internal server error' 
+        });
     }
 };
 
@@ -94,7 +123,11 @@ exports.getLeadsByAdviser = async (req, res) => {
           { $match: filter }
         ]);
     
-        return res.status(200).json(allSearchedLeads);
+        return res.send({
+            success: true,
+            statusCode: 200,
+            data:allSearchedLeads
+        });
       } catch (error) {
         console.log(error);
         next(error);
@@ -106,22 +139,40 @@ exports.getAdditionalData = async (req, res) => {
     try {
         const lead = await LeadModel.findById(leadId);
         if (!lead) {
-            return res.status(404).send({ message: 'No lead found' });
+            return res.send({
+                success: false,
+                statusCode: 404,
+                message: 'No lead found' 
+            });
         }
 
         const { associates } = lead;
         if (!associates) {
-            return res.status(404).send({ message: 'No additional data found for this lead' });
+            return  res.send({
+                success: false,
+                statusCode: 404,
+                message: 'No additional data found for this lead' 
+            });
         }
-
-        res.status(200).send(associates);
+        res.send({
+            success: true,
+            statusCode: 200,
+            data:associates
+        });
     } catch (error) {
         console.error(error);
-        res.status(500).send({ message: 'Internal server error' });
+        res.send({
+            success: false,
+            statusCode: 500,
+            message: 'Internal server error'
+        });
     }
 };
 
 exports.getLeadscount = async (req, res) => {
+    const authHeader = req.header.authHeader;
+    const authtoken = authHeader.split(" ")[1];
+    const decode = jwt.verify(authtoken,token)
     const consultantId = req.user._id;
     const RegularLeads = {};
     const SeasonalLeads = {};
@@ -139,9 +190,17 @@ exports.getLeadscount = async (req, res) => {
         SeasonalLeads.numConvertedLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal",status: "Converted"   });
         SeasonalLeads.numJunkLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal",status: "Junk"   });
     
-        res.status(200).send({ RegularLeads, SeasonalLeads });
+        res.send({
+            success: true,
+            statusCode: 200,
+            data:{ RegularLeads, SeasonalLeads }
+        });
     } catch (error) {
         console.error(error);
-        res.status(500).send({ message: 'Internal server error' });
+        res.send({
+            success: false,
+            statusCode: 500,
+            message: 'Internal server error' 
+        });
     }
 };

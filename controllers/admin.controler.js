@@ -32,7 +32,6 @@ exports.GetAllUser = async (req, res) => {
 exports.GetSearchedUser = async (req, res,next) => {
     try {
         const params = req.body || '';
-        console.log(params);
         const searchParam = params.search;
         const filter = {};
 
@@ -61,8 +60,11 @@ exports.GetSearchedUser = async (req, res,next) => {
                 }
             }
         ]);
-
-        return res.status(200).json(AllSearchedUser);
+        return res.send({
+            success: false,
+            statusCode: 500,
+            data:AllSearchedUser
+        });
     } catch (error) {
         console.log(error);
         next(error);
@@ -71,7 +73,6 @@ exports.GetSearchedUser = async (req, res,next) => {
 
 exports.Login = async (req, res) => {
     let { email_id, password } = req.body;
-    console.log(req.body);
 
     try {
         const user = await UserModel.findOne({ email_id });
@@ -91,20 +92,20 @@ exports.Login = async (req, res) => {
                     });
                 } else {
                     // Generate JWT token
-                    let keyToken = jwt.sign({ UserId: user._id }, token); // Ensure 'token' is defined
-
+                    
                     const data = {
-                        keyToken: keyToken,
+                        UserId: user._id,
                         role: user.role,
                         User_code: user.code,
                         User_name: user.name,
                         email_id: user.email_id
                     };
-
+                    let keyToken = jwt.sign( data, token); 
+                    
                     res.send({
                         success: true,
                         statusCode: 200,
-                        data: data
+                        data: keyToken
                     });
                 }
             });
@@ -127,7 +128,6 @@ exports.Login = async (req, res) => {
 
 exports.Register = async (req, res) => {
     const {User_code, User_name , email_id ,mobile_no,password,dateOfJoining ,role }=req.body
-    console.log(req.body);
     
     const getExistingUser = await UserModel.find({ email_id: email_id });  
     const duplicatecode = await UserModel.find({ code: User_code });  
@@ -254,7 +254,6 @@ exports.Logout = async (req, res) => {
 
 exports.forgotPassword = async (req, res) => {
     const { email_id } = req.body;
-    console.log(email_id);
     try {
       const user = await UserModel.findOne({ email_id });
       if (!user) { 
@@ -266,7 +265,8 @@ exports.forgotPassword = async (req, res) => {
       }
   
       // Generate OTP and set expiration
-      const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+    //   const otp = Math.floor(100000 + Math.random() * 900000).toString(); 
+      const otp = Math.floor(1000 + Math.random() * 9000).toString(); 
       user.otp = otp;
       user.otpExpires = Date.now() + 3600000; // 1 hour expiration
   
@@ -291,6 +291,7 @@ exports.forgotPassword = async (req, res) => {
 
 exports.resetPassword = async (req, res) => {
   const { otp,email_id,newPassword } = req.body;
+  
     // const valid = validatePassword(Password)
     // if(valid){
     //     return res.status(400).send({message:valid[0]})
@@ -303,7 +304,9 @@ exports.resetPassword = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(400).send({ message: 'OTP is invalid or has expired.' });
+        return  res.send({ success: true,
+            statusCode: 400, 
+            message: 'OTP is invalid or has expired.' });
     }
     const salt = bcrypt.genSaltSync(10);
     const hashPASS = bcrypt.hashSync(newPassword, salt);
@@ -312,10 +315,16 @@ exports.resetPassword = async (req, res) => {
       user.otpExpires = undefined;
 
       //await user.save();
-      res.status(200).send({ message: 'Password has been updated.' });
+      res.send({ success: true,
+        statusCode: 200, 
+        message: 'Password has been updated.' });
 
   } catch (error) {
     console.error(error);
-    res.status(500).send({ message: 'Error resetting password.' });
+    res.send({
+        success: false,
+        statusCode: 500,
+        message:'Error  resetting password.'
+    });
   }
 };
