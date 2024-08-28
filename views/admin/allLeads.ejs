@@ -1,0 +1,70 @@
+<main>
+	<%- include('../partials/adminSidebar') %>
+	
+	<div id="main-wrapper">
+		<div class="lead-info py-4">
+			<div class="container">
+				<!-- Search and Sort Form -->
+				<form action="/admin/Leads/all" method="GET" class="mb-4">
+					<div class="row">
+						<div class="col-md-4">
+							<input type="text" name="search" class="form-control" placeholder="Search by Lead ID, Consultant Code, Lead Type, Status" value="<%= search || '' %>">
+						</div>
+						<div class="col-md-3">
+							<select name="sortBy" class="form-control">
+								<option value="">Sort By</option>
+								<option value="leadID" <%= sortBy === 'leadID' ? 'selected' : '' %>>Lead ID</option>
+								<option value="consultant_code" <%= sortBy === 'consultant_code' ? 'selected' : '' %>>Consultant Code</option>
+								<option value="leadType" <%= sortBy === 'leadType' ? 'selected' : '' %>>Lead Type</option>
+								<option value="status" <%= sortBy === 'status' ? 'selected' : '' %>>Status</option>
+							</select>
+						</div>
+						<div class="col-md-2">
+							<select name="order" class="form-control">
+								<option value="asc" <%= order === 'asc' ? 'selected' : '' %>>Ascending</option>
+								<option value="desc" <%= order === 'desc' ? 'selected' : '' %>>Descending</option>
+							</select>
+						</div>
+						<div class="col-md-3">
+							<button type="submit" class="btn btn-primary">Search</button>
+						</div>
+					</div>
+				</form>
+				
+				<!-- Lead Information Table -->
+				<div class="tbl-header" style="max-height: 75%; overflow: auto;">
+			<table  cellpadding="0" cellspacing="0"  border="0">
+				<thead>
+					<tr>
+						<th scope="col">Lead ID</th>
+						<th scope="col">consultant code</th>
+						<th scope="col">Name</th>
+						<th scope="col">Type</th>
+						<th scope="col">Event Location</th>
+						<th scope="col">Status</th>
+						<th scope="col">Actions</th>
+					</tr>
+				</table>
+			</div>
+			<div class="tbl-content">
+				<table cellpadding="0" cellspacing="0" border="0">
+				<tbody>
+					<% for(let i=0; i<allLeads.length; i++) { %>
+						<tr>
+							<th scope="row"> <%= allLeads[i].leadID %> </th>
+							<td> <%= allLeads[i].consultant_code %> </td>
+							<td> <%= allLeads[i].name %> </td>
+							<td> <%= allLeads[i].leadType %> </td>
+							<td> <%= allLeads[i].eventLocation + " " + allLeads[i].pincode%> </td>
+							<td class="fw-bold text-<%= allLeads[i].status %>"> <%= allLeads[i].status %> </td>
+							<td><a href="/admin/Leads/view/<%= allLeads[i]._id %>" class="custom-btn btn-2">View</a></td>
+						</tr>
+					<% } %>
+				</tbody>
+			</table>
+		</div>
+				<!-- ... -->
+			</div>
+		</div>
+	</div>
+</main>
