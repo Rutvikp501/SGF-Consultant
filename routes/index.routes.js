@@ -6,6 +6,10 @@ const Admin  = require('../controllers/admin.controler');
 router.post('/leadapi/addLead', leadController.addLead);
 router.get('/leadapi/getAllLeads', leadController.getAllLeads);
 router.get('/leadapi/getLeadscount', leadController.getLeadscount);
+router.get('/leadapi/getDashboardData', leadController.getDashboardData);
+router.get('/leadapi/getconvertedLeads', leadController.getconvertedLeads);
+router.get('/leadapi/getpendingLeads', leadController.getpendingLeads);
+router.get('/leadapi/getleadsview/:leadId', leadController.getleadsview);
 router.post('/leadapi/getSearchedLeads', leadController.getLeadsByAdviser);
 router.get('/leadapi/getAdditionalData/:leadId', leadController.getAdditionalData);
 

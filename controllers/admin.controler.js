@@ -177,8 +177,13 @@ exports.Register = async (req, res) => {
 
 exports.Edit = async (req, res) => {
     const { id } = request.body;
+    const authHeader = req.headers.authorization;
+    const authtoken = authHeader.split(" ")[1];
+    const decode = jwt.verify(authtoken,token)
+    console.log(decode.UserId);
+    
     try {
-      const result = await UserModel.findById(id);
+      const result = await UserModel.findById(decode.UserId);
       response.send({
         success: "success",
         data: result,
@@ -222,13 +227,17 @@ exports.Update = async (req, res) => {
 
 exports.Delete = async (req, res) => {
     console.log(req.params.id);
+    const authHeader = req.headers.authorization;
+    const authtoken = authHeader.split(" ")[1];
+    const decode = jwt.verify(authtoken,token)
+    console.log(decode.UserId);
     try {
-        let User = await UserModel.findById(req.params.id);
+        let User = await UserModel.findById(decode.UserId);
         console.log(User); // Check what User object is returned
         if (!User) {
             return res.status(404).json({ message: 'User not found' });
         }
-        let delete1 = await UserModel.findByIdAndDelete({_id:req.params.id});
+        let delete1 = await UserModel.findByIdAndDelete({_id:decode.UserId});
         res.status(200).json({ message: 'User deleted' });
     } catch (error) {
         console.error(error);
