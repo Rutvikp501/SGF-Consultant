@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: User Management API
+  title: User Management and Lead Management API
   version: 1.0.0
   description: API documentation for User Management and Lead Management
 
@@ -15,17 +15,6 @@ security:
   - bearerAuth: []
 
 paths:
-  /:
-    get:
-      tags:
-        - Home
-      description: Home Page
-      responses:
-        '200':
-          description: Home Page
-        '401':
-          description: Unauthorized
-
   /api/adminapi/:
     get:
       tags:
@@ -104,6 +93,34 @@ paths:
                 role:
                   type: string
                 dateOfJoining:
+                  type: string
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+  /api/adminapi/edit:
+    post:
+      tags:
+        - User API
+      description: Edit user details
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                User_code:
+                  type: string
+                User_name:
+                  type: string
+                email_id:
+                  type: string
+                mobile_no:
+                  type: number
+                role:
                   type: string
       responses:
         '200':
@@ -204,7 +221,6 @@ paths:
         '400':
           description: Bad Request
 
-
   /api/leadapi/addLead:
     post:
       tags:
@@ -265,11 +281,74 @@ paths:
         '400':
           description: Bad Request
 
-  /api/leadapi/getSearchedLeads:
+  /api/leadapi/getLeadscount:
+    get:
+      tags:
+        - Lead API
+      description: Get leads count
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+  /api/leadapi/getDashboardData:
+    get:
+      tags:
+        - Lead API
+      description: Get dashboard data
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+  /api/leadapi/getconvertedLeads:
+    get:
+      tags:
+        - Lead API
+      description: Get converted leads
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+  /api/leadapi/getpendingLeads:
+    get:
+      tags:
+        - Lead API
+      description: Get pending leads
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+  /api/leadapi/getleadsview/{leadId}:
+    get:
+      tags:
+        - Lead API
+      description: Get detailed view of a lead
+      parameters:
+        - in: path
+          name: leadId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+        '404':
+          description: Lead not found
+        '500':
+          description: Internal server error
+
+  /api/leadapi/getLeadsByConsultant:
     post:
       tags:
         - Lead API
-      description:  Get leads by Search  
+      description: Get leads by consultant
       requestBody:
         required: true
         content:
@@ -277,16 +356,13 @@ paths:
             schema:
               type: object
               properties:
-                search:
+                consultant_code:
                   type: string
       responses:
         '200':
           description: Success
         '400':
           description: Bad Request
-
-
-
 
   /api/leadapi/getAdditionalData/{leadId}:
     get:

@@ -3,14 +3,16 @@ const express = require('express');
 const router = express.Router();
 const leadController = require('../controllers/lead.controller');
 const Admin  = require('../controllers/admin.controler');
+
+
 router.post('/leadapi/addLead', leadController.addLead);
 router.get('/leadapi/getAllLeads', leadController.getAllLeads);
 router.get('/leadapi/getLeadscount', leadController.getLeadscount);
 router.get('/leadapi/getDashboardData', leadController.getDashboardData);
 router.get('/leadapi/getconvertedLeads', leadController.getconvertedLeads);
 router.get('/leadapi/getpendingLeads', leadController.getpendingLeads);
+router.post('/leadapi/getLeadsByConsultant', leadController.getLeadsByConsultant);
 router.get('/leadapi/getleadsview/:leadId', leadController.getleadsview);
-router.post('/leadapi/getSearchedLeads', leadController.getLeadsByAdviser);
 router.get('/leadapi/getAdditionalData/:leadId', leadController.getAdditionalData);
 
 
@@ -25,4 +27,3 @@ router.post('/adminapi/forgotPassword',Admin.forgotPassword)
 router.post('/adminapi/resetPassword',Admin.resetPassword)
 
 module.exports = router;
-// app.use('/adviser',require('./adviser.route'));

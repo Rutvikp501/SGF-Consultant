@@ -46,17 +46,16 @@ exports.GetSearchedUser = async (req, res,next) => {
         const AllSearchedUser = await UserModel.aggregate([
             { $match: filter },
             {
-                $addFields: {
-                    name: { $concat: ["$name", " - ", "$email_id"] },
-                    value: "$name"
-                }
-            },
-            { $unset: ["name", "email_id"] }, // Remove original fields if needed
-            {
                 $project: {
-                    _id: 0,
+                    _id: 0, // Exclude the _id field
                     value: 1,
-                    name: 1 // Include only the value and name fields
+                    fullName: 1, // Include the concatenated name and email_id
+                    code: 1,
+                    name: 1,
+                    mobile_no: 1,
+                    email_id: 1,
+                    cycle: 1,
+                    consultantLifetimeCycleNumber: 1
                 }
             }
         ]);

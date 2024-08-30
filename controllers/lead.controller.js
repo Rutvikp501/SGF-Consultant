@@ -85,7 +85,7 @@ exports.getAllLeads = async (req, res) => {
     const authHeader = req.headers.authorization;
     const authtoken = authHeader.split(" ")[1];
     const decode = jwt.verify(authtoken,token)
-    console.log(decode);
+   
     try {
         const leads = await LeadModel.find();
         if (!leads.length) {
@@ -110,12 +110,12 @@ exports.getAllLeads = async (req, res) => {
     }
 };
 
-exports.getLeadsByAdviser = async (req, res) => {
+exports.getLeadsByConsultant = async (req, res) => {
     try {
         const authHeader = req.headers.authorization;
         const authtoken = authHeader.split(" ")[1];
         const decode = jwt.verify(authtoken,token)
-        console.log(decode);
+       
         const params = req.body || '';
         const searchParam = params.search;
         const filter = {};
@@ -185,7 +185,7 @@ exports.getLeadscount = async (req, res) => {
     const authHeader = req.headers.authorization;
     const authtoken = authHeader.split(" ")[1];
     const decode = jwt.verify(authtoken,token)
-    console.log(decode);
+   
     
     const consultantId = decode.UserId;
     const RegularLeads = {};
@@ -253,40 +253,14 @@ exports.getDashboardData = async (req, res) => {
         });
     }
 };
-
-exports.getleadsview = async (req, res) => {
-    const authHeader = req.headers.authorization;
-    const authtoken = authHeader.split(" ")[1];
-    const decode = jwt.verify(authtoken,token)
-    const leadId = req.params.leadId;
-    console.log(decode);
-    const consultantId = decode.UserId;
-    const Leads = await LeadModel.findById(leadId).populate("consultant");
-    try {
-        res.send({
-            success: true,
-            statusCode: 200,
-            data:Leads
-        });
-    } catch (error) {
-        console.error(error);
-        res.send({
-            success: false,
-            statusCode: 500,
-            message: 'Internal server error' 
-        });
-    }
-};
 exports.getconvertedLeads = async (req, res) => {
     const authHeader = req.headers.authorization;
     const authtoken = authHeader.split(" ")[1];
     const decode = jwt.verify(authtoken,token)
-    console.log(decode);
+   
     const consultantId = decode.UserId;
-    const ConvertedLeads = await LeadModel.find({ consultant: consultantId, status: "Converted" });
+    const ConvertedLeads = await LeadModel.find({ consultant: consultantId, status: "Converted" }).populate("consultant");
     try {
-
-    
         res.send({
             success: true,
             statusCode: 200,
@@ -305,16 +279,37 @@ exports.getpendingLeads  = async (req, res) => {
     const authHeader = req.headers.authorization;
     const authtoken = authHeader.split(" ")[1];
     const decode = jwt.verify(authtoken,token)
-    console.log(decode);
+   
     const consultantId = decode.UserId;
     const pendingLeads = await LeadModel.find({ consultant: consultantId, status: "Pending" }).populate("consultant");
     try {
-
-    
         res.send({
             success: true,
             statusCode: 200,
             data:pendingLeads
+        });
+    } catch (error) {
+        console.error(error);
+        res.send({
+            success: false,
+            statusCode: 500,
+            message: 'Internal server error' 
+        });
+    }
+};
+exports.getleadsview = async (req, res) => {
+    const authHeader = req.headers.authorization;
+    const authtoken = authHeader.split(" ")[1];
+    const decode = jwt.verify(authtoken,token)
+    const leadId = req.params.leadId;
+   
+    const consultantId = decode.UserId;
+    const Leads = await LeadModel.findById(leadId).populate("consultant");
+    try {
+        res.send({
+            success: true,
+            statusCode: 200,
+            data:Leads
         });
     } catch (error) {
         console.error(error);
