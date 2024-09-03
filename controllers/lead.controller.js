@@ -7,7 +7,7 @@ exports.addLead = async (req, res) => {
     const authHeader = req.headers.authorization;
     const authtoken = authHeader.split(" ")[1];
     const decode = jwt.verify(authtoken,token)
-    console.log(11000237641478);
+    console.log("11000237641478");
     const { Adviser, name, email, phone, eventName, eventDate, eventLocation, pincode, eventSpecialsName, specialCode, leadType, status, } = req.body;
     // console.log(req.body);
     try {
@@ -82,9 +82,7 @@ exports.addLead = async (req, res) => {
 };
 
 exports.getAllLeads = async (req, res) => {
-    const authHeader = req.headers.authorization;
-    const authtoken = authHeader.split(" ")[1];
-    const decode = jwt.verify(authtoken,token)
+
    
     try {
         const leads = await LeadModel.find();
@@ -182,12 +180,11 @@ exports.getAdditionalData = async (req, res) => {
 };
 
 exports.getLeadscount = async (req, res) => {
-    const authHeader = req.headers.authorization;
-    const authtoken = authHeader.split(" ")[1];
-    const decode = jwt.verify(authtoken,token)
-   
-    
-    const consultantId = decode.UserId;
+    // const authHeader = req.headers.authorization;
+    // const authtoken = authHeader.split(" ")[1];
+    // const decode = jwt.verify(authtoken,token)
+    // const consultantId = decode.UserId;
+    const consultantId = "66ab659fdec07a2c29fd9609";
     const RegularLeads = {};
     const SeasonalLeads = {};
     try {
@@ -218,15 +215,17 @@ exports.getLeadscount = async (req, res) => {
         });
     }
 };
+
 exports.getDashboardData = async (req, res) => {
-    const authHeader = req.headers.authorization;
-    const authtoken = authHeader.split(" ")[1];
-    const decode = jwt.verify(authtoken,token)    
-    const consultantId = decode.UserId;
+    // const authHeader = req.headers.authorization;
+    // const authtoken = authHeader.split(" ")[1];
+    // const decode = jwt.verify(authtoken,token)    
+    // const consultantId = decode.UserId||"66ab659fdec07a2c29fd9609";
+    const consultantId = "66ab659fdec07a2c29fd9609";
     const RegularLeads = {};
     const SeasonalLeads = {};
     try {
-        RegularLeads.numAllLeads = await LeadModel.countDocuments({consultant: consultantId,});
+        RegularLeads.AllLeads = await LeadModel.countDocuments({consultant: consultantId,});
         // Regular Leads Counts
         RegularLeads.numPendingLeads = await LeadModel.countDocuments({ consultant: consultantId,leadType: "Regular",status: "Pending" });
         RegularLeads.numAllLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Regular" });
@@ -238,11 +237,58 @@ exports.getDashboardData = async (req, res) => {
         SeasonalLeads.numAllLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal"   });
         SeasonalLeads.numConvertedLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal",status: "Converted"   });
         SeasonalLeads.numJunkLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal",status: "Junk"   });
-    
+        const leadsData = [
+
+            {
+                title: 'ALL Leads',
+                des: 'Counts for All Leads',
+                status: RegularLeads.AllLeads
+            },
+            {
+                title: 'Regular ALL Leads ',
+                des: 'Counts for All Leads',
+                status: RegularLeads.numAllLeads
+            },
+            {
+                title: 'Regular Pending Leads',
+                des: 'Counts for Pending Leads',
+                status: RegularLeads.numPendingLeads
+            },
+            {
+                title: 'Regular Converted Leads',
+                des: 'Counts for Converted Leads',
+                status: RegularLeads.numConvertedLeads
+            },
+            // {
+            //     title: 'Regular Junk Leads',
+            //     des: 'Counts for Junk Leads',
+            //     status: RegularLeads.numJunkLeads
+            // },
+            {
+                title: 'Seasonal ALL Leads',
+                des: 'Counts for All Leads',
+                status: SeasonalLeads.numAllLeads
+            },
+            {
+                title: 'Seasonal Pending Leads',
+                des: 'Counts for Pending Leads',
+                status: SeasonalLeads.numPendingLeads
+            },
+            {
+                title: 'Seasonal Converted Leads',
+                des: 'Counts for Converted Leads',
+                status: SeasonalLeads.numConvertedLeads
+            },
+            // {
+            //     title: 'Seasonal Junk Leads',
+            //     des: 'Counts for Junk Leads',
+            //     status:SeasonalLeads.numJunkLeads
+            // },
+        ];
         res.send({
             success: true,
             statusCode: 200,
-            data:{ RegularLeads, SeasonalLeads }
+            data: leadsData 
         });
     } catch (error) {
         console.error(error);
@@ -253,6 +299,7 @@ exports.getDashboardData = async (req, res) => {
         });
     }
 };
+
 exports.getconvertedLeads = async (req, res) => {
     const authHeader = req.headers.authorization;
     const authtoken = authHeader.split(" ")[1];
@@ -275,6 +322,7 @@ exports.getconvertedLeads = async (req, res) => {
         });
     }
 };
+
 exports.getpendingLeads  = async (req, res) => {
     const authHeader = req.headers.authorization;
     const authtoken = authHeader.split(" ")[1];
@@ -297,6 +345,7 @@ exports.getpendingLeads  = async (req, res) => {
         });
     }
 };
+
 exports.getleadsview = async (req, res) => {
     const authHeader = req.headers.authorization;
     const authtoken = authHeader.split(" ")[1];
