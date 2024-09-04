@@ -58,16 +58,16 @@ app.use(homeRoutes);
 app.use(authRoutes);
 app.use(adminRoutes);
 app.use(consultantRoutes);
-app.use('/api/user',require('./routes/user.route'));
-app.use('/api/lead', require('./routes/lead.route'));
+app.use('/api/user',require('./routes/user.route.js'));
+app.use('/api/lead', require('./routes/lead.route.js'));
 app.use('/api', require('./routes/index.routes.js'));
 
 // 404 page
-app.use((req,res) => {
-    res.status(404).render("404page", { title: "Page not found" });
-});
+// app.use((req,res) => {
+//     res.status(404).render("404page", { title: "Page not found" });
+// });
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT;
 app.listen(port, console.log(`Server is running at http://localhost:${port}`));
 
 
