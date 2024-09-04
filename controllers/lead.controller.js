@@ -2,6 +2,7 @@ const { calculateCycle, calculateLeadCycle, generateLeadID } = require('../helpe
 const LeadModel = require('../models/lead.models');
 const UserModel = require('../models/user');
 const jwt = require('jsonwebtoken');
+const { addLead } = require('../utility/bitrix');
 const token = process.env.token
 exports.addLead = async (req, res) => {
     const authHeader = req.headers.authorization;
@@ -47,14 +48,24 @@ exports.addLead = async (req, res) => {
         }
         await consultantDetails.save();
 
-        const lead = new LeadModel({
+        const LeadData={
             consultant: consultantDetails._id,
             consultant_code: consultantDetails.code,
             name: name,
             email: email,
             phone: phone,
-            eventName: eventName,
-            eventDate: eventDate,
+            events: [
+                {
+                    name: 'Product Launch',
+                    date: new Date('2024-10-15'),
+                    timing: '10:00 AM - 12:00 PM'
+                },
+                {
+                    name: 'Workshop',
+                    date: new Date('2024-10-16'),
+                    timing: '02:00 PM - 04:00 PM'
+                }
+            ],
             eventLocation: eventLocation,
             pincode: pincode,
             eventSpecialsName: eventSpecialsName,
@@ -62,9 +73,26 @@ exports.addLead = async (req, res) => {
             leadType: leadType,
             status: status,
             leadID: leadID,
-            cycle: { label: leadcycle.Label, number: leadcycle.Number,year:leadcycle.year }
-        });
-        await lead.save();
+            cycle: { label: leadcycle.Label, number: leadcycle.Number,year:leadcycle.year },
+            package: {
+                packageName: 'Gold Package',
+                subname: 'Premium Services',
+                addOns: ['Addon1', 'Addon2'],
+                amount: 10000
+            }
+        }
+        let bitrixres= await addLead(LeadData)
+
+const lead = new LeadModel({
+    ...LeadData,
+    bitrixres: {
+        status: bitrixres.status || '',
+        message: bitrixres.message || ''
+    }
+});
+
+await lead.save();
+
         res.send({
             success: true,
             statusCode: 201,
