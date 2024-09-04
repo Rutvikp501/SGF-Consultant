@@ -4,7 +4,7 @@
   "description": "A Food waste management system in which donors can donate the food and this food can be fed to the needy people",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js",
+    "start": "node app.js",
     "dev": "nodemon app.js -e html,css,js,ejs"
   },
   "keywords": [
