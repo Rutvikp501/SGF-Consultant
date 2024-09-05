@@ -362,7 +362,7 @@ router.post("/admin/addLeads", async (req, res) => {
 				message: "leadID already exist."
 			});
 		}
-		//await consultantDetails.save();
+		await consultantDetails.save();
 		const formattedEvents = params.events.map(event => ({
 			name: event.name || 'Unnamed Event',
 			date: new Date(event.date), // Ensure date is a Date object
@@ -403,9 +403,9 @@ router.post("/admin/addLeads", async (req, res) => {
 			}
 		});
 
-		console.log(lead);
+		//console.log(lead);
 
-		//await lead.save();
+		await lead.save();
 
 		req.flash("success", "Lead successfully added");
 		res.redirect("/admin/Leads/all");

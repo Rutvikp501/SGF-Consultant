@@ -168,7 +168,7 @@ router.post("/consultant/addLeads", middleware.ensureconsultantLoggedIn, async (
 				title: "Leads",
 				errors,});
 		}
-		//await consultantDetails.save();
+		await consultantDetails.save();
 		const formattedEvents = params.events.map(event => ({
 			name: event.name || 'Unnamed Event',
 			date: new Date(event.date), // Ensure date is a Date object
@@ -209,9 +209,9 @@ router.post("/consultant/addLeads", middleware.ensureconsultantLoggedIn, async (
 			}
 		});
 
-		console.log(lead);
+		//console.log(lead);
 
-		//await lead.save();
+		await lead.save();
  		req.flash("success", "Lead  successfully added ");
 		res.redirect("/consultant/Leads/all");
     } catch (error) {
