@@ -75,7 +75,7 @@ router.post("/auth/login", middleware.ensureNotLoggedIn,
 		failureFlash: true,
 		successFlash: true
 	}), (req,res) => {
-		console.log(req.user.role);
+		//console.log(req.user.role);
 		
 		res.redirect(req.session.returnTo || `/${req.user.role}/dashboard`);
 	}

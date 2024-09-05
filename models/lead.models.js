@@ -22,12 +22,12 @@ const leadSchema = new mongoose.Schema(
     date: { type: Date },
     timing: { type: String }
   }],
-  packages :  {
-    name: { type: String , default: ''},
-    subname: { type: String , default: ''},
-    addonS:  [{ type: String , default: ''}],
-    amount: { type: Number , default: ''}
-  },  
+  package: { 
+    name: { type: String },
+    subname: { type: String },
+    addonS: [{ type: String }],
+    amount: { type: Number }
+  },
   bitrixres :  {
     status: { type: String , default: ''},
     message: { type: String , default: ''},
@@ -35,6 +35,7 @@ const leadSchema = new mongoose.Schema(
   booking :  {
     status: { type: String , default: ''},
     package:{ type: String , default: ''},
+    amount:{ type: Number , default: 0},
     discountprec:{ type: Number , default: null},
   },  
   conversionDate: { type: Date ,default: null},

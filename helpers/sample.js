@@ -55,9 +55,9 @@ const generateLeadID = (consultantNumber, leadType, cycleMonth, consultantLifeti
   const leadYearCode = `Y${new Date().getFullYear() % 100}`;
 
   if (leadType === 'Seasonal') {
-    return `${consultantNumber}${leadTypeCode}${cycleMonth}${consultantLifetimeCycleNumber}L${leadNumber}${leadYearCode}`;
+    return `${consultantNumber}-${leadTypeCode}${cycleMonth}${consultantLifetimeCycleNumber}L${leadNumber}${leadYearCode}`;
   } else {
-    return `${consultantNumber}${leadTypeCode}${cycleMonth}${consultantLifetimeCycleNumber}L${leadNumber}${leadYearCode}`;
+    return `${consultantNumber}-${leadTypeCode}${cycleMonth}${consultantLifetimeCycleNumber}L${leadNumber}${leadYearCode}`;
   }
 };
 

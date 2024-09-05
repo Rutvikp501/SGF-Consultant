@@ -15,6 +15,7 @@
   "author": "atharva",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
     "connect-flash": "^0.1.1",
     "cors": "^2.8.5",

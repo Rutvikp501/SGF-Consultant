@@ -8,15 +8,34 @@ exports.addLead = async (req, res) => {
     const authHeader = req.headers.authorization;
     const authtoken = authHeader.split(" ")[1];
     const decode = jwt.verify(authtoken,token)
-    console.log("11000237641478");
-    const { Adviser, name, email, phone, eventName, eventDate, eventLocation, pincode, eventSpecialsName, specialCode, leadType, status, } = req.body;
-    // console.log(req.body);
+    let params=req.body;
+    // console.log(params);
+    // let params={
+    //     consultant: '001',
+    //     name: 'RUTVIK LAXMAN PATIL',
+    //     email: 'rutvik72patil@gmail.com',
+    //     phone: '09137898236',
+    //     events: [ { name: 'testing', date: '2024-09-19', timing: '10AM to 3PM' } ],
+    //     eventLocation: 'kalyan',
+    //     pincode: '421102',
+    //     eventSpecialsName: 'testing',
+    //     specialCode: '123',
+    //     leadType: 'Regular',
+    //     package: {
+    //       packageName: 'silver',
+    //       subname: 'test',
+    //       addOns: 'test,test2',
+    //       amount: '1212'
+    //     }
+    //   }
+      
     try {
 
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear();
         const { cycleLabel, cycleNumber } = calculateCycle(currentDate);
         const consultantDetails = await UserModel.findById(decode.UserId);
+        // const consultantDetails = await UserModel.findById('66d5e186b589421293512854');
        
         if (!consultantDetails) {
             return res.send({
@@ -26,18 +45,18 @@ exports.addLead = async (req, res) => {
             });
         }
         consultantDetails.calculateLifetimeCycleNumber();
-        const leadcycle = calculateLeadCycle(leadType, currentDate)
+        const leadcycle = calculateLeadCycle(params.leadType, currentDate)
         let leadNumber = 1;
         let cycleKey = `${currentYear}-${leadcycle.Label}`;
         
-        if (leadType === 'Seasonal') {
+        if (params.leadType === 'Seasonal') {
             leadNumber = (consultantDetails.leadsPerCycle.seasonal.get(cycleKey) || 0) + 1;
             consultantDetails.leadsPerCycle.seasonal.set(cycleKey, leadNumber);
         } else {
             leadNumber = (consultantDetails.leadsPerCycle.regular.get(cycleKey) || 0) + 1;
             consultantDetails.leadsPerCycle.regular.set(cycleKey, leadNumber);
         }
-        const leadID = generateLeadID(consultantDetails.code, leadType, leadcycle.Label, consultantDetails.consultantLifetimeCycleNumber, leadNumber, pincode);
+        const leadID = generateLeadID(consultantDetails.code, params.leadType, leadcycle.Label, consultantDetails.consultantLifetimeCycleNumber, leadNumber, params.pincode);
         const duplicatecode = await LeadModel.find({ leadIDd: leadID }); 
         if(duplicatecode!=""){
             return res.send({
@@ -46,41 +65,37 @@ exports.addLead = async (req, res) => {
                 message: "leadID already exist."
             }); 
         }
-        await consultantDetails.save();
-
-        const LeadData={
-            consultant: consultantDetails._id,
-            consultant_code: consultantDetails.code,
-            name: name,
-            email: email,
-            phone: phone,
-            events: [
-                {
-                    name: 'Product Launch',
-                    date: new Date('2024-10-15'),
-                    timing: '10:00 AM - 12:00 PM'
-                },
-                {
-                    name: 'Workshop',
-                    date: new Date('2024-10-16'),
-                    timing: '02:00 PM - 04:00 PM'
-                }
-            ],
-            eventLocation: eventLocation,
-            pincode: pincode,
-            eventSpecialsName: eventSpecialsName,
-            specialCode: specialCode,
-            leadType: leadType,
-            status: status,
-            leadID: leadID,
-            cycle: { label: leadcycle.Label, number: leadcycle.Number,year:leadcycle.year },
-            package: {
-                packageName: 'Gold Package',
-                subname: 'Premium Services',
-                addOns: ['Addon1', 'Addon2'],
-                amount: 10000
-            }
-        }
+ await consultantDetails.save();
+  const formattedEvents = params.events.map(event => ({
+    name: event.name || 'Unnamed Event',
+    date: new Date(event.date), // Ensure date is a Date object
+    timing: event.timing || 'Not specified',
+}));
+const packageData = { 
+    name: params.package.packageName || 'NA',
+    subname: params.package.subname || 'NA',
+    addonS: params.package.addOns ? params.package.addOns.split(',').map(item => item.trim()) : [],
+    amount: parseFloat(params.package.amount) || 0
+  }
+const LeadData = {
+    consultant: consultantDetails._id,
+    consultant_code: consultantDetails.code,
+    consultant_mobile_no: consultantDetails.mobile_no,
+    consultant_email_id: consultantDetails.email_id,
+    name: params.name,
+    email: params.email,
+    phone: params.phone,
+    events: formattedEvents,
+    eventLocation: params.eventLocation,
+    pincode: params.pincode,
+    eventSpecialsName: params.eventSpecialsName,
+    specialCode: params.specialCode,
+    leadType: params.leadType,
+    status: params.status,
+    leadID: leadID,
+    cycle: { label: leadcycle.Label, number: leadcycle.Number, year: leadcycle.year },
+    package: packageData
+  };
         let bitrixres= await addLead(LeadData)
 
 const lead = new LeadModel({
@@ -90,6 +105,9 @@ const lead = new LeadModel({
         message: bitrixres.message || ''
     }
 });
+
+//console.log(lead);
+
 
 await lead.save();
 

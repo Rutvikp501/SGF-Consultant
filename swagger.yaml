@@ -233,7 +233,7 @@ paths:
             schema:
               type: object
               properties:
-                Adviser:
+                consultant:
                   type: string
                 name:
                   type: string
@@ -259,11 +259,44 @@ paths:
                 status:
                   type: string
                   enum: ['Pending', 'Converted', 'Junk']
+                events:
+                  type: array
+                  description: Array of events associated with the lead
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: Event name
+                      date:
+                        type: string
+                        format: date
+                        description: Event date (YYYY-MM-DD)
+                      timing:
+                        type: string
+                        description: Event timing (e.g., "10AM to 3PM")
+                package:
+                  type: object
+                  description: Package details related to the lead
+                  properties:
+                    packageName:
+                      type: string
+                      description: Name of the package
+                    subname:
+                      type: string
+                      description: Subname or sub-category of the package
+                    addOns:
+                      type: string
+                      description: Add-ons for the package (comma-separated)
+                    amount:
+                      type: number
+                      description: Amount for the package
                 cycle:
                   type: number
                 conversionDate:
                   type: string
                   format: date
+
       responses:
         '200':
           description: Success
