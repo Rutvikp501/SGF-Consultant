@@ -55,7 +55,7 @@
 							<td> <%= allLeads[i].consultant_code %> </td>
 							<td> <%= allLeads[i].name %> </td>
 							<td> <%= allLeads[i].leadType %> </td>
-							<td> <%= allLeads[i].eventLocation + " " + allLeads[i].pincode%> </td>
+							<td> <%= allLeads[i].pincode%> </td>
 							<td class="fw-bold text-<%= allLeads[i].status %>"> <%= allLeads[i].status %> </td>
 							<td><a href="/admin/Leads/view/<%= allLeads[i]._id %>" class="custom-btn btn-2">View</a></td>
 						</tr>

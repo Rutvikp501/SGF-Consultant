@@ -36,8 +36,8 @@ router.get("/consultant/leads/pending", middleware.ensureconsultantLoggedIn, asy
 router.get("/consultant/leads/all", middleware.ensureconsultantLoggedIn, async (req,res) => {
 	try
 	{
-		const AllLeads = await LeadModel.find().populate("consultant");
-		res.render("consultant/allleads", { title: "All Leads", AllLeads });
+		const AllLeads = await LeadModel.find({ consultant: req.user._id,}).populate("consultant");
+		res.render("consultant/allleads", { title: "All Leads",allLeads: AllLeads });
 	}
 	catch(err)
 	{
@@ -66,7 +66,7 @@ router.get("/consultant/leads/view/:leadId", middleware.ensureconsultantLoggedIn
 	{
 		const leadId = req.params.leadId;
 		const Leads = await LeadModel.findById(leadId).populate("consultant");
-		res.render("consultant/leads", { title: "Leads details", Leads });
+		res.render("consultant/leads", { title: "Leads details", Leads: Leads, });
 	}
 	catch(err)
 	{

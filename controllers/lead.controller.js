@@ -5,37 +5,49 @@ const jwt = require('jsonwebtoken');
 const { addLead } = require('../utility/bitrix');
 const token = process.env.token
 exports.addLead = async (req, res) => {
-    const authHeader = req.headers.authorization;
-    const authtoken = authHeader.split(" ")[1];
-    const decode = jwt.verify(authtoken,token)
+    // const authHeader = req.headers.authorization;
+    // const authtoken = authHeader.split(" ")[1];
+    // const decode = jwt.verify(authtoken,token)
+    // const consultantDetails = await UserModel.findById(decode.UserId);
     let params=req.body;
     // console.log(params);
     // let params={
-    //     consultant: '001',
-    //     name: 'RUTVIK LAXMAN PATIL',
-    //     email: 'rutvik72patil@gmail.com',
-    //     phone: '09137898236',
-    //     events: [ { name: 'testing', date: '2024-09-19', timing: '10AM to 3PM' } ],
-    //     eventLocation: 'kalyan',
-    //     pincode: '421102',
-    //     eventSpecialsName: 'testing',
-    //     specialCode: '123',
-    //     leadType: 'Regular',
-    //     package: {
-    //       packageName: 'silver',
-    //       subname: 'test',
-    //       addOns: 'test,test2',
-    //       amount: '1212'
-    //     }
-    //   }
+//   "consultant": "66d53dbcc2b97c685044086b",
+//   "name": "testing1",
+//   "email": "testing1@gmail",
+//   "phone": "12121212",
+//   "eventName": "testing1",
+//   "eventDate": "2024-09-06",
+//   "eventLocation": "kalyan",
+//   "pincode": "421102",
+//   "eventSpecialsName": "",
+//   "specialCode": "",
+//   "leadType": "Regular",
+//   "status": "Pending",
+//   "events": [
+//     {
+//       "name": "testing",
+//       "date": "2024-09-06",
+//       "timing": "10AM - 10PM"
+//     }
+//   ],
+//   "package": {
+//     "packageName": "silver",
+//     "subname": "string",
+//     "addOns": "string",
+//     "amount": 12000
+//   },
+//   "cycle": 0,
+//   "conversionDate": "2024-09-06"
+// }
       
     try {
 
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear();
         const { cycleLabel, cycleNumber } = calculateCycle(currentDate);
-        const consultantDetails = await UserModel.findById(decode.UserId);
-        // const consultantDetails = await UserModel.findById('66d5e186b589421293512854');
+        
+        const consultantDetails = await UserModel.findById(params.consultant);
        
         if (!consultantDetails) {
             return res.send({
@@ -57,7 +69,8 @@ exports.addLead = async (req, res) => {
             consultantDetails.leadsPerCycle.regular.set(cycleKey, leadNumber);
         }
         const leadID = generateLeadID(consultantDetails.code, params.leadType, leadcycle.Label, consultantDetails.consultantLifetimeCycleNumber, leadNumber, params.pincode);
-        const duplicatecode = await LeadModel.find({ leadIDd: leadID }); 
+        const duplicatecode = await LeadModel.find({ leadID: leadID }); 
+        
         if(duplicatecode!=""){
             return res.send({
                 success: false,

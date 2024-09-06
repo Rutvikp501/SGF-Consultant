@@ -8,60 +8,97 @@
 			<h5 class="m-0 color-theme d-inline-block">Leads</h5>
 		</div> -->
 		
-		<div class="border m-4 my-3 p-4 bg-white rounded-2 shadow-sm">
-			<div class="mb-2">
-				<span>Lead ID:</span>
-				<span><%= Leads.leadID %></span>
-			</div>
-			
-			<div class="mb-2">
-				<span>Lead type:</span>
-				<span><%= Leads.leadType %></span>
-			</div>
-			
-			<div class="mb-2">
-				<span>eventName:</span>
-				<span><%= Leads.eventName %></span>
-			</div>
-			
-			<div class="mb-2">
-				<span>Time of eventDate:</span>
-				<span><%= Leads.eventDate.toLocaleString("en-IN", { dateStyle: "medium", }) %></span>
-			</div>
-			
-			<div class="mb-2">
-				<span>Address to collect:</span>
-				<span><%= Leads.eventLocation %></span>
-			</div>
-			
-			<div class="mb-2">
-				<span>Phone:</span>
-				<span><%= Leads.phone %></span>
-			</div>
-			
-			<% if(Leads.cycle != "") { %>
-				<div class="mb-2">
-					<span>Cycle label:</span>
-					<div class="ms-3"><%= Leads.cycle.label %></div>
-					<span>Cycle number:</span>
-					<div class="ms-3"><%= Leads.cycle.number %></div>
-					<span>Cycle year:</span>
-					<div class="ms-3"><%= Leads.cycle.year %></div>
+		<div class="lead-info py-4">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-8">
+						<div class="card shadow-sm">
+							<div class="card-header bg-transparent border-0">
+								<h3 class="mb-0"></i>Lead Information</h3>
+							</div>
+							<div class="card-body pt-0">
+								<table class="table table-bordered">
+									<tr>
+									  <th width="30%">Lead ID:</th>
+									  <td width="2%">:</td>
+									  <td><%= Leads.leadID %></td>
+									</tr>
+									<tr>
+									  <th width="30%">Lead Type:</th>
+									  <td width="2%">:</td>
+									  <td><%= Leads.leadType %></td>
+									</tr>
+								  
+									<!-- Event details -->
+									<% Leads.events.forEach(function(event) { %>
+									<tr>
+									  <th width="30%">Event Name:</th>
+									  <td width="2%">:</td>
+									  <td><%= event.name %></td>
+									</tr>
+									<tr>
+									  <th width="30%">Event Date:</th>
+									  <td width="2%">:</td>
+									  <td><%= event.date.toLocaleString("en-IN", { dateStyle: "medium" }) %></td>
+									</tr>
+									<tr>
+									  <th width="30%">Event Timing:</th>
+									  <td width="2%">:</td>
+									  <td><%= event.timing %></td>
+									</tr>
+									<% }) %>
+								  
+									<!-- Cycle details -->
+									<% if (Leads.cycle != "") { %>
+									<tr>
+									  <th width="30%">Cycle Label:</th>
+									  <td width="2%">:</td>
+									  <td><%= Leads.cycle.label %></td>
+									</tr>
+									<tr>
+									  <th width="30%">Cycle Number:</th>
+									  <td width="2%">:</td>
+									  <td><%= Leads.cycle.number %></td>
+									</tr>
+									<tr>
+									  <th width="30%">Cycle Year:</th>
+									  <td width="2%">:</td>
+									  <td><%= Leads.cycle.year %></td>
+									</tr>
+									<% } %>
+								  
+									<!-- Display packages if lead is converted -->
+										<% if (Leads.package && Leads.package.name) { %>
+										<tr>
+										  <th width="30%">Package Name:</th>
+										  <td width="2%">:</td>
+										  <td><%= Leads.package.name %></td>
+										</tr>
+										<tr>
+										  <th width="30%">Package Subname:</th>
+										  <td width="2%">:</td>
+										  <td><%= Leads.package.subname %></td>
+										</tr>
+										<tr>
+										  <th width="30%">Amount:</th>
+										  <td width="2%">:</td>
+										  <td><%= Leads.package.amount %></td>
+										</tr>
+										<tr>
+										  <th width="30%">Add-ons:</th>
+										  <td width="2%">:</td>
+										  <td><%= Leads.package.addonS.join(', ') %></td>
+										</tr>
+										<% } %>
+									  
+								  </table>
+								  
+								  
+							</div>
+						</div>
+					</div>
 				</div>
-			<% } %>
-				
-
-			
-<!-- 			
-			<div class="mt-4">
-				<% if(Leads.status == "Pending") { %>
-					<a href="/admin/Leads/accept/<%= Leads._id %>" class="btn">Convered</a>
-					<a href="/admin/Leads/reject/<%= Leads._id %>" class="btn btn-danger">Junk</a>
-				<% } else if(Leads.status == "Convered") { %>
-					<a href="/admin/Leads/assign/<%= Leads._id %>" class="btn">Assign agent</a>
-				<% } %>
-			</div> -->
-			
+			</div>
 		</div>
 		
 	</div>

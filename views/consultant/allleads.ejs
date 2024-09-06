@@ -25,21 +25,20 @@
 			<div class="tbl-content">
 				<table cellpadding="0" cellspacing="0" border="0">
 				<tbody>
-					<% for(let i=0; i<AllLeads.length; i++) { %>
+					<% for(let i=0; i<allLeads.length; i++) { %>
 						<tr>
-							<th scope="row"> <%= AllLeads[i].leadID %> </th>
-							<td> <%= AllLeads[i].consultant_code %> </td>
-							<td> <%= AllLeads[i].name %> </td>
-							<td> <%= AllLeads[i].leadType %> </td>
-							<td> <%= AllLeads[i].eventLocation + " " + AllLeads[i].pincode%> </td>
-							<td class="fw-bold text-<%= AllLeads[i].status %>"> <%= AllLeads[i].status %> </td>
-							<td><a href="/consultant/Leads/view/<%= AllLeads[i]._id %>" class="custom-btn btn-2">View</a></td>
+							<th scope="row"> <%= allLeads[i].leadID %> </th>
+							<td> <%= allLeads[i].consultant_code %> </td>
+							<td> <%= allLeads[i].name %> </td>
+							<td> <%= allLeads[i].leadType %> </td>
+							<td> <%= allLeads[i].pincode%> </td>
+							<td class="fw-bold text-<%= allLeads[i].status %>"> <%= allLeads[i].status %> </td>
+							<td><a href="/consultant/Leads/view/<%= allLeads[i]._id %>" class="custom-btn btn-2">View</a></td>
 						</tr>
 					<% } %>
 				</tbody>
 			</table>
 		</div>
-		
 		
 	</div>
 </main>

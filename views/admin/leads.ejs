@@ -13,82 +13,80 @@
 							<div class="card-body pt-0">
 								<table class="table table-bordered">
 									<tr>
-										<th width="30%">Lead ID:</th>
-										<td width="2%">:</td>
-										<td><%= Leads.leadID %></td>
+									  <th width="30%">Lead ID:</th>
+									  <td width="2%">:</td>
+									  <td><%= Leads.leadID %></td>
 									</tr>
 									<tr>
-										<th width="30%">Lead type</th>
-										<td width="2%">:</td>
-										<td><%= Leads.leadType %></td>
+									  <th width="30%">Lead Type:</th>
+									  <td width="2%">:</td>
+									  <td><%= Leads.leadType %></td>
+									</tr>
+								  
+									<!-- Event details -->
+									<% Leads.events.forEach(function(event) { %>
+									<tr>
+									  <th width="30%">Event Name:</th>
+									  <td width="2%">:</td>
+									  <td><%= event.name %></td>
 									</tr>
 									<tr>
-										<th width="30%">Event Name</th>
-										<td width="2%">:</td>
-										<td><%= Leads.eventName %></td>
+									  <th width="30%">Event Date:</th>
+									  <td width="2%">:</td>
+									  <td><%= event.date.toLocaleString("en-IN", { dateStyle: "medium" }) %></td>
 									</tr>
 									<tr>
-										<th width="30%">Date of event</th>
-										<td width="2%">:</td>
-										<td><%= Leads.eventDate.toLocaleString("en-IN", { dateStyle: "medium", }) %></td>
+									  <th width="30%">Event Timing:</th>
+									  <td width="2%">:</td>
+									  <td><%= event.timing %></td>
+									</tr>
+									<% }) %>
+								  
+									<!-- Cycle details -->
+									<% if (Leads.cycle != "") { %>
+									<tr>
+									  <th width="30%">Cycle Label:</th>
+									  <td width="2%">:</td>
+									  <td><%= Leads.cycle.label %></td>
 									</tr>
 									<tr>
-										<th width="30%">Event Location</th>
-										<td width="2%">:</td>
-										<td><%= Leads.eventLocation %></td>
+									  <th width="30%">Cycle Number:</th>
+									  <td width="2%">:</td>
+									  <td><%= Leads.cycle.number %></td>
 									</tr>
 									<tr>
-										<th width="30%">Phone</th>
-										<td width="2%">:</td>
-										<td><%= Leads.phone %></td>
-									</tr>
-									<tr>
-										<th width="30%">Email</th>
-										<td width="2%">:</td>
-										<td><%= Leads.email %></td>
-									</tr>
-									<% if(Leads.cycle != "") { %>
-									<tr>
-										<th width="30%">Cycle label</th>
-										<td width="2%">:</td>
-										<td><%= Leads.cycle.label %></td>
-									</tr>
-									<tr>
-										<th width="30%">Cycle number</th>
-										<td width="2%">:</td>
-										<td><%= Leads.cycle.number %></td>
-									</tr>
-									<tr>
-										<th width="30%">Cycle year</th>
-										<td width="2%">:</td>
-										<td><%= Leads.cycle.year %></td>
+									  <th width="30%">Cycle Year:</th>
+									  <td width="2%">:</td>
+									  <td><%= Leads.cycle.year %></td>
 									</tr>
 									<% } %>
-									<% if(Leads.status == "Converted") { %>
-										<% ConvertedLeads.forEach(function(convertedLead) { %>
-										  <tr>
-											<th width="30%">Package Name</th>
-											<td width="2%">:</td>
-											<td><%= convertedLead.packages.name %></td>
-										  </tr>
-										  <tr>
-											<th width="30%">Package Subname</th>
-											<td width="2%">:</td>
-											<td><%= convertedLead.packages.subname %></td>
-										  </tr>
-										  <tr>
-											<th width="30%">Amount</th>
-											<td width="2%">:</td>
-											<td><%= convertedLead.packages.amount %></td>
-										  </tr>
-										  <tr>
-											<th width="30%">Addons</th>
-											<td width="2%">:</td>
-											<td><%= convertedLead.packages.addonS.join(', ') %></td>
-										  </tr>
-										<% }) %>
-									  <% } %>
-								</table>
+								  
+									<!-- Display packages if lead is converted -->
+										<% if (Leads.package && Leads.package.name) { %>
+										<tr>
+										  <th width="30%">Package Name:</th>
+										  <td width="2%">:</td>
+										  <td><%= Leads.package.name %></td>
+										</tr>
+										<tr>
+										  <th width="30%">Package Subname:</th>
+										  <td width="2%">:</td>
+										  <td><%= Leads.package.subname %></td>
+										</tr>
+										<tr>
+										  <th width="30%">Amount:</th>
+										  <td width="2%">:</td>
+										  <td><%= Leads.package.amount %></td>
+										</tr>
+										<tr>
+										  <th width="30%">Add-ons:</th>
+										  <td width="2%">:</td>
+										  <td><%= Leads.package.addonS.join(', ') %></td>
+										</tr>
+										<% } %>
+									  
+								  </table>
+								  
 								<div class="mt-4">
 									<% if(Leads.status == "Pending") { %>
 										<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#convertModal">Convert</button>
