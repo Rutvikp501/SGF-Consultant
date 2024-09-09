@@ -91,9 +91,9 @@
 //             schema:
 //               type: object
 //               properties:
-//                 User_code:
+//                 user_code:
 //                   type: string
-//                 User_name:
+//                 user_name:
 //                   type: string
 //                 email_id:
 //                   type: string
@@ -129,7 +129,7 @@
 //             schema:
 //               type: object
 //               properties:
-//                 User_name:
+//                 user_name:
 //                   type: string
 //                 email_id:
 //                   type: string

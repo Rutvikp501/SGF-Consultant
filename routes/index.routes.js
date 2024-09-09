@@ -17,6 +17,7 @@ router.get('/leadapi/getAdditionalData/:leadId', leadController.getAdditionalDat
 
 
 router.get('/adminapi/',Admin.GetAllUser)
+router.post('/adminapi/getUserData',Admin.GetUserData)
 router.post('/adminapi/getSearcheduser',Admin.GetSearchedUser)
 router.post('/adminapi/login',Admin.Login)
 router.post('/adminapi/register',Admin.Register)

@@ -15,11 +15,11 @@ router.get("/auth/signup", middleware.ensureNotLoggedIn, (req,res) => {
 
 router.post("/auth/signup", middleware.ensureNotLoggedIn, async (req,res) => {
 	
-	const { code,User_name, email_id, password1, password2, role } = req.body;
+	const { code,user_name, email_id, password1, password2, role } = req.body;
 	
 	let errors = [];
 	
-	if (!User_name  || !email_id || !password1 || !password2 || !code) {
+	if (!user_name  || !email_id || !password1 || !password2 || !code) {
 		errors.push({ msg: "Please fill in all the fields" });
 	}
 	if (password1 != password2) {
@@ -31,7 +31,7 @@ router.post("/auth/signup", middleware.ensureNotLoggedIn, async (req,res) => {
 	if(errors.length > 0) {
 		return res.render("auth/signup", {
 			title: "User Signup",
-			errors, User_name, email_id, password1, password2
+			errors, user_name, email_id, password1, password2
 		});
 	}
 	
@@ -44,11 +44,11 @@ router.post("/auth/signup", middleware.ensureNotLoggedIn, async (req,res) => {
 			errors.push({msg: "This Email is already registered. Please try another email."});
 			return res.render("auth/signup", {
 				title: "User Signup",
-				User_name,  errors, email_id, password1, password2,code
+				user_name,  errors, email_id, password1, password2,code
 			});
 		}
 		
-		const newUser = new User({ name:User_name,  email_id:email_id, password:password1, role:role ,code:code});
+		const newUser = new User({ name:user_name,  email_id:email_id, password:password1, role:role ,code:code});
 		const salt = bcrypt.genSaltSync(10);
 		const hash = bcrypt.hashSync(newUser.password, salt);
 		newUser.password = hash;

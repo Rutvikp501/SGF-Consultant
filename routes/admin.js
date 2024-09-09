@@ -224,11 +224,11 @@ router.get("/admin/addConsultant", middleware.ensureAdminLoggedIn, async (req, r
 router.post("/admin/addConsultant", middleware.ensureAdminLoggedIn, async (req, res) => {
 
 
-	const { email_id, password1, role, User_code, User_name, mobile_no, dateOfJoining, isAdmin } = req.body;
+	const { email_id, password1, role, user_code, user_name, mobile_no, dateOfJoining, isAdmin } = req.body;
 	let errors = [];
 
 	// Validate input fields
-	if (!email_id || !password1 || !User_code || !User_name || !mobile_no || !dateOfJoining) {
+	if (!email_id || !password1 || !user_code || !user_name || !mobile_no || !dateOfJoining) {
 		errors.push({ msg: "Please fill in all the fields" });
 	}
 
@@ -239,20 +239,20 @@ router.post("/admin/addConsultant", middleware.ensureAdminLoggedIn, async (req, 
 	if (errors.length > 0) {
 		return res.render("/admin/addConsultant", {
 			title: "addConsultant",
-			errors, email_id, password1, User_code, User_name, mobile_no, dateOfJoining, isAdmin
+			errors, email_id, password1, user_code, user_name, mobile_no, dateOfJoining, isAdmin
 		});
 	}
 
 	try {
 		// Check for existing email and user code
 		const getExistingUser = await User.findOne({ email_id: email_id });
-		const duplicateCode = await User.findOne({ code: User_code });
+		const duplicateCode = await User.findOne({ code: user_code });
 
 		if (getExistingUser) {
 			errors.push({ msg: "This Email is already registered. Please try another email." });
 			return res.render("/admin/addConsultant", {
 				title: "addConsultant",
-				errors, email_id, password1, User_code, User_name, mobile_no, dateOfJoining, isAdmin
+				errors, email_id, password1, user_code, user_name, mobile_no, dateOfJoining, isAdmin
 			});
 		}
 
@@ -270,8 +270,8 @@ router.post("/admin/addConsultant", middleware.ensureAdminLoggedIn, async (req, 
 
 		// Create new user
 		const newUser = new User({
-			code: User_code,
-			name: User_name,
+			code: user_code,
+			name: user_name,
 			email_id: email_id,
 			mobile_no: mobile_no,
 			role: role,

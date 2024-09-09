@@ -46,6 +46,26 @@ paths:
         '400':
           description: Bad Request
 
+  /api/adminapi/getUserData:
+    post:
+      tags:
+        - User API
+      description: Search for users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                UserId:
+                  type: string
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
   /api/adminapi/login:
     post:
       tags:
@@ -80,9 +100,9 @@ paths:
             schema:
               type: object
               properties:
-                User_code:
+                user_code:
                   type: string
-                User_name:
+                user_name:
                   type: string
                 email_id:
                   type: string
@@ -112,9 +132,9 @@ paths:
             schema:
               type: object
               properties:
-                User_code:
+                user_code:
                   type: string
-                User_name:
+                user_name:
                   type: string
                 email_id:
                   type: string
@@ -146,7 +166,7 @@ paths:
             schema:
               type: object
               properties:
-                User_name:
+                user_name:
                   type: string
                 email_id:
                   type: string
@@ -241,13 +261,6 @@ paths:
                   type: string
                 phone:
                   type: string
-                eventName:
-                  type: string
-                eventDate:
-                  type: string
-                  format: date
-                eventLocation:
-                  type: string
                 pincode:
                   type: string
                 eventSpecialsName:
@@ -268,6 +281,9 @@ paths:
                       name:
                         type: string
                         description: Event name
+                      location:
+                        type: string
+                        description: Event location
                       date:
                         type: string
                         format: date
@@ -291,11 +307,6 @@ paths:
                     amount:
                       type: number
                       description: Amount for the package
-                cycle:
-                  type: number
-                conversionDate:
-                  type: string
-                  format: date
 
       responses:
         '200':

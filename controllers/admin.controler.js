@@ -29,6 +29,37 @@ exports.GetAllUser = async (req, res) => {
     }
 };
 
+exports.GetUserData = async (req, res) => {
+    try {
+        // const authHeader = req.headers.authorization;
+        // const authtoken = authHeader.split(" ")[1];
+        // const decode = jwt.verify(authtoken,token)
+         const decode = req.body
+        if (decode.UserId.length < 24) {
+            return res.status(400).json({
+                status: false,
+                statusCode: 400,
+                message: 'Invalid UserId length. It must be 24 characters long.',
+            });
+        }
+        const User  =await UserModel.findById(decode.UserId);
+        if (User){
+        res.send({
+            success: true,
+            statusCode: 200,
+            data:User
+        })
+        }else{
+        res.send({
+            success: false,
+            statusCode: 200,
+            message:"Dont have Users To Show..."
+        })
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
 exports.GetSearchedUser = async (req, res,next) => {
     try {
         const params = req.body || '';
@@ -95,8 +126,8 @@ exports.Login = async (req, res) => {
                     const data = {
                         UserId: user._id,
                         role: user.role,
-                        User_code: user.code,
-                        User_name: user.name,
+                        user_code: user.code,
+                        user_name: user.name,
                         email_id: user.email_id
                     };
                     let keyToken = jwt.sign( data, token); 
@@ -126,10 +157,10 @@ exports.Login = async (req, res) => {
 };
 
 exports.Register = async (req, res) => {
-    const {User_code, User_name , email_id ,mobile_no,password,dateOfJoining ,role }=req.body
+    const {user_code, user_name , email_id ,mobile_no,password,dateOfJoining ,role }=req.body
     
     const getExistingUser = await UserModel.find({ email_id: email_id });  
-    const duplicatecode = await UserModel.find({ code: User_code });  
+    const duplicatecode = await UserModel.find({ code: user_code });  
     // const valid = validatePassword(password)
     // if(valid){
     //     return res.status(400).send({message:valid[0]})
@@ -146,8 +177,8 @@ exports.Register = async (req, res) => {
             const date = parseDate(dateOfJoining);
             const {cycleLabel,cycleNumber} = calculateCycle(date);
                 const User = new UserModel({
-                    code:User_code,
-                    name:User_name,
+                    code:user_code,
+                    name:user_name,
                     email_id:email_id,
                     mobile_no:mobile_no,
                     role:role,
@@ -193,7 +224,7 @@ exports.Edit = async (req, res) => {
 };
 
 exports.Update = async (req, res) => {
-    const {Password, User_name , email_id }=req.body
+    const {Password, user_name , email_id }=req.body
     const getExistingUser = await UserModel.find({ email_id: email_id });   
     // console.log(getExistingUser);
     const valid = validatePassword(Password)
@@ -209,7 +240,7 @@ exports.Update = async (req, res) => {
             const hashPASS = bcrypt.hashSync(Password, salt);
                 const User = new UserModel({
                     Password:hashPASS,
-                    User_name:User_name,
+                    user_name:user_name,
                     email_id:email_id})//the password from the body and hashed password is different
                 await User.save();
                 res.send({success: false,
@@ -295,7 +326,7 @@ exports.forgotPassword = async (req, res) => {
         message:'Error sending OTP.'
     });
     }
-  };
+};
 
 exports.resetPassword = async (req, res) => {
   const { otp,email_id,newPassword } = req.body;

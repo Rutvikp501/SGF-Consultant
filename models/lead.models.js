@@ -20,6 +20,7 @@ const leadSchema = new mongoose.Schema(
   events: [{
     name: { type: String },
     date: { type: Date },
+    location: { type: String },
     timing: { type: String }
   }],
   package: { 

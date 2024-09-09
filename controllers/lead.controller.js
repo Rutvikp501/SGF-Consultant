@@ -5,20 +5,17 @@ const jwt = require('jsonwebtoken');
 const { addLead } = require('../utility/bitrix');
 const token = process.env.token
 exports.addLead = async (req, res) => {
-    // const authHeader = req.headers.authorization;
+    //  
     // const authtoken = authHeader.split(" ")[1];
     // const decode = jwt.verify(authtoken,token)
-    // const consultantDetails = await UserModel.findById(decode.UserId);
-    let params=req.body;
-    // console.log(params);
-    // let params={
+    //const consultantDetails = await UserModel.findById(decode.UserId);
+   let params=req.body;
+//     console.log(params);
+//     let params={
 //   "consultant": "66d53dbcc2b97c685044086b",
 //   "name": "testing1",
 //   "email": "testing1@gmail",
 //   "phone": "12121212",
-//   "eventName": "testing1",
-//   "eventDate": "2024-09-06",
-//   "eventLocation": "kalyan",
 //   "pincode": "421102",
 //   "eventSpecialsName": "",
 //   "specialCode": "",
@@ -28,7 +25,8 @@ exports.addLead = async (req, res) => {
 //     {
 //       "name": "testing",
 //       "date": "2024-09-06",
-//       "timing": "10AM - 10PM"
+//       "timing": "10AM - 10PM",
+//       "location": "kalyan",
 //     }
 //   ],
 //   "package": {
@@ -82,6 +80,7 @@ exports.addLead = async (req, res) => {
   const formattedEvents = params.events.map(event => ({
     name: event.name || 'Unnamed Event',
     date: new Date(event.date), // Ensure date is a Date object
+    location: event.location || 'Not specified',
     timing: event.timing || 'Not specified',
 }));
 const packageData = { 
@@ -99,7 +98,6 @@ const LeadData = {
     email: params.email,
     phone: params.phone,
     events: formattedEvents,
-    eventLocation: params.eventLocation,
     pincode: params.pincode,
     eventSpecialsName: params.eventSpecialsName,
     specialCode: params.specialCode,
@@ -169,9 +167,9 @@ exports.getAllLeads = async (req, res) => {
 
 exports.getLeadsByConsultant = async (req, res) => {
     try {
-        const authHeader = req.headers.authorization;
-        const authtoken = authHeader.split(" ")[1];
-        const decode = jwt.verify(authtoken,token)
+        // const authHeader = req.headers.authorization;
+        // const authtoken = authHeader.split(" ")[1];
+        // const decode = jwt.verify(authtoken,token)
        
         const params = req.body || '';
         const searchParam = params.search;
@@ -239,11 +237,11 @@ exports.getAdditionalData = async (req, res) => {
 };
 
 exports.getLeadscount = async (req, res) => {
-    // const authHeader = req.headers.authorization;
-    // const authtoken = authHeader.split(" ")[1];
-    // const decode = jwt.verify(authtoken,token)
-    // const consultantId = decode.UserId;
-    const consultantId = "66ab659fdec07a2c29fd9609";
+    const authHeader = req.headers.authorization;
+    const authtoken = authHeader.split(" ")[1];
+    const decode = jwt.verify(authtoken,token)
+    const consultantId = decode.UserId;
+    // const consultantId = "66ab659fdec07a2c29fd9609";
     const RegularLeads = {};
     const SeasonalLeads = {};
     try {
@@ -276,11 +274,11 @@ exports.getLeadscount = async (req, res) => {
 };
 
 exports.getDashboardData = async (req, res) => {
-    // const authHeader = req.headers.authorization;
-    // const authtoken = authHeader.split(" ")[1];
-    // const decode = jwt.verify(authtoken,token)    
-    // const consultantId = decode.UserId||"66ab659fdec07a2c29fd9609";
-    const consultantId = "66ab659fdec07a2c29fd9609";
+    const authHeader = req.headers.authorization;
+    const authtoken = authHeader.split(" ")[1];
+    const decode = jwt.verify(authtoken,token)    
+    const consultantId = decode.UserId||"66ab659fdec07a2c29fd9609";
+    // const consultantId = "66ab659fdec07a2c29fd9609";
     const RegularLeads = {};
     const SeasonalLeads = {};
     try {
@@ -363,7 +361,7 @@ exports.getconvertedLeads = async (req, res) => {
     const authHeader = req.headers.authorization;
     const authtoken = authHeader.split(" ")[1];
     const decode = jwt.verify(authtoken,token)
-   
+    //  const decode = req.body
     const consultantId = decode.UserId;
     const ConvertedLeads = await LeadModel.find({ consultant: consultantId, status: "Converted" }).populate("consultant");
     try {
@@ -386,8 +384,9 @@ exports.getpendingLeads  = async (req, res) => {
     const authHeader = req.headers.authorization;
     const authtoken = authHeader.split(" ")[1];
     const decode = jwt.verify(authtoken,token)
-   
-    const consultantId = decode.UserId;
+      const consultantId = decode.UserId;
+    // const decode = req.body
+    // const consultantId = decode.UserId;
     const pendingLeads = await LeadModel.find({ consultant: consultantId, status: "Pending" }).populate("consultant");
     try {
         res.send({
@@ -406,9 +405,9 @@ exports.getpendingLeads  = async (req, res) => {
 };
 
 exports.getleadsview = async (req, res) => {
-    const authHeader = req.headers.authorization;
-    const authtoken = authHeader.split(" ")[1];
-    const decode = jwt.verify(authtoken,token)
+    // const authHeader = req.headers.authorization;
+    // const authtoken = authHeader.split(" ")[1];
+    // const decode = jwt.verify(authtoken,token)
     const leadId = req.params.leadId;
    
     const consultantId = decode.UserId;
