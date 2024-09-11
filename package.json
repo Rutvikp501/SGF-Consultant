@@ -6,12 +6,7 @@
     "start": "nodemon index.js",
     "dev": "nodemon index.js -e html,css,js,ejs"
   },
-  "keywords": [
-    "Food",
-    "Waste",
-    "management"
-  ],
-  "author": "atharva",
+  "author": "",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.7.7",
