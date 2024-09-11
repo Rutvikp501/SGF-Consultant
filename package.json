@@ -1,7 +1,6 @@
 {
-  "name": "prajaahar_rakshak",
+  "name": "sgf_backend",
   "version": "0.0.1",
-  "description": "A Food waste management system in which donors can donate the food and this food can be fed to the needy people",
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js",
