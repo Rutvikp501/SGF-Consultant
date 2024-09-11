@@ -10,34 +10,6 @@ exports.addLead = async (req, res) => {
     // const decode = jwt.verify(authtoken,token)
     //const consultantDetails = await UserModel.findById(decode.UserId);
    let params=req.body;
-//     console.log(params);
-//     let params={
-//   "consultant": "66d53dbcc2b97c685044086b",
-//   "name": "testing1",
-//   "email": "testing1@gmail",
-//   "phone": "12121212",
-//   "pincode": "421102",
-//   "eventSpecialsName": "",
-//   "specialCode": "",
-//   "leadType": "Regular",
-//   "status": "Pending",
-//   "events": [
-//     {
-//       "name": "testing",
-//       "date": "2024-09-06",
-//       "timing": "10AM - 10PM",
-//       "location": "kalyan",
-//     }
-//   ],
-//   "package": {
-//     "packageName": "silver",
-//     "subname": "string",
-//     "addOns": "string",
-//     "amount": 12000
-//   },
-//   "cycle": 0,
-//   "conversionDate": "2024-09-06"
-// }
       
     try {
 
@@ -405,12 +377,7 @@ exports.getpendingLeads  = async (req, res) => {
 };
 
 exports.getleadsview = async (req, res) => {
-    // const authHeader = req.headers.authorization;
-    // const authtoken = authHeader.split(" ")[1];
-    // const decode = jwt.verify(authtoken,token)
     const leadId = req.params.leadId;
-   
-    const consultantId = decode.UserId;
     const Leads = await LeadModel.findById(leadId).populate("consultant");
     try {
         res.send({

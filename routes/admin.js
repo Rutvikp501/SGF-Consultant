@@ -354,7 +354,8 @@ router.post("/admin/addLeads", async (req, res) => {
 			consultantDetails.leadsPerCycle.regular.set(cycleKey, leadNumber);
 		}
 		const leadID = generateLeadID(consultantDetails.code, params.leadType, leadcycle.Label, consultantDetails.consultantLifetimeCycleNumber, leadNumber, params.pincode);
-		const duplicatecode = await LeadModel.find({ leadIDd: leadID });
+		
+		const duplicatecode = await LeadModel.find({ leadID: leadID });
 		if (duplicatecode != "") {
 			return res.send({
 				success: false,
