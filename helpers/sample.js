@@ -1,16 +1,4 @@
-const calculateCycle = () => {
-  const date = new Date();
-  const startDate = new Date(date.getFullYear(), 0, 1);  // Start of the year
-  const days = Math.floor((date - startDate) / (24 * 60 * 60 * 1000));  // Days since start of the year
 
-  // Calculate the cycle number (each cycle is 60 days)
-  const cycleNumber = Math.ceil((days + 1) / 60);  // Adding 1 to include the start of the first cycle in day count
-
-  // Ensure cycle number falls within a reasonable range (e.g., 1-6)
-  const cycleLabel = String.fromCharCode(64 + cycleNumber);  // ASCII 'A' starts at 65, 'B' at 66, etc.
-
-  return { cycleLabel: cycleLabel, cycleNumber: cycleNumber };
-};
 
 
 const convertToIST = (date) => {
@@ -26,13 +14,30 @@ const parseDate = (dateString) => {
   return convertToIST(date);
 };
 
+const calculateCycle = () => {
+  const date = new Date();
+  const startDate = new Date(date.getFullYear(), 0, 1);  // Start of the year
+  const days = Math.floor((date - startDate) / (24 * 60 * 60 * 1000));  // Days since start of the year
 
+  // Calculate the cycle number (each cycle is 60 days)
+  const cycleNumber = Math.ceil((days + 1) / 60);  // Adding 1 to include the start of the first cycle in day count
+
+  // Ensure cycle number falls within a reasonable range (e.g., 1-6)
+  const cycleLabel = String.fromCharCode(64 + cycleNumber);  // ASCII 'A' starts at 65, 'B' at 66, etc.
+
+  return { cycleLabel: cycleLabel, cycleNumber: cycleNumber };
+};
 const calculateLeadCycle = (leadType, eventDate) => {
+  console.log(leadType,eventDate);
+  
   const date = new Date(eventDate);
   let leadcycleLabel = '';
   let leadcycleNumber = 0;
 
-  if (leadType === 'Seasonal') {
+  if (leadType == 'Seasonal') {
+    
+    console.log("Seasonal");
+    
     const month = date.getMonth() + 1;
     if (month <= 2) { leadcycleLabel = 'A'; leadcycleNumber = 1; } // January-February
     else if (month <= 4) { leadcycleLabel = 'B'; leadcycleNumber = 2; } // March-April
@@ -40,13 +45,15 @@ const calculateLeadCycle = (leadType, eventDate) => {
     else if (month <= 8) { leadcycleLabel = 'D'; leadcycleNumber = 4; } // July-August
     else if (month <= 10) { cycleLabel = 'E'; cycleNumber = 5; }// September-October
     else { leadcycleLabel = 'F'; leadcycleNumber = 6; }// November-December
+    return { Label: leadcycleLabel, Number: leadcycleNumber ,year:date.getFullYear() };
 
   } else {
-    // Regular lead cycles
-    leadcycleNumber = Math.floor((date.getMonth() + 1) / 2) + 1;
-    leadcycleLabel = String.fromCharCode(64 + leadcycleNumber); // Convert 1 -> 'A', 2 -> 'B', etc.
+    const date = new Date(eventDate);
+    const monthNumber = date.getMonth();
+    const year = date.getFullYear();
+    const label = String.fromCharCode(65 + monthNumber);
+    return { Label: label, Number: monthNumber + 1, Year: year };
   }
-  return { Label: leadcycleLabel, Number: leadcycleNumber ,year:date.getFullYear() };
 }
 
 const generateLeadID = (consultantNumber, leadType, cycleMonth, consultantLifetimeCycleNumber, leadNumber, pincode) => {

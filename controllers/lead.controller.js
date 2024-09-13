@@ -15,8 +15,6 @@ exports.addLead = async (req, res) => {
 
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear();
-        const { cycleLabel, cycleNumber } = calculateCycle(currentDate);
-        
         const consultantDetails = await UserModel.findById(params.consultant);
        
         if (!consultantDetails) {
@@ -28,6 +26,7 @@ exports.addLead = async (req, res) => {
         }
         consultantDetails.calculateLifetimeCycleNumber();
         const leadcycle = calculateLeadCycle(params.leadType, currentDate)
+        
         let leadNumber = 1;
         let cycleKey = `${currentYear}-${leadcycle.Label}`;
         
@@ -38,7 +37,10 @@ exports.addLead = async (req, res) => {
             leadNumber = (consultantDetails.leadsPerCycle.regular.get(cycleKey) || 0) + 1;
             consultantDetails.leadsPerCycle.regular.set(cycleKey, leadNumber);
         }
+        
         const leadID = generateLeadID(consultantDetails.code, params.leadType, leadcycle.Label, consultantDetails.consultantLifetimeCycleNumber, leadNumber, params.pincode);
+        console.log(leadID);
+       
         const duplicatecode = await LeadModel.find({ leadID: leadID }); 
         
         if(duplicatecode!=""){
