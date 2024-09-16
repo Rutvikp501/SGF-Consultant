@@ -11,7 +11,7 @@ router.get('/leadapi/getLeadscount', leadController.getLeadscount);
 router.get('/leadapi/getDashboardData', leadController.getDashboardData);
 router.get('/leadapi/getconvertedLeads', leadController.getconvertedLeads);
 router.get('/leadapi/getpendingLeads', leadController.getpendingLeads);
-router.post('/leadapi/getLeadsByConsultant', leadController.getLeadsByConsultant);
+router.post('/leadapi/getSearchedlead', leadController.getSearchedlead);
 router.get('/leadapi/getleadsview/:leadId', leadController.getleadsview);
 router.get('/leadapi/getAdditionalData/:leadId', leadController.getAdditionalData);
 

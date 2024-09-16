@@ -17,6 +17,11 @@ const userSchema = new mongoose.Schema({
 		seasonal: { type: Map, of: Number, default: new Map() },
 		regular: { type: Map, of: Number, default: new Map() }
 	},
+	sales_assistan: { 
+		name: { type: String, default: null},
+		mobile_no: { type: Number,default: null},
+		email_id: { type: String,default: null},
+	},
 	otp: { type: String, default: null },
 	otpExpires: { type: Date, default: null },
 }, { timestamps: true }

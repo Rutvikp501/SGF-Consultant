@@ -3,6 +3,8 @@ const LeadModel = require('../models/lead.models');
 const UserModel = require('../models/user');
 const jwt = require('jsonwebtoken');
 const { addLead } = require('../utility/bitrix');
+const ConvertedLeadModel = require('../models/convertedLead.model');
+const JunkLeadModel = require('../models/junkLead.model');
 const token = process.env.token
 exports.addLead = async (req, res) => {
     //  
@@ -113,10 +115,29 @@ await lead.save();
 };
 
 exports.getAllLeads = async (req, res) => {
-
+    let {status}=req.body;
    
     try {
-        const leads = await LeadModel.find();
+       // const leads = await LeadModel.find();
+        let leads;
+
+        // Determine which model to query based on the status
+        if (status === 'pending') {
+            leads = await LeadModel.find({ status: 'pending' });
+        } else if (status === 'converted') {
+            // leads = await LeadModel.find({ status: 'pending' });
+            leads = await ConvertedLeadModel.find();
+        } else if (status === 'junk') {
+            // leads = await LeadModel.find({ status: 'pending' });
+            leads = await JunkLeadModel.find();
+        } else {
+            // If no valid status is provided, return an error
+            return res.send({
+                success: false,
+                statusCode: 400,
+                message: 'Invalid status provided. Must be "pending", "converted", or "junk".'
+            });
+        }
         if (!leads.length) {
             return res.send({
                 success: false,
@@ -139,7 +160,7 @@ exports.getAllLeads = async (req, res) => {
     }
 };
 
-exports.getLeadsByConsultant = async (req, res) => {
+exports.getSearchedlead = async (req, res) => {
     try {
         // const authHeader = req.headers.authorization;
         // const authtoken = authHeader.split(" ")[1];
@@ -256,7 +277,7 @@ exports.getDashboardData = async (req, res) => {
     const RegularLeads = {};
     const SeasonalLeads = {};
     try {
-        RegularLeads.AllLeads = await LeadModel.countDocuments({consultant: consultantId,});
+        let AllLeads = await LeadModel.countDocuments({consultant: consultantId,});
         // Regular Leads Counts
         RegularLeads.numPendingLeads = await LeadModel.countDocuments({ consultant: consultantId,leadType: "Regular",status: "Pending" });
         RegularLeads.numAllLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Regular" });
@@ -268,53 +289,61 @@ exports.getDashboardData = async (req, res) => {
         SeasonalLeads.numAllLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal"   });
         SeasonalLeads.numConvertedLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal",status: "Converted"   });
         SeasonalLeads.numJunkLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal",status: "Junk"   });
-        const leadsData = [
 
-            {
-                title: 'ALL Leads',
-                des: 'Counts for All Leads',
-                status: RegularLeads.AllLeads
-            },
-            {
-                title: 'Regular ALL Leads ',
-                des: 'Counts for All Leads',
-                status: RegularLeads.numAllLeads
-            },
-            {
-                title: 'Regular Pending Leads',
-                des: 'Counts for Pending Leads',
-                status: RegularLeads.numPendingLeads
-            },
-            {
-                title: 'Regular Converted Leads',
-                des: 'Counts for Converted Leads',
-                status: RegularLeads.numConvertedLeads
-            },
-            // {
-            //     title: 'Regular Junk Leads',
-            //     des: 'Counts for Junk Leads',
-            //     status: RegularLeads.numJunkLeads
-            // },
-            {
-                title: 'Seasonal ALL Leads',
-                des: 'Counts for All Leads',
-                status: SeasonalLeads.numAllLeads
-            },
-            {
-                title: 'Seasonal Pending Leads',
-                des: 'Counts for Pending Leads',
-                status: SeasonalLeads.numPendingLeads
-            },
-            {
-                title: 'Seasonal Converted Leads',
-                des: 'Counts for Converted Leads',
-                status: SeasonalLeads.numConvertedLeads
-            },
-            // {
-            //     title: 'Seasonal Junk Leads',
-            //     des: 'Counts for Junk Leads',
-            //     status:SeasonalLeads.numJunkLeads
-            // },
+        const leadsData = [
+            [
+                {
+                    "title": "ALL Leads",
+                    "des": "Counts for All Leads",
+                    "status": AllLeads
+                },
+                {
+                    "title": "Regular ALL Leads ",
+                    "des": "Counts for All Leads",
+                    "status": RegularLeads.numAllLeads,
+                    "subList":[
+                        {
+                            "title": "Regular Pending Leads",
+                            "des": "Counts for Pending Leads",
+                            "status": RegularLeads.numPendingLeads
+                        },
+                        {
+                            "title": "Regular Converted Leads",
+                            "des": "Counts for Converted Leads",
+                            "status": RegularLeads.numConvertedLeads
+                        },
+                        {
+                            "title": "Regular Junk Leads",
+                            "des": "Counts for Junk Leads",
+                            "status": RegularLeads.numJunkLeads
+                        },
+                    ]
+                },
+                {
+                    "title": "Seasonal ALL Leads",
+                    "des": "Counts for All Leads",
+                    "status":SeasonalLeads.numAllLeads,
+                    "subList":[
+                        {
+                            "title": "Seasonal Pending Leads",
+                            "des": "Counts for Pending Leads",
+                            "status": SeasonalLeads.numPendingLeads
+                        },
+                        {
+                            "title": "Seasonal Converted Leads",
+                            "des": "Counts for Converted Leads",
+                            "status": SeasonalLeads.numConvertedLeads
+                        },
+                        {
+                            "title": "Seasonal Junk Leads",
+                            "des": "Counts for Junk Leads",
+                            "status": SeasonalLeads.numJunkLeads
+                        }
+                    ]
+                },
+            ]
+            
+            
         ];
         res.send({
             success: true,
