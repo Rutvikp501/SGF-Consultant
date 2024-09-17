@@ -7,36 +7,11 @@ const ConvertedLeadModel = require('../models/convertedLead.model');
 const JunkLeadModel = require('../models/junkLead.model');
 const token = process.env.token
 exports.addLead = async (req, res) => {
-    //  
     // const authtoken = authHeader.split(" ")[1];
     // const decode = jwt.verify(authtoken,token)
     //const consultantDetails = await UserModel.findById(decode.UserId);
   let params=req.body;
-//   let params = {
-//     consultant: '66ab659fdec07a2c29fd9609',
-//     name: 'Rutvik',
-//     email: 'test1@gmail.com',
-//     phone: '12341234',
-//     pincode: '421102',
-//     eventSpecialsName: 'testing',
-//     specialCode: 'code123',
-//     leadType: 'Regular',
-//     status: 'Pending',
-//     events: [
-//       {
-//         name: 'testing',
-//         location: 'mumbai',
-//         date: '2024-09-17',
-//         timing: '2-5'
-//       }
-//     ],
-//     package: {
-//       packageName: 'package',
-//       subname: 'subname',
-//       addOns: '',
-//       amount: 12345
-//     }
-//   }
+
       
     try {
 
@@ -327,16 +302,19 @@ exports.getDashboardData = async (req, res) => {
                         {
                             "title": "Regular Pending Leads",
                             "des": "Counts for Pending Leads",
+                            "key": "Pending",
                             "status": RegularLeads.numPendingLeads
                         },
                         {
                             "title": "Regular Converted Leads",
                             "des": "Counts for Converted Leads",
+                            "key": "Converted",
                             "status": RegularLeads.numConvertedLeads
                         },
                         {
                             "title": "Regular Junk Leads",
                             "des": "Counts for Junk Leads",
+                            "key": "Junk",
                             "status": RegularLeads.numJunkLeads
                         },
                     ]
@@ -349,21 +327,26 @@ exports.getDashboardData = async (req, res) => {
                         {
                             "title": "Seasonal Pending Leads",
                             "des": "Counts for Pending Leads",
+                            "key": "Pending",
                             "status": SeasonalLeads.numPendingLeads
                         },
                         {
                             "title": "Seasonal Converted Leads",
                             "des": "Counts for Converted Leads",
+                            "key": "Converted",
                             "status": SeasonalLeads.numConvertedLeads
                         },
                         {
                             "title": "Seasonal Junk Leads",
                             "des": "Counts for Junk Leads",
+                            "key": "Junk",
                             "status": SeasonalLeads.numJunkLeads
                         }
                     ]
                 },
         ];
+        //console.log(leadsData);
+        
         res.send({
             success: true,
             statusCode: 200,

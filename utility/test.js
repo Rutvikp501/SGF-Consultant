@@ -18,3 +18,29 @@
     UF_CRM_1725961934686: "",// Package amount
     UF_CRM_1723870968846: "",// Equiry No
 }
+
+//   let params = {
+//     consultant: '66ab659fdec07a2c29fd9609',
+//     name: 'Rutvik',
+//     email: 'test1@gmail.com',
+//     phone: '12341234',
+//     pincode: '421102',
+//     eventSpecialsName: 'testing',
+//     specialCode: 'code123',
+//     leadType: 'Regular',
+//     status: 'Pending',
+//     events: [
+//       {
+//         name: 'testing',
+//         location: 'mumbai',
+//         date: '2024-09-17',
+//         timing: '2-5'
+//       }
+//     ],
+//     package: {
+//       packageName: 'package',
+//       subname: 'subname',
+//       addOns: '',
+//       amount: 12345
+//     }
+//   }
