@@ -61,6 +61,9 @@ header .navbar-toggler:focus
 {
 	color: var(--theme-color);
 }
+#sales-assistant-name-field, #sales-assistant-mobile-field {
+  transition: all 0.3s ease;
+}
 
 /* .btn
 {

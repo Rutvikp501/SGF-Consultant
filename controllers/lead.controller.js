@@ -11,8 +11,6 @@ exports.addLead = async (req, res) => {
     // const decode = jwt.verify(authtoken,token)
     //const consultantDetails = await UserModel.findById(decode.UserId);
   let params=req.body;
-
-      
     try {
 
         const currentDate = new Date();
@@ -89,7 +87,7 @@ const LeadData = {
 const lead = new LeadModel({
     ...LeadData,
     bitrixres: {
-        status: bitrixres.no || '',
+        // status: bitrixres.no || '',
         message: bitrixres.message || ''
     }
 });
@@ -283,7 +281,7 @@ exports.getDashboardData = async (req, res) => {
     
         // Seasonal Leads Counts  
         SeasonalLeads.numPendingLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal",status: "Pending" });   
-        SeasonalLeads.numAllLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal"   });
+        SeasonalLeads.numAllLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal"});
         SeasonalLeads.numConvertedLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal",status: "Converted"   });
         SeasonalLeads.numJunkLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal",status: "Junk"   });
 

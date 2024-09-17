@@ -224,7 +224,7 @@ router.get("/admin/addConsultant", middleware.ensureAdminLoggedIn, async (req, r
 router.post("/admin/addConsultant", middleware.ensureAdminLoggedIn, async (req, res) => {
 
 
-	const { email_id, password1, role, user_code, user_name, mobile_no, dateOfJoining, isAdmin } = req.body;
+	const { email_id, password1, role, user_code, user_name, mobile_no, dateOfJoining, isAdmin,sales_assistan_name, sales_assistan_mobile_no } = req.body;
 	let errors = [];
 
 	// Validate input fields
@@ -277,6 +277,10 @@ router.post("/admin/addConsultant", middleware.ensureAdminLoggedIn, async (req, 
 			role: role,
 			password: hash,
 			dateOfJoining: date,
+			sales_assistan: {
+				name: sales_assistan_name || null,
+				mobile_no: sales_assistan_mobile_no || null,
+			},
 			currentcycle: { label: cycleLabel, number: cycleNumber }
 		});
 

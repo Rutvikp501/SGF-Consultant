@@ -1,16 +1,11 @@
 <main>
     <%- include('../partials/adminSidebar') %>
-    
+
     <div id="main-wrapper">
-        
-        <!-- <div class="bg-white shadow-sm p-3">
-            <span class="me-3" id="sidebar-toggler-btn"><i class="fas fa-bars"></i></span>
-            <h5 class="m-0 color-theme d-inline-block">Assign Agent</h5>
-        </div> -->
-        
+
         <p class="title">Add User</p>
         <form action="/admin/addConsultant" method="POST" class="form">
-    
+
             <% if (typeof errors != 'undefined') { %>
                 <% errors.forEach(function(error) { %>
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -19,7 +14,7 @@
                     </div>
                 <% }); %>
             <% } %>
-            
+
             <div class="gridf">
                 <label>
                     <input type="text" name="user_code" class="input" id="user-code" value="<%= typeof user_code != 'undefined' ? user_code : '' %>" required>
@@ -30,40 +25,71 @@
                     <input type="text" name="user_name" class="input" id="user-name" value="<%= typeof user_name != 'undefined' ? user_name : '' %>" required>
                     <span>Name</span>
                 </label>
-          
 
-            <label>
-                <input type="email" name="email_id" class="input" id="email" value="<%= typeof email_id != 'undefined' ? email_id : '' %>" required>
-                <span>Email Address</span>
-            </label>
-            
-            <label>
-                <input type="password" name="password1" class="input" id="password1" value="<%= typeof password1 != 'undefined' ? password1 : '' %>" required>
-                <span>Password</span>
-            </label>
-            
-            <label>
-                <input type="date" name="dateOfJoining" class="input" id="date-of-joining" value="<%= typeof dateOfJoining != 'undefined' ? dateOfJoining : '' %>" required>
-                <span>Date of Joining</span>
-            </label>
-            
-            <label>
-                <input type="tel" name="mobile_no" class="input" id="mobile-no" value="<%= typeof mobile_no != 'undefined' ? mobile_no : '' %>" required>
-                <span>Mobile Number</span>
-            </label>
-            
-            <label>
-                <select class="input" name="role" id="role">
-                    <option value="consultant">Consultant</option>
-                    <option value="admin">Admin</option>
-                    <option value="partners ">partners</option>
-                </select>
-                <span>Signup as</span>
-            </label>
-              </div>
+                <label>
+                    <input type="email" name="email_id" class="input" id="email" value="<%= typeof email_id != 'undefined' ? email_id : '' %>" required>
+                    <span>Email Address</span>
+                </label>
+
+                <label>
+                    <input type="password" name="password1" class="input" id="password1" value="<%= typeof password1 != 'undefined' ? password1 : '' %>" required>
+                    <span>Password</span>
+                </label>
+
+                <label>
+                    <input type="date" name="dateOfJoining" class="input" id="date-of-joining" value="<%= typeof dateOfJoining != 'undefined' ? dateOfJoining : '' %>" required>
+                    <span>Date of Joining</span>
+                </label>
+
+                <label>
+                    <input type="tel" name="mobile_no" class="input" id="mobile-no" value="<%= typeof mobile_no != 'undefined' ? mobile_no : '' %>" required>
+                    <span>Mobile Number</span>
+                </label>
+
+                <label>
+                    <select class="input" name="role" id="role">
+                        <option value="consultant">Consultant</option>
+                        <option value="admin">Admin</option>
+                        <option value="partners">Partners</option>
+                    </select>
+                    <span>Signup as</span>
+                </label>
+
+                <label id="sales-assistant-name-field">
+                    <input type="text" name="sales_assistan_name" class="input" id="sales-assistan-name" value="<%= typeof sales_assistan_name != 'undefined' ? sales_assistan_name : '' %>">
+                    <span>Sales Assistant Name</span>
+                </label>
+
+                <label id="sales-assistant-mobile-field">
+                    <input type="tel" name="sales_assistan_mobile_no" class="input" id="sales-assistan-mobile-no" value="<%= typeof sales_assistan_mobile_no != 'undefined' ? sales_assistan_mobile_no : '' %>">
+                    <span>Sales Assistant Mobile No.</span>
+                </label>
+
+
+            </div>
             <button type="submit" class="submit d-block m-auto mt-4">Submit</button>
-           
+
         </form>
-        
+
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const roleSelect = document.getElementById('role');
+            const salesAssistantNameField = document.getElementById('sales-assistant-name-field');
+            const salesAssistantMobileField = document.getElementById('sales-assistant-mobile-field');
+
+            function toggleSalesAssistantFields() {
+                if (roleSelect.value === 'admin') {
+                    salesAssistantNameField.style.display = 'none';
+                    salesAssistantMobileField.style.display = 'none';
+                } else {
+                    salesAssistantNameField.style.display = 'block';
+                    salesAssistantMobileField.style.display = 'block';
+                }
+            }
+
+            toggleSalesAssistantFields();
+            roleSelect.addEventListener('change', toggleSalesAssistantFields);
+        });
+    </script>
 </main>

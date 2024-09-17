@@ -40,7 +40,7 @@ exports.addLead = async (LeadData) => {
             return {
                 status: true,
                 statusCode: 200,
-                no: response.result,
+               // no: response.result,
                 message: 'Successfully added',
             };
         } else {
