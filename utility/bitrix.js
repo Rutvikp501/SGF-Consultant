@@ -18,15 +18,15 @@ exports.addLead = async (LeadData) => {
             'fields[UF_CRM_1725958005830]': LeadData.consultant_mobile_no || '',
             'fields[UF_CRM_1725957892961]': LeadData.consultant_email_id || '',
             'fields[UF_CRM_1723871068885]': LeadData.event_location || '',
-            'fields[UF_CRM_1725958658829]': LeadData.lead_id || '',
-            'fields[UF_CRM_1723870992344]': LeadData.date_of_issue || '',
+            'fields[UF_CRM_1725958658829]': LeadData.leadID || '',
+            'fields[UF_CRM_1723870992344]': LeadData.currentDate || '',
             'fields[UF_CRM_1723871015696]': LeadData.booking_name || '',
-            'fields[UF_CRM_1723871636157]': LeadData.event_date_time || '',
+            'fields[UF_CRM_1723871636157]': LeadData.formattedEvents.date || '',
             'fields[UF_CRM_1724929500047]': LeadData.event_type || '',
             'fields[UF_CRM_1725627014795]': LeadData.event_date || '',
             'fields[UF_CRM_1725627051950]': LeadData.eventSpecialsName || '',
             'fields[UF_CRM_1725627132023]': LeadData.specialCode || '',
-            'fields[UF_CRM_1725961934686]': LeadData.package_amount || ''
+            'fields[UF_CRM_1725961934686]': LeadData.packageData.amount || ''
         };
 
         const response = await axios.post(apiUrl, null, {

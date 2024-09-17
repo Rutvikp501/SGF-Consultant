@@ -106,6 +106,7 @@ const LeadData = {
     status: params.status,
     leadID: leadID,
     cycle: { label: leadcycle.Label, number: leadcycle.Number, year: leadcycle.year },
+    currentDate: currentDate,
     package: packageData
   };
        let bitrixres= await addLead(LeadData)
@@ -312,7 +313,7 @@ exports.getDashboardData = async (req, res) => {
         SeasonalLeads.numJunkLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal",status: "Junk"   });
 
         const leadsData = [
-            [
+            
                 {
                     "title": "ALL Leads",
                     "des": "Counts for All Leads",
@@ -362,7 +363,7 @@ exports.getDashboardData = async (req, res) => {
                         }
                     ]
                 },
-            ]
+            
             
             
         ];

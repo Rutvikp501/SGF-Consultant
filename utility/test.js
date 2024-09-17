@@ -16,4 +16,5 @@
     UF_CRM_1725627051950: "",//eventSpecialsName 
     UF_CRM_1725627132023: "",//specialCode
     UF_CRM_1725961934686: "",// Package amount
+    UF_CRM_1723870968846: "",// Equiry No
 }
