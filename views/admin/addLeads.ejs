@@ -1,150 +1,155 @@
 <main>
     <%- include('../partials/adminSidebar') %>
 
-        <div id="main-wrapper">
-            <h3 class="title text-center">Add Lead</h3>
-            <form action="/admin/addLeads" method="POST" class="form">
+    <div id="main-wrapper">
+        <h3 class="title text-center">Add Lead</h3>
+        <form action="/admin/addLeads" method="POST" class="form">
 
-                <% if (typeof errors !='undefined' ) { %>
-                    <% errors.forEach(function(error) { %>
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <%= error.msg %>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                    aria-label="Close"></button>
-                        </div>
-                        <% }); %>
-                            <% } %>
+            <% if (typeof errors != 'undefined') { %>
+                <% errors.forEach(function(error) { %>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <%= error.msg %>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <% }); %>
+            <% } %>
 
-                                <div>
-                                    <div class="gridf">
-                                        <label>
-                                            <input type="text" name="consultant" class="input" id="consultant" required
-                                                autofocus>
-                                            <span>consultant</span>
-                                        </label>
-                                    </div>
-                                    <div id="events-section" class="events-section">
-                                        <h4>Event Details</h4>
-                                        <div class="event-group"></div>
-                                        <label>
-                                            <input type="text" name="name" class="input" id="name" required>
-                                            <span>Name</span>
-                                        </label>
+            <div class="gridf">
+                <label>
+                    <input type="text" name="consultant" class="input" id="consultant" required autofocus>
+                    <span>Consultant</span>
+                </label>
+                
+                <label>
+                    <input type="text" name="name" class="input" id="name" required>
+                    <span>Name</span>
+                </label>
 
-                                        <label>
-                                            <input type="email" name="email" class="input" id="email" required>
-                                            <span>Email Address</span>
-                                        </label>
+                <label>
+                    <input type="email" name="email" class="input" id="email" required>
+                    <span>Email Address</span>
+                </label>
 
-                                        <label>
-                                            <input type="tel" name="phone" class="input" id="phone" required>
-                                            <span>Phone Number</span>
-                                        </label>
-                                    </div>
-                                    </div>
-                                    <div id="events-section" class="events-section">
-                                        <h4>Event Details</h4>
-                                        <div class="event-group">
-                                            <label>
-                                                <input type="text" name="events[0][name]" class="input" required>
-                                                <span>Event Name</span>
-                                            </label>
-                                            <label>
-                                                <input type="date" name="events[0][date]" class="input" required>
-                                                <span>Event Date</span>
-                                            </label>
-                                            <label>
-                                                <input type="text" name="events[0][timing]" class="input" required>
-                                                <span>Event Timing</span>
-                                            </label>
-                                            <label>
-                                                <input type="text" name="eventLocation" class="input"
-                                                    id="event-location" required>
-                                                <span>Event Location</span>
-                                            </label>
-                                        </div>
-                                    </div>
+                <label>
+                    <input type="tel" name="phone" class="input" id="phone" required>
+                    <span>Phone Number</span>
+                </label>
+            </div>
 
-                                    <button type="button" id="add-event" class="btn btn-secondary mt-3">Add Another
-                                        Event</button>
-                                    <div class="gridf">
+            <h4>Event Details</h4>
+            <div id="events-section" class="event-grid">
+                <div class="event-group">
+                    <label>
+                        <input type="text" name="events[0][name]" class="input" required>
+                        <span>Event Name</span>
+                    </label>
 
+                    <label>
+                        <input type="text" name="events[0][location]" class="input" required>
+                        <span>Event Location</span>
+                    </label>
 
-                                        <label>
-                                            <input type="text" name="pincode" class="input" id="pincode" required>
-                                            <span>Pincode</span>
-                                        </label>
+                    <label>
+                        <input type="date" name="events[0][date]" class="input" required>
+                        <span>Event Date</span>
+                    </label>
 
-                                        <label>
-                                            <input type="text" name="eventSpecialsName" class="input"
-                                                id="event-specials-name">
-                                            <span>Event Specials Name</span>
-                                        </label>
+                    <label>
+                        <input type="text" name="events[0][timing]" class="input" required>
+                        <span>Event Timing</span>
+                    </label>
+                </div>
+            </div>
 
-                                        <label>
-                                            <input type="text" name="specialCode" class="input" id="special-code">
-                                            <span>Special Code</span>
-                                        </label>
+            <button type="button" id="add-event" class="submit d-block m-auto mt-4"> <i class="bi bi-plus-circle"></i></button>
 
-                                        <label>
-                                            <select class="input" name="leadType" id="lead-type" required>
-                                                <option value="Regular">Regular</option>
-                                                <option value="Seasonal">Seasonal</option>
-                                            </select>
-                                            <span>Lead Type</span>
-                                        </label>
-                                    </div>
-                                    <div id="package-section">
-                                        <h4>Package Details</h4>
-                                        <div class="package-section">
-                                            <label>
-                                                <input type="text" name="package[packageName]" class="input">
-                                                <span>Package Name</span>
-                                            </label>
-                                            <label>
-                                                <input type="text" name="package[subname]" class="input">
-                                                <span>Subname</span>
-                                            </label>
-                                            <label>
-                                                <input type="text" name="package[addOns]" class="input">
-                                                <span>Add-Ons (comma separated)</span>
-                                            </label>
-                                            <label>
-                                                <input type="number" name="package[amount]" class="input">
-                                                <span>Amount</span>
-                                            </label>
-                                        </div>
-                                    </div>
-                               
-                                <button type="submit" class="submit d-block m-auto mt-4">Submit</button>
-            </form>
-        </div>
+            <div class="event-grid">
+                <label>
+                    <input type="text" name="pincode" class="input" id="pincode" required>
+                    <span>Pincode</span>
+                </label>
+
+                <label>
+                    <input type="text" name="eventSpecialsName" class="input" id="event-specials-name">
+                    <span>Event Specials Name</span>
+                </label>
+
+                <label>
+                    <input type="text" name="specialCode" class="input" id="special-code">
+                    <span>Special Code</span>
+                </label>
+
+                <label>
+                    <select class="input" name="leadType" id="lead-type" required>
+                        <option value="Regular">Regular</option>
+                        <option value="Seasonal">Seasonal</option>
+                    </select>
+                    <span>Lead Type</span>
+                </label>
+
+                <input type="hidden" name="status" value="Pending">
+            </div>
+
+            <div id="package-section">
+                <h4>Package Details</h4>
+                <div class="package-section">
+                    <label>
+                        <input type="text" name="package[packageName]" class="input">
+                        <span>Package Name</span>
+                    </label>
+
+                    <label>
+                        <input type="text" name="package[subname]" class="input">
+                        <span>Subname</span>
+                    </label>
+
+                    <label>
+                        <input type="text" name="package[addOns]" class="input">
+                        <span>Add-Ons (comma separated)</span>
+                    </label>
+
+                    <label>
+                        <input type="number" name="package[amount]" class="input">
+                        <span>Amount</span>
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="submit d-block m-auto mt-4">Submit</button>
+        </form>
+    </div>
 </main>
 
 <script>
-    document.getElementById('add-event').addEventListener('click', function () {
-        const eventsSection = document.getElementById('events-section');
-        const eventGroups = document.querySelectorAll('.event-group');
-        const eventIndex = eventGroups.length;
+document.getElementById('add-event').addEventListener('click', function () {
+    const eventsSection = document.querySelector('.event-grid');
+    const eventGroups = document.querySelectorAll('.event-grid > .event-group');
+    const eventIndex = eventGroups.length;
 
-        const newEventGroup = document.createElement('div');
-        newEventGroup.className = 'event-group';
+    const newEventGroup = document.createElement('div');
+    newEventGroup.className = 'event-group'; // Add class to group each event
 
-        newEventGroup.innerHTML = `
-            <label>
-                <input type="text" name="events[${eventIndex}][name]" class="input" required>
-                <span>Event Name</span>
-            </label>
-            <label>
-                <input type="date" name="events[${eventIndex}][date]" class="input" required>
-                <span>Event Date</span>
-            </label>
-            <label>
-                <input type="text" name="events[${eventIndex}][timing]" class="input" required>
-                <span>Event Timing</span>
-            </label>
-        `;
+    newEventGroup.innerHTML = `
+        <label>
+            <input type="text" name="events[${eventIndex}][name]" class="input" required>
+            <span>Event Name</span>
+        </label>
+        <label>
+            <input type="text" name="events[${eventIndex}][location]" class="input" required>
+            <span>Event Location</span>
+        </label>
+        <label>
+            <input type="date" name="events[${eventIndex}][date]" class="input" required>
+            <span>Event Date</span>
+        </label>
+        <label>
+            <input type="text" name="events[${eventIndex}][timing]" class="input" required>
+            <span>Event Timing</span>
+        </label>
+    `;
 
-        eventsSection.appendChild(newEventGroup);
-    });
+    eventsSection.appendChild(newEventGroup);
+});
+
+
 </script>

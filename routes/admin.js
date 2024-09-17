@@ -2,17 +2,17 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const middleware = require("../middleware/index.js");
-const User = require("../models/user.js");
+const UserModel = require("../models/user.js");
 const LeadModel = require("../models/lead.models.js");
 const ConvertedLeadModel = require("../models/convertedLead.model.js");
 const JunkLeadModel = require("../models/junkLead.model.js");
-const { calculateCycle, calculateLeadCycle, generateLeadID } = require("../helpers/sample.js");
+const { calculateCycle, calculateLeadCycle, generateLeadID ,calculateLifetimeCycleNumber} = require("../helpers/sample.js");
 const { addLead } = require("../utility/bitrix.js");
 
 
 router.get("/admin/dashboard", middleware.ensureAdminLoggedIn, async (req, res) => {
-	const numAdmins = await User.countDocuments({ role: "admin" });
-	const numAgents = await User.countDocuments({ role: "consultant" });
+	const numAdmins = await UserModel.countDocuments({ role: "admin" });
+	const numAgents = await UserModel.countDocuments({ role: "consultant" });
 	const numPendingLeads = await LeadModel.countDocuments({ status: "Pending" });
 	const numConvertedLeads = await LeadModel.countDocuments({ status: "Converted" });
 	const numJunkLeads = await LeadModel.countDocuments({ status: "Junk" });
@@ -169,7 +169,7 @@ router.post("/admin/Leads/reject/:LeadsId", middleware.ensureAdminLoggedIn, asyn
 router.get("/admin/Leads/assign/:LeadsId", middleware.ensureAdminLoggedIn, async (req, res) => {
 	try {
 		const LeadsId = req.params.LeadsId;
-		const agents = await User.find({ role: "agent" });
+		const agents = await UserModel.find({ role: "agent" });
 		const Leads = await LeadModel.findById(LeadsId).populate("donor");
 		res.render("admin/assignAgent", { title: "Assign agent", Leads, agents });
 	}
@@ -197,7 +197,7 @@ router.post("/admin/Leads/assign/:LeadsId", middleware.ensureAdminLoggedIn, asyn
 
 router.get("/admin/agents", middleware.ensureAdminLoggedIn, async (req, res) => {
 	try {
-		const consultant = await User.find({ role: "consultant" });
+		const consultant = await UserModel.find({ role: "consultant" });
 		// console.log(consultant);
 
 		res.render("admin/Consultants", { title: "List of consultant", consultant });
@@ -210,7 +210,7 @@ router.get("/admin/agents", middleware.ensureAdminLoggedIn, async (req, res) => 
 });
 router.get("/admin/addConsultant", middleware.ensureAdminLoggedIn, async (req, res) => {
 	try {
-		const agents = await User.find({ role: "agent" });
+		const agents = await UserModel.find({ role: "agent" });
 		res.render("admin/addConsultant", { title: "List of agents", agents });
 	}
 	catch (err) {
@@ -245,8 +245,8 @@ router.post("/admin/addConsultant", middleware.ensureAdminLoggedIn, async (req, 
 
 	try {
 		// Check for existing email and user code
-		const getExistingUser = await User.findOne({ email_id: email_id });
-		const duplicateCode = await User.findOne({ code: user_code });
+		const getExistingUser = await UserModel.findOne({ email_id: email_id });
+		const duplicateCode = await UserModel.findOne({ code: user_code });
 
 		if (getExistingUser) {
 			errors.push({ msg: "This Email is already registered. Please try another email." });
@@ -269,7 +269,7 @@ router.post("/admin/addConsultant", middleware.ensureAdminLoggedIn, async (req, 
 		const { cycleLabel, cycleNumber } = calculateCycle(date);
 
 		// Create new user
-		const newUser = new User({
+		const newUser = new UserModel({
 			code: user_code,
 			name: user_name,
 			email_id: email_id,
@@ -303,7 +303,7 @@ router.put("/admin/profile", middleware.ensureAdminLoggedIn, async (req, res) =>
 	try {
 		const id = req.user._id;
 		const updateObj = req.body.admin;	// updateObj: {name, lastName, gender, address, phone}
-		await User.findByIdAndUpdate(id, updateObj);
+		await UserModel.findByIdAndUpdate(id, updateObj);
 
 		req.flash("success", "Profile updated successfully");
 		res.redirect("/admin/profile");
@@ -331,11 +331,13 @@ router.get("/admin/addLeads", middleware.ensureAdminLoggedIn, async (req, res) =
 });
 router.post("/admin/addLeads", async (req, res) => {
 	let params = req.body;
+	console.log(params);
+	
 	try {
 		const currentDate = new Date();
 		const currentYear = currentDate.getFullYear();
 		const { cycleLabel, cycleNumber } = calculateCycle(currentDate);
-		const consultantDetails = await User.findOne({ code: params.consultant });
+		const consultantDetails = await UserModel.findOne({ code: params.consultant });
 
 		// Check if consultant exists
 		if (!consultantDetails) {
