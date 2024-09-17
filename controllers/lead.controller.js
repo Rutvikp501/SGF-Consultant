@@ -11,32 +11,32 @@ exports.addLead = async (req, res) => {
     // const authtoken = authHeader.split(" ")[1];
     // const decode = jwt.verify(authtoken,token)
     //const consultantDetails = await UserModel.findById(decode.UserId);
-  //let params=req.body;
-  let params = {
-    consultant: '66ab659fdec07a2c29fd9609',
-    name: 'Rutvik',
-    email: 'test1@gmail.com',
-    phone: '12341234',
-    pincode: '421102',
-    eventSpecialsName: 'testing',
-    specialCode: 'code123',
-    leadType: 'Regular',
-    status: 'Pending',
-    events: [
-      {
-        name: 'testing',
-        location: 'mumbai',
-        date: '2024-09-17',
-        timing: '2-5'
-      }
-    ],
-    package: {
-      packageName: 'package',
-      subname: 'subname',
-      addOns: '',
-      amount: 12345
-    }
-  }
+  let params=req.body;
+//   let params = {
+//     consultant: '66ab659fdec07a2c29fd9609',
+//     name: 'Rutvik',
+//     email: 'test1@gmail.com',
+//     phone: '12341234',
+//     pincode: '421102',
+//     eventSpecialsName: 'testing',
+//     specialCode: 'code123',
+//     leadType: 'Regular',
+//     status: 'Pending',
+//     events: [
+//       {
+//         name: 'testing',
+//         location: 'mumbai',
+//         date: '2024-09-17',
+//         timing: '2-5'
+//       }
+//     ],
+//     package: {
+//       packageName: 'package',
+//       subname: 'subname',
+//       addOns: '',
+//       amount: 12345
+//     }
+//   }
       
     try {
 
@@ -363,9 +363,6 @@ exports.getDashboardData = async (req, res) => {
                         }
                     ]
                 },
-            
-            
-            
         ];
         res.send({
             success: true,
