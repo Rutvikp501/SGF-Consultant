@@ -28,15 +28,12 @@ const calculateCycle = () => {
   return { cycleLabel: cycleLabel, cycleNumber: cycleNumber };
 };
 const calculateLeadCycle = (leadType, eventDate) => {
-  console.log(leadType,eventDate);
   
   const date = new Date(eventDate);
   let leadcycleLabel = '';
   let leadcycleNumber = 0;
 
   if (leadType == 'Seasonal') {
-    
-    console.log("Seasonal");
     
     const month = date.getMonth() + 1;
     if (month <= 2) { leadcycleLabel = 'A'; leadcycleNumber = 1; } // January-February
