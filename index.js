@@ -47,7 +47,6 @@ app.use((req, res, next) => {
     res.locals.warning = req.flash("warning");
     next();
 });
-
 const swaggerUI = require('swagger-ui-express');
 const YAML = require("yamljs");
 const swaggerDocument = YAML.load(path.join(__dirname, '/swagger.yaml'));

@@ -21,7 +21,7 @@
     "jsonwebtoken": "^9.0.2",
     "method-override": "^3.0.0",
     "mongoose": "^6.1.2",
-    "nodemailer": "^6.9.14",
+    "nodemailer": "^6.9.15",
     "passport": "^0.5.2",
     "passport-local": "^1.0.0",
     "password-validator": "^5.3.0",

@@ -1,0 +1,52 @@
+<!-- templates/welcome-template.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to Swaptography</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            line-height: 1.6;
+        }
+        h2 {
+            color: #4CAF50;
+        }
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h2>Welcome to Swaptography, {{name}}!</h2>
+        <p>We are excited to have you join our platform as a consultant. Your {{role}} code is: <strong>{{user_code}}</strong>.</p>
+        
+        <h3>Login Details</h3>
+        <p>You can log in to your account using the following credentials:</p>
+        <ul>
+            <li><strong>Login ID (Email):</strong> {{email_id}}</li>
+            <li><strong>Password:</strong> {{password}}</li>
+            <li><strong>Login Link:</strong> <a href="https://swapto-photo.netlify.app" target="_blank">Login to Swaptography</a></li>
+        </ul>
+        <!-- <p>Please make sure to change your password upon first login for security reasons.</p> -->
+
+        <h3>Your Role</h3>
+        <p>Your assigned role is: <strong>{{role}}</strong>.</p>
+        
+        <!-- <h3>Sales Assistant Details</h3>
+        <p>If you need any assistance regarding sales, feel free to reach out to your dedicated Sales Assistant:</p>
+        <ul>
+            <li><strong>Name:</strong> {{sales_assistan_name}}</li>
+            <li><strong>Mobile No:</strong> {{sales_assistan_mobile_no}}</li>
+        </ul> -->
+
+        <p>Thank you for joining Swaptography. We look forward to a fruitful collaboration.</p>
+        
+        <p>Best Regards,</p>
+        <p>The Swaptography Team</p>
+    </div>
+</body>
+</html>

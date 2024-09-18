@@ -4,47 +4,49 @@ const ConvertedLeadModel = require('../models/convertedLead.model');
 const JunkLeadModel = require('../models/junkLead.model');
 
 exports.addLead = async (LeadData) => {
-   // console.log(LeadData);
-    
     try {
         const apiUrl = `https://swaptography.bitrix24.in/rest/8/t6107s6fsf94wfo9/crm.lead.add.json`;
+
+        // Mapping the LeadData to the requestBody
         const requestBody = {
             'fields[NAME]': LeadData.name || '',
-            'fields[PHONE][0][VALUE]': LeadData.phone || '',
-            'fields[PHONE][0][VALUE_TYPE]': 'WORK',
-            'fields[EMAIL][0][VALUE]': LeadData.email || '',
-            'fields[EMAIL][0][VALUE_TYPE]': 'WORK',
-            'fields[UF_CRM_1725626932463]': LeadData.consultant_code || '',
-            'fields[UF_CRM_1725958005830]': LeadData.consultant_mobile_no || '',
-            'fields[UF_CRM_1725957892961]': LeadData.consultant_email_id || '',
-            'fields[UF_CRM_1723871068885]': LeadData.event_location || '',
-            'fields[UF_CRM_1725958658829]': LeadData.leadID || '',
-            'fields[UF_CRM_1723870992344]': LeadData.currentDate || '',
-            'fields[UF_CRM_1723871015696]': LeadData.booking_name || '',
-            'fields[UF_CRM_1723871636157]': LeadData.formattedEvents.date || '',
-            'fields[UF_CRM_1724929500047]': LeadData.event_type || '',
-            'fields[UF_CRM_1725627014795]': LeadData.event_date || '',
-            'fields[UF_CRM_1725627051950]': LeadData.eventSpecialsName || '',
-            'fields[UF_CRM_1725627132023]': LeadData.specialCode || '',
-            'fields[UF_CRM_1725961934686]': LeadData.packageData.amount || ''
+    'fields[PHONE][0][VALUE]': LeadData.phone || '',
+    'fields[PHONE][0][VALUE_TYPE]': 'WORK',
+    'fields[EMAIL][0][VALUE]': LeadData.email || '',
+    'fields[EMAIL][0][VALUE_TYPE]': 'WORK',
+    'fields[UF_CRM_1725626932463]': LeadData.consultant_code || '', // consultant_code
+    'fields[UF_CRM_1725958005830]': LeadData.consultant_mobile_no || '', // consultant_mobile_no
+    'fields[UF_CRM_1725957892961]': LeadData.consultant_email_id || '', // consultant_email_id
+    'fields[UF_CRM_1723871068885]': LeadData.events?.[0]?.location || '', // event_location from events array
+    'fields[UF_CRM_1723872311251]': LeadData.events?.[0]?.location || '', // event_location from city
+    'fields[UF_CRM_1725958658829]': LeadData.leadID || '', // leadID
+    'fields[UF_CRM_1723870992344]': LeadData.currentDate || '', // currentDate
+    'fields[UF_CRM_1723871015696]': LeadData.name || '', // name (duplicate but required by the API)
+    'fields[UF_CRM_1723871636157]': LeadData.events?.[0]?.date || '', // date from events array
+    'fields[UF_CRM_1726651078700]': LeadData.events?.[0]?.name || '', // date from events array
+    'fields[UF_CRM_1724929500047]': LeadData.leadType || '', // event_type (assuming it's mapped to leadType)
+    'fields[UF_CRM_1726651303165]': LeadData.pincode || '', // event_type (assuming it's mapped to leadType)
+    'fields[UF_CRM_1725627014795]': LeadData.events?.[0]?.date || '', // event_date from events array
+    'fields[UF_CRM_1725627051950]': LeadData.eventSpecialsName || '', // eventSpecialsName
+    'fields[UF_CRM_1725627132023]': LeadData.specialCode || '', // specialCode
+    'fields[UF_CRM_1725961934686]': LeadData.package?.amount || '', // package amount
         };
-
         const response = await axios.post(apiUrl, null, {
             params: requestBody,
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             }
         });
-        
+
         if (response.status === 200) {
             return {
                 status: true,
                 statusCode: 200,
-               // no: response.result,
+                leadno: response.data.result,
                 message: 'Successfully added',
             };
         } else {
-            console.error("Failed to add lead:", response.data.error);
+            console.error("Failed to add lead:", response.error);
             return {
                 status: false,
                 statusCode: response.status,
@@ -60,6 +62,7 @@ exports.addLead = async (LeadData) => {
         };
     }
 };
+
 
 
 

@@ -31,6 +31,7 @@ const leadSchema = new mongoose.Schema(
   },
   bitrixres :  {
     status: { type: String , default: ''},
+    leadno: { type: String , default: ''},
     message: { type: String , default: ''},
   },  
   booking :  {

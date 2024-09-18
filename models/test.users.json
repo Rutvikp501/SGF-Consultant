@@ -1,0 +1,240 @@
+[{
+  "_id": {
+    "$oid": "66ab659fdec07a2c29fd9609"
+  },
+  "code": "001",
+  "name": "testing1",
+  "mobile_no": 1111111111,
+  "email_id": "testing12@gmail.com",
+  "password": "$2a$10$tNJeTgN3HmMl59Sc3CBaR.n0YEKT1bYz3psyjghQubMsQEXzGTeHK",
+  "dateOfJoining": {
+    "$date": "2023-01-01T00:00:00.000Z"
+  },
+  "otp": "658189",
+  "otpExpires": {
+    "$date": "2024-08-02T11:45:29.394Z"
+  },
+  "createdAt": {
+    "$date": "2024-08-01T10:38:23.871Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-18T09:42:26.041Z"
+  },
+  "consultantLifetimeCycleNumber": 11,
+  "__v": 0,
+  "leadsPerCycle": {
+    "regular": {
+      "2024-E": 1,
+      "2024-I": 16
+    },
+    "seasonal": {}
+  },
+  "role": "consultant"
+},
+{
+  "_id": {
+    "$oid": "66b0aa515b58763fa2eca70e"
+  },
+  "code": "A001",
+  "name": "Rutvik Patil",
+  "email_id": "patilrutvik501@gmail.com",
+  "password": "$2a$10$tNJeTgN3HmMl59Sc3CBaR.n0YEKT1bYz3psyjghQubMsQEXzGTeHK",
+  "role": "admin",
+  "leadsPerCycle": {
+    "seasonal": {},
+    "regular": {}
+  },
+  "otp": "9135",
+  "otpExpires": {
+    "$date": "2024-08-28T10:52:21.779Z"
+  },
+  "createdAt": {
+    "$date": "2024-08-05T10:32:50.052Z"
+  },
+  "updatedAt": {
+    "$date": "2024-08-28T09:52:21.782Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66d53dbcc2b97c685044086b"
+  },
+  "code": "005",
+  "name": "dhanush01",
+  "mobile_no": 8547074716,
+  "email_id": "dhanushsaji1@gmail.com",
+  "password": "$2a$10$9kPvEQdAYzBBvcWYJRFA1.0makhM48qCOR5IlYLAQpY4xzD/M5PDG",
+  "role": "cunsultant",
+  "dateOfJoining": {
+    "$date": "2024-09-02T05:30:00.000Z"
+  },
+  "leadsPerCycle": {
+    "seasonal": {},
+    "regular": {
+      "2024-E": 4
+    }
+  },
+  "otp": null,
+  "otpExpires": null,
+  "createdAt": {
+    "$date": "2024-09-02T04:23:24.699Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-10T09:26:27.609Z"
+  },
+  "consultantLifetimeCycleNumber": 1,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66d5e186b589421293512854"
+  },
+  "code": "1KLY05SWAPNILJOSHI",
+  "name": "Swapnil Joshi",
+  "mobile_no": 81088429546,
+  "email_id": "joshi.swap999@gmail.com",
+  "password": "$2a$10$sqewEAjIlFAqUfyur.GBou3KkhAiHCZr.moeuj3K8BdHmIdH3PrMW",
+  "role": "consultant",
+  "dateOfJoining": {
+    "$date": "2024-09-02T00:00:00.000Z"
+  },
+  "leadsPerCycle": {
+    "seasonal": {
+      "2024-": 1
+    },
+    "regular": {
+      "2024-E": 2,
+      "2024-I": 1
+    }
+  },
+  "otp": null,
+  "otpExpires": null,
+  "createdAt": {
+    "$date": "2024-09-02T16:02:14.021Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-17T10:30:52.717Z"
+  },
+  "consultantLifetimeCycleNumber": 1,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66daa96858ce5d3d71a4c658"
+  },
+  "code": "C001",
+  "name": "Rutvik Patil ",
+  "mobile_no": 8591575654,
+  "email_id": "rutvik72patil@gmail.com",
+  "password": "$2a$10$sqewEAjIlFAqUfyur.GBou3KkhAiHCZr.moeuj3K8BdHmIdH3PrMW",
+  "role": "consultant",
+  "dateOfJoining": {
+    "$date": "2024-07-04T00:00:00.000Z"
+  },
+  "leadsPerCycle": {
+    "seasonal": {},
+    "regular": {
+      "2024-E": 3,
+      "2024-I": 5
+    }
+  },
+  "otp": null,
+  "otpExpires": null,
+  "createdAt": {
+    "$date": "2024-09-06T07:04:08.812Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-17T19:50:54.186Z"
+  },
+  "consultantLifetimeCycleNumber": 2,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66e1234dac4c3fe5cc2a98d3"
+  },
+  "code": "010",
+  "name": "Head office ",
+  "mobile_no": 8591575654,
+  "email_id": "rutvik.gainn@gmail.com",
+  "password": "$2a$10$sqewEAjIlFAqUfyur.GBou3KkhAiHCZr.moeuj3K8BdHmIdH3PrMW",
+  "role": "admin",
+  "dateOfJoining": {
+    "$date": "2024-07-01T00:00:00.000Z"
+  },
+  "leadsPerCycle": {
+    "seasonal": {},
+    "regular": {}
+  },
+  "otp": null,
+  "otpExpires": null,
+  "createdAt": {
+    "$date": "2024-09-11T04:57:49.314Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-11T04:57:49.314Z"
+  },
+  "consultantLifetimeCycleNumber": 2,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66e31a9dbf3144bb1f01e432"
+  },
+  "code": "0011",
+  "name": "patilrutvik501@gmail.com",
+  "mobile_no": 1234,
+  "email_id": "patilrutvik@gmail.com",
+  "password": "$2a$10$VL8LKCJRirdOGYWibpXxBuTPmIgqctnJjnEGUuN9XPH3RUE6/wlKy",
+  "role": "consultant",
+  "dateOfJoining": {
+    "$date": "2024-08-01T00:00:00.000Z"
+  },
+  "leadsPerCycle": {
+    "seasonal": {},
+    "regular": {}
+  },
+  "otp": null,
+  "otpExpires": null,
+  "createdAt": {
+    "$date": "2024-09-12T16:45:17.562Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-12T16:45:17.562Z"
+  },
+  "consultantLifetimeCycleNumber": 1,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66eaad10e6c2656b13163053"
+  },
+  "code": "HO001",
+  "name": "Head Office",
+  "mobile_no": 8591575654,
+  "email_id": "swaptographymanagement@gmail.com",
+  "password": "$2a$10$CIdxOg8yJKJf3SPPD4nJdOzM81jnUC5tFC/yqtK7YwrM8TaCPKDDm",
+  "role": "consultant",
+  "dateOfJoining": {
+    "$date": "2024-09-18T00:00:00.000Z"
+  },
+  "leadsPerCycle": {
+    "seasonal": {},
+    "regular": {}
+  },
+  "sales_assistan": {
+    "name": "rutvik",
+    "mobile_no": 1231231231
+  },
+  "otp": null,
+  "otpExpires": null,
+  "createdAt": {
+    "$date": "2024-09-18T10:36:00.111Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-18T10:36:00.111Z"
+  },
+  "consultantLifetimeCycleNumber": 1,
+  "__v": 0
+}]

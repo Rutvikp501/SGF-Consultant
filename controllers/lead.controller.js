@@ -10,13 +10,13 @@ exports.addLead = async (req, res) => {
     // const authtoken = authHeader.split(" ")[1];
     // const decode = jwt.verify(authtoken,token)
     //const consultantDetails = await UserModel.findById(decode.UserId);
-  let params=req.body;
+    let params = req.body;
     try {
 
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear();
         const consultantDetails = await UserModel.findById(params.consultant);
-       
+
         if (!consultantDetails) {
             return res.send({
                 success: false,
@@ -26,10 +26,10 @@ exports.addLead = async (req, res) => {
         }
         consultantDetails.calculateLifetimeCycleNumber();
         const leadcycle = calculateLeadCycle(params.leadType, currentDate)
-        
+
         let leadNumber = 1;
         let cycleKey = `${currentYear}-${leadcycle.Label}`;
-        
+
         if (params.leadType === 'Seasonal') {
             leadNumber = (consultantDetails.leadsPerCycle.seasonal.get(cycleKey) || 0) + 1;
             consultantDetails.leadsPerCycle.seasonal.set(cycleKey, leadNumber);
@@ -37,81 +37,84 @@ exports.addLead = async (req, res) => {
             leadNumber = (consultantDetails.leadsPerCycle.regular.get(cycleKey) || 0) + 1;
             consultantDetails.leadsPerCycle.regular.set(cycleKey, leadNumber);
         }
-        
+
         const leadID = generateLeadID(consultantDetails.code, params.leadType, leadcycle.Label, consultantDetails.consultantLifetimeCycleNumber, leadNumber, params.pincode);
         //console.log(leadID);
-       
-        const duplicatecode = await LeadModel.find({ leadID: leadID }); 
-        
-        if(duplicatecode!=""){
+
+        const duplicatecode = await LeadModel.find({ leadID: leadID });
+
+        if (duplicatecode != "") {
             return res.send({
                 success: false,
                 statusCode: 400,
                 message: "leadID already exist."
-            }); 
+            });
         }
- await consultantDetails.save();
-  const formattedEvents = params.events.map(event => ({
-    name: event.name || 'Unnamed Event',
-    date: new Date(event.date), // Ensure date is a Date object
-    location: event.location || 'Not specified',
-    timing: event.timing || 'Not specified',
-}));
-const packageData = { 
-    name: params.package.packageName || 'NA',
-    subname: params.package.subname || 'NA',
-    addonS: params.package.addOns ? params.package.addOns.split(',').map(item => item.trim()) : [],
-    amount: parseFloat(params.package.amount) || 0
-  }
-const LeadData = {
-    consultant: consultantDetails._id,
-    consultant_code: consultantDetails.code,
-    consultant_mobile_no: consultantDetails.mobile_no,
-    consultant_email_id: consultantDetails.email_id,
-    name: params.name,
-    email: params.email,
-    phone: params.phone,
-    events: formattedEvents,
-    pincode: params.pincode,
-    eventSpecialsName: params.eventSpecialsName,
-    specialCode: params.specialCode,
-    leadType: params.leadType,
-    status: params.status,
-    leadID: leadID,
-    cycle: { label: leadcycle.Label, number: leadcycle.Number, year: leadcycle.year },
-    currentDate: currentDate,
-    package: packageData
-  };
-       let bitrixres= await addLead(LeadData)
 
-const lead = new LeadModel({
-    ...LeadData,
-    bitrixres: {
-        // status: bitrixres.no || '',
-        message: bitrixres.message || ''
-    }
-});
-
-//console.log(lead);
-
-
-await lead.save();
-
-        res.send({
-            success: true,
-            statusCode: 201,
-             message: 'Lead added successfully',
-            data:lead
-        });
+        const formattedEvents = params.events.map(event => ({
+            name: event.name || 'Unnamed Event',
+            date: new Date(event.date), // Ensure date is a Date object
+            location: event.location || 'Not specified',
+            timing: event.timing || 'Not specified',
+        }));
+        const packageData = {
+            name: params.package.packageName || 'NA',
+            subname: params.package.subname || 'NA',
+            addonS: params.package.addOns ? params.package.addOns.split(',').map(item => item.trim()) : [],
+            amount: parseFloat(params.package.amount) || 0
+        }
+        const LeadData = {
+            consultant: consultantDetails._id,
+            consultant_code: consultantDetails.code,
+            consultant_mobile_no: consultantDetails.mobile_no,
+            consultant_email_id: consultantDetails.email_id,
+            name: params.name,
+            email: params.email,
+            phone: params.phone,
+            events: formattedEvents,
+            pincode: params.pincode,
+            eventSpecialsName: params.eventSpecialsName,
+            specialCode: params.specialCode,
+            leadType: params.leadType,
+            status: params.status,
+            leadID: leadID,
+            cycle: { label: leadcycle.Label, number: leadcycle.Number, year: leadcycle.year },
+            currentDate: currentDate,
+            package: packageData
+        };
+        const bitrixres = await addLead(LeadData);
+        if (bitrixres.status) {
+            await consultantDetails.save();
+            const lead = new LeadModel({
+                ...LeadData,
+                bitrixres: {   
+                    leadno: bitrixres.leadno || '',
+                    message: bitrixres.message || '' }
+            });
+            await lead.save();
+            res.send({
+                success: true,
+                statusCode: 201,
+                message: 'Lead added successfully',
+                data: lead
+            });
+        } else {
+            res.send({
+                success: false,
+                statusCode: bitrixres.statusCode,
+                message: bitrixres.error
+            });
+        }
     } catch (error) {
         console.error(error);
         res.send({
             success: false,
             statusCode: 500,
-             message: 'Internal server error'
+            message: 'Internal server error'
         });
     }
 };
+
 
 exports.getAllLeads = async (req, res) => {
     let {status}=req.body;

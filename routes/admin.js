@@ -8,6 +8,7 @@ const ConvertedLeadModel = require("../models/convertedLead.model.js");
 const JunkLeadModel = require("../models/junkLead.model.js");
 const { calculateCycle, calculateLeadCycle, generateLeadID ,calculateLifetimeCycleNumber} = require("../helpers/sample.js");
 const { addLead } = require("../utility/bitrix.js");
+const { Consultant_Wellcome } = require("../utility/email.util.js");
 
 
 router.get("/admin/dashboard", middleware.ensureAdminLoggedIn, async (req, res) => {
@@ -51,7 +52,6 @@ router.get("/admin/Leads/all", middleware.ensureAdminLoggedIn, async (req, res) 
 		res.redirect("back");
 	}
 });
-
 
 router.get("/admin/Leads/converted", middleware.ensureAdminLoggedIn, async (req, res) => {
 	try {
@@ -166,38 +166,10 @@ router.post("/admin/Leads/reject/:LeadsId", middleware.ensureAdminLoggedIn, asyn
 
 });
 
-router.get("/admin/Leads/assign/:LeadsId", middleware.ensureAdminLoggedIn, async (req, res) => {
-	try {
-		const LeadsId = req.params.LeadsId;
-		const agents = await UserModel.find({ role: "agent" });
-		const Leads = await LeadModel.findById(LeadsId).populate("donor");
-		res.render("admin/assignAgent", { title: "Assign agent", Leads, agents });
-	}
-	catch (err) {
-		console.log(err);
-		req.flash("error", "Some error occurred on the server.")
-		res.redirect("back");
-	}
-});
-
-router.post("/admin/Leads/assign/:LeadsId", middleware.ensureAdminLoggedIn, async (req, res) => {
-	try {
-		const LeadsId = req.params.LeadsId;
-		const { agent, adminToAgentMsg } = req.body;
-		await LeadModel.findByIdAndUpdate(LeadsId, { status: "assigned", agent, adminToAgentMsg });
-		req.flash("success", "Agent assigned successfully");
-		res.redirect(`/admin/Leads/view/${LeadsId}`);
-	}
-	catch (err) {
-		console.log(err);
-		req.flash("error", "Some error occurred on the server.")
-		res.redirect("back");
-	}
-});
-
-router.get("/admin/agents", middleware.ensureAdminLoggedIn, async (req, res) => {
+router.get("/admin/consultants", middleware.ensureAdminLoggedIn, async (req, res) => {
 	try {
 		const consultant = await UserModel.find({ role: "consultant" });
+		const admin = await UserModel.find({ role: "admin" });
 		// console.log(consultant);
 
 		res.render("admin/Consultants", { title: "List of consultant", consultant });
@@ -208,10 +180,23 @@ router.get("/admin/agents", middleware.ensureAdminLoggedIn, async (req, res) => 
 		res.redirect("back");
 	}
 });
-router.get("/admin/addConsultant", middleware.ensureAdminLoggedIn, async (req, res) => {
+router.get("/admin/admins", middleware.ensureAdminLoggedIn, async (req, res) => {
+	try {
+		const admin = await UserModel.find({ role: "admin" });
+		//console.log(admin);
+
+		res.render("admin/admins", { title: "List of Admin", admin });
+	}
+	catch (err) {
+		console.log(err);
+		req.flash("error", "Some error occurred on the server.")
+		res.redirect("back");
+	}
+});
+router.get("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) => {
 	try {
 		const agents = await UserModel.find({ role: "agent" });
-		res.render("admin/addConsultant", { title: "List of agents", agents });
+		res.render("admin/addUser", { title: "List of agents", agents });
 	}
 	catch (err) {
 		console.log(err);
@@ -221,13 +206,11 @@ router.get("/admin/addConsultant", middleware.ensureAdminLoggedIn, async (req, r
 
 
 });
-router.post("/admin/addConsultant", middleware.ensureAdminLoggedIn, async (req, res) => {
+router.post("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) => {
 
 
 	const { email_id, password1, role, user_code, user_name, mobile_no, dateOfJoining, isAdmin,sales_assistan_name, sales_assistan_mobile_no } = req.body;
 	let errors = [];
-
-	// Validate input fields
 	if (!email_id || !password1 || !user_code || !user_name || !mobile_no || !dateOfJoining) {
 		errors.push({ msg: "Please fill in all the fields" });
 	}
@@ -237,8 +220,8 @@ router.post("/admin/addConsultant", middleware.ensureAdminLoggedIn, async (req, 
 	}
 
 	if (errors.length > 0) {
-		return res.render("/admin/addConsultant", {
-			title: "addConsultant",
+		return res.render("/admin/addUser", {
+			title: "addUser",
 			errors, email_id, password1, user_code, user_name, mobile_no, dateOfJoining, isAdmin
 		});
 	}
@@ -250,14 +233,14 @@ router.post("/admin/addConsultant", middleware.ensureAdminLoggedIn, async (req, 
 
 		if (getExistingUser) {
 			errors.push({ msg: "This Email is already registered. Please try another email." });
-			return res.render("/admin/addConsultant", {
-				title: "addConsultant",
+			return res.render("/admin/addUser", {
+				title: "addUser",
 				errors, email_id, password1, user_code, user_name, mobile_no, dateOfJoining, isAdmin
 			});
 		}
 
 		if (duplicateCode) {
-			return res.status(400).send({ success: "failed", message: "Consultant code already exists." });
+			return res.status(400).send({ success: "failed", message: "User code already exists." });
 		}
 
 		// Encrypt the password
@@ -283,12 +266,10 @@ router.post("/admin/addConsultant", middleware.ensureAdminLoggedIn, async (req, 
 			},
 			currentcycle: { label: cycleLabel, number: cycleNumber }
 		});
-
-		// console.log(newUser);
 		await newUser.save();
-
-		req.flash("success", "Consultant  successfully added ");
-		res.redirect("/admin/agents");
+		await Consultant_Wellcome(newUser,password1); // wellcome mail 
+		req.flash("success", "User  successfully added ");
+		res.redirect("/admin/consultants");
 
 	} catch (err) {
 		console.log(err);
@@ -335,90 +316,91 @@ router.get("/admin/addLeads", middleware.ensureAdminLoggedIn, async (req, res) =
 });
 router.post("/admin/addLeads", async (req, res) => {
 	let params = req.body;
-	console.log(params);
 	
 	try {
 		const currentDate = new Date();
-		const currentYear = currentDate.getFullYear();
-		const { cycleLabel, cycleNumber } = calculateCycle(currentDate);
-		const consultantDetails = await UserModel.findOne({ code: params.consultant });
+        const currentYear = currentDate.getFullYear();
+        const consultantDetails = await UserModel.findById(params.consultant);
 
-		// Check if consultant exists
-		if (!consultantDetails) {
-			return res.status(404).send({ message: 'Consultant not found' });
-		}
-		consultantDetails.calculateLifetimeCycleNumber();
-		const leadcycle = calculateLeadCycle(params.leadType, currentDate)
-		let leadNumber = 1;
-		let cycleKey = `${currentYear}-${leadcycle.Label}`;
+        if (!consultantDetails) {
+			req.flash("warning", "Consultant not found");
+			res.redirect("/admin/addLeads");
+        }
+        consultantDetails.calculateLifetimeCycleNumber();
+        const leadcycle = calculateLeadCycle(params.leadType, currentDate)
 
-		if (params.leadType === 'Seasonal') {
-			leadNumber = (consultantDetails.leadsPerCycle.seasonal.get(cycleKey) || 0) + 1;
-			consultantDetails.leadsPerCycle.seasonal.set(cycleKey, leadNumber);
-		} else {
-			leadNumber = (consultantDetails.leadsPerCycle.regular.get(cycleKey) || 0) + 1;
-			consultantDetails.leadsPerCycle.regular.set(cycleKey, leadNumber);
-		}
-		const leadID = generateLeadID(consultantDetails.code, params.leadType, leadcycle.Label, consultantDetails.consultantLifetimeCycleNumber, leadNumber, params.pincode);
-		
-		const duplicatecode = await LeadModel.find({ leadID: leadID });
-		if (duplicatecode != "") {
-			return res.send({
-				success: false,
-				statusCode: 400,
-				message: "leadID already exist."
-			});
-		}
-		await consultantDetails.save();
-		const formattedEvents = params.events.map(event => ({
-			name: event.name || 'Unnamed Event',
-			date: new Date(event.date), // Ensure date is a Date object
-			timing: event.timing || 'Not specified',
-		}));
-		const packageData = {
-			name: params.package.packageName || 'NA',
-			subname: params.package.subname || 'NA',
-			addonS: params.package.addOns ? params.package.addOns.split(',').map(item => item.trim()) : [],
-			amount: parseFloat(params.package.amount) || 0
-		}
-		const LeadData = {
-			consultant: consultantDetails._id,
-			consultant_code: consultantDetails.code,
-			consultant_mobile_no: consultantDetails.mobile_no,
-			consultant_email_id: consultantDetails.email_id,
-			name: params.name,
-			email: params.email,
-			phone: params.phone,
-			events: formattedEvents,
-			eventLocation: params.eventLocation,
-			pincode: params.pincode,
-			eventSpecialsName: params.eventSpecialsName,
-			specialCode: params.specialCode,
-			leadType: params.leadType,
-			status: params.status,
-			leadID: leadID,
-			cycle: { label: leadcycle.Label, number: leadcycle.Number, year: leadcycle.year },
-			package: packageData
-		};
-		let bitrixres = await addLead(LeadData)
+        let leadNumber = 1;
+        let cycleKey = `${currentYear}-${leadcycle.Label}`;
 
-		const lead = new LeadModel({
-			...LeadData,
-			bitrixres: {
-				status: bitrixres.status || '',
-				message: bitrixres.message || ''
-			}
-		});
+        if (params.leadType === 'Seasonal') {
+            leadNumber = (consultantDetails.leadsPerCycle.seasonal.get(cycleKey) || 0) + 1;
+            consultantDetails.leadsPerCycle.seasonal.set(cycleKey, leadNumber);
+        } else {
+            leadNumber = (consultantDetails.leadsPerCycle.regular.get(cycleKey) || 0) + 1;
+            consultantDetails.leadsPerCycle.regular.set(cycleKey, leadNumber);
+        }
 
-		//console.log(lead);
+        const leadID = generateLeadID(consultantDetails.code, params.leadType, leadcycle.Label, consultantDetails.consultantLifetimeCycleNumber, leadNumber, params.pincode);
+        //console.log(leadID);
 
-		await lead.save();
+        const duplicatecode = await LeadModel.find({ leadID: leadID });
 
-		req.flash("success", "Lead successfully added");
-		res.redirect("/admin/Leads/all");
+        if (duplicatecode != "") {
+			req.flash("warning", "leadID already exist.");
+			res.redirect("/admin/addLeads");
+        }
+
+        const formattedEvents = params.events.map(event => ({
+            name: event.name || 'Unnamed Event',
+            date: new Date(event.date), // Ensure date is a Date object
+            location: event.location || 'Not specified',
+            timing: event.timing || 'Not specified',
+        }));
+        const packageData = {
+            name: params.package.packageName || 'NA',
+            subname: params.package.subname || 'NA',
+            addonS: params.package.addOns ? params.package.addOns.split(',').map(item => item.trim()) : [],
+            amount: parseFloat(params.package.amount) || 0
+        }
+        const LeadData = {
+            consultant: consultantDetails._id,
+            consultant_code: consultantDetails.code,
+            consultant_mobile_no: consultantDetails.mobile_no,
+            consultant_email_id: consultantDetails.email_id,
+            name: params.name,
+            email: params.email,
+            phone: params.phone,
+            events: formattedEvents,
+            pincode: params.pincode,
+            eventSpecialsName: params.eventSpecialsName,
+            specialCode: params.specialCode,
+            leadType: params.leadType,
+            status: params.status,
+            leadID: leadID,
+            cycle: { label: leadcycle.Label, number: leadcycle.Number, year: leadcycle.year },
+            currentDate: currentDate,
+            package: packageData
+        };
+        const bitrixres = await addLead(LeadData);
+        if (bitrixres.status) {
+            await consultantDetails.save();
+            const lead = new LeadModel({
+                ...LeadData,
+                bitrixres: {   
+                    leadno: bitrixres.leadno || '',
+                    message: bitrixres.message || '' }
+            });
+            await lead.save();
+			req.flash("success", "Lead successfully added");
+			res.redirect("/admin/Leads/all");
+        } else {
+			req.flash("error", `${bitrixres.error}`);
+			res.redirect("/admin/addLeads");
+        }
 	} catch (error) {
+		req.flash("error", "Internal server error");
+		res.redirect("/admin/addLeads");
 		console.error(error);
-		res.status(500).send({ message: 'Internal server error' });
 	}
 });
 
