@@ -17,6 +17,10 @@ const userSchema = new mongoose.Schema({
 		seasonal: { type: Map, of: Number, default: new Map() },
 		regular: { type: Map, of: Number, default: new Map() }
 	},
+	convertedLeadsPerCycle: {
+        seasonal: { type: Map, of: Number, default: new Map() },
+		regular: { type: Map, of: Number, default: new Map() }
+    },
 	sales_assistan: { 
 		name: { type: String, default: null},
 		mobile_no: { type: Number,default: null},

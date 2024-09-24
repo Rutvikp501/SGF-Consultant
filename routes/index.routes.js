@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const leadController = require('../controllers/lead.controller');
 const Admin  = require('../controllers/admin.controler');
+const bitrix = require('../utility/bitrix');
 
 
 router.post('/leadapi/addLead', leadController.addLead);
@@ -26,5 +27,7 @@ router.patch('/adminapi/update/:id', Admin.Update);
 router.delete('/adminapi/delete/:id', Admin.Delete);
 router.post('/adminapi/forgotPassword',Admin.forgotPassword)
 router.post('/adminapi/resetPassword',Admin.resetPassword)
+
+router.post('/bitrix/convertedleads',bitrix.getConvertedLead)
 
 module.exports = router;

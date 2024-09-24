@@ -364,12 +364,12 @@ exports.getDashboardData = async (req, res) => {
 };
 
 exports.getconvertedLeads = async (req, res) => {
-    const authHeader = req.headers.authorization;
-    const authtoken = authHeader.split(" ")[1];
-    const decode = jwt.verify(authtoken,token)
-    //  const decode = req.body
+    // const authHeader = req.headers.authorization;
+    // const authtoken = authHeader.split(" ")[1];
+    // const decode = jwt.verify(authtoken,token)
+    const decode = req.body
     const consultantId = decode.UserId;
-    const ConvertedLeads = await LeadModel.find({ consultant: consultantId, status: "Converted" }).populate("consultant");
+    const ConvertedLeads = await ConvertedLeadModel.find({ consultant: consultantId,}).populate("consultant");
     try {
         res.send({
             success: true,

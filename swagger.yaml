@@ -426,3 +426,50 @@ paths:
           description: No additional data found
         '500':
           description: Internal server error
+  
+  /api/bitrix/convertedleads:
+    post:
+      tags:
+        - bitrix API
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                consultant:
+                  type: string
+                leadID:
+                  type: string
+                invoice:
+                  type: array
+                  description: Array of events associated with the lead
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: invoice name
+                      paymentstatus:
+                        type: string
+                        description: paymentstatus
+                      totalamount:
+                        type: number
+                        description: totalamount
+                      percentage:
+                        type: number
+                        description: persentage
+                      commission:
+                        type: number
+                        description: commission
+                      dateofconversion:
+                        type: string
+                        format: date
+                        description: invoice date (YYYY-MM-DD)
+
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
