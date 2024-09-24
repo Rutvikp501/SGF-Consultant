@@ -7,7 +7,7 @@ const JunkLeadModel = require('../models/junkLead.model');
 const { bitrixaddLead } = require('../utility/bitrix');
 const token = process.env.token
 exports.addLead = async (req, res, isWebForm = false) => {
-    
+
     let params = req.body;
     // let params ={
     //     consultant: 'C001',
@@ -190,10 +190,10 @@ exports.addLead = async (req, res, isWebForm = false) => {
 
 
 exports.getAllLeads = async (req, res) => {
-    let {status}=req.body;
-   
+    let { status } = req.body;
+
     try {
-       // const leads = await LeadModel.find();
+        // const leads = await LeadModel.find();
         let leads;
 
         // Determine which model to query based on the status
@@ -207,26 +207,26 @@ exports.getAllLeads = async (req, res) => {
             leads = await JunkLeadModel.find();
         } else {
             // If no valid status is provided, return an error
-             leads = await LeadModel.find();
+            leads = await LeadModel.find();
         }
         if (!leads.length) {
             return res.send({
                 success: false,
                 statusCode: 404,
-                 message: 'No leads found '
+                message: 'No leads found '
             });
         }
         res.send({
             success: true,
             statusCode: 200,
-           data:leads
+            data: leads
         });
     } catch (error) {
         console.error(error);
         res.send({
             success: false,
             statusCode: 500,
-            message: 'Internal server error' 
+            message: 'Internal server error'
         });
     }
 };
@@ -236,35 +236,35 @@ exports.getSearchedlead = async (req, res) => {
         // const authHeader = req.headers.authorization;
         // const authtoken = authHeader.split(" ")[1];
         // const decode = jwt.verify(authtoken,token)
-       
+
         const params = req.body || '';
         const searchParam = params.search;
         const filter = {};
-    
+
         if (searchParam) {
-          filter.$or = [
-            { consultant_code: { $regex: searchParam, $options: 'i' } },
-            { leadID: { $regex: searchParam, $options: 'i' } },
-            { email: { $regex: searchParam, $options: 'i' } },
-            { leadType: { $regex: searchParam, $options: 'i' } },
-            { pincode: { $regex: searchParam, $options: 'i' } },
-            { status: { $regex: searchParam, $options: 'i' } }
-          ];
+            filter.$or = [
+                { consultant_code: { $regex: searchParam, $options: 'i' } },
+                { leadID: { $regex: searchParam, $options: 'i' } },
+                { email: { $regex: searchParam, $options: 'i' } },
+                { leadType: { $regex: searchParam, $options: 'i' } },
+                { pincode: { $regex: searchParam, $options: 'i' } },
+                { status: { $regex: searchParam, $options: 'i' } }
+            ];
         }
-    
+
         const allSearchedLeads = await LeadModel.aggregate([
-          { $match: filter }
+            { $match: filter }
         ]);
-    
+
         return res.send({
             success: true,
             statusCode: 200,
-            data:allSearchedLeads
+            data: allSearchedLeads
         });
-      } catch (error) {
+    } catch (error) {
         console.log(error);
         next(error);
-      }
+    }
 };
 
 exports.getAdditionalData = async (req, res) => {
@@ -275,22 +275,22 @@ exports.getAdditionalData = async (req, res) => {
             return res.send({
                 success: false,
                 statusCode: 404,
-                message: 'No lead found' 
+                message: 'No lead found'
             });
         }
 
         const { associates } = lead;
         if (!associates) {
-            return  res.send({
+            return res.send({
                 success: false,
                 statusCode: 404,
-                message: 'No additional data found for this lead' 
+                message: 'No additional data found for this lead'
             });
         }
         res.send({
             success: true,
             statusCode: 200,
-            data:associates
+            data: associates
         });
     } catch (error) {
         console.error(error);
@@ -305,36 +305,36 @@ exports.getAdditionalData = async (req, res) => {
 exports.getLeadscount = async (req, res) => {
     const authHeader = req.headers.authorization;
     const authtoken = authHeader.split(" ")[1];
-    const decode = jwt.verify(authtoken,token)
+    const decode = jwt.verify(authtoken, token)
     const consultantId = decode.UserId;
     // const consultantId = "66ab659fdec07a2c29fd9609";
     const RegularLeads = {};
     const SeasonalLeads = {};
     try {
-        RegularLeads.numAllLeads = await LeadModel.countDocuments({consultant: consultantId,});
+        RegularLeads.numAllLeads = await LeadModel.countDocuments({ consultant: consultantId, });
         // Regular Leads Counts
-        RegularLeads.numPendingLeads = await LeadModel.countDocuments({ consultant: consultantId,leadType: "Regular",status: "Pending" });
-        RegularLeads.numAllLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Regular" });
-        RegularLeads.numConvertedLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Regular",status: "Converted"  });
-        RegularLeads.numJunkLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Regular",status: "Junk"  });
-    
+        RegularLeads.numPendingLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Regular", status: "Pending" });
+        RegularLeads.numAllLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Regular" });
+        RegularLeads.numConvertedLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Regular", status: "Converted" });
+        RegularLeads.numJunkLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Regular", status: "Junk" });
+
         // Seasonal Leads Counts  
-        SeasonalLeads.numPendingLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal",status: "Pending" });   
-        SeasonalLeads.numAllLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal"   });
-        SeasonalLeads.numConvertedLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal",status: "Converted"   });
-        SeasonalLeads.numJunkLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal",status: "Junk"   });
-    
+        SeasonalLeads.numPendingLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal", status: "Pending" });
+        SeasonalLeads.numAllLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal" });
+        SeasonalLeads.numConvertedLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal", status: "Converted" });
+        SeasonalLeads.numJunkLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal", status: "Junk" });
+
         res.send({
             success: true,
             statusCode: 200,
-            data:{ RegularLeads, SeasonalLeads }
+            data: { RegularLeads, SeasonalLeads }
         });
     } catch (error) {
         console.error(error);
         res.send({
             success: false,
             statusCode: 500,
-            message: 'Internal server error' 
+            message: 'Internal server error'
         });
     }
 };
@@ -342,152 +342,202 @@ exports.getLeadscount = async (req, res) => {
 exports.getDashboardData = async (req, res) => {
     const authHeader = req.headers.authorization;
     const authtoken = authHeader.split(" ")[1];
-    const decode = jwt.verify(authtoken,token)    
-    const consultantId = decode.UserId||"66ab659fdec07a2c29fd9609";
+    const decode = jwt.verify(authtoken, token)
+    const consultantId = decode.UserId || "66ab659fdec07a2c29fd9609";
     // const consultantId = "66ab659fdec07a2c29fd9609";
     const RegularLeads = {};
     const SeasonalLeads = {};
     try {
-        let AllLeads = await LeadModel.countDocuments({consultant: consultantId,});
+        let AllLeads = await LeadModel.countDocuments({ consultant: consultantId, });
         // Regular Leads Counts
-        RegularLeads.numPendingLeads = await LeadModel.countDocuments({ consultant: consultantId,leadType: "Regular",status: "Pending" });
-        RegularLeads.numAllLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Regular" });
-        RegularLeads.numConvertedLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Regular",status: "Converted"  });
-        RegularLeads.numJunkLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Regular",status: "Junk"  });
-    
+        RegularLeads.numPendingLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Regular", status: "Pending" });
+        RegularLeads.numAllLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Regular" });
+        RegularLeads.numConvertedLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Regular", status: "Converted" });
+        RegularLeads.numJunkLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Regular", status: "Junk" });
+
         // Seasonal Leads Counts  
-        SeasonalLeads.numPendingLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal",status: "Pending" });   
-        SeasonalLeads.numAllLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal"});
-        SeasonalLeads.numConvertedLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal",status: "Converted"   });
-        SeasonalLeads.numJunkLeads = await LeadModel.countDocuments({consultant: consultantId,leadType: "Seasonal",status: "Junk"   });
+        SeasonalLeads.numPendingLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal", status: "Pending" });
+        SeasonalLeads.numAllLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal" });
+        SeasonalLeads.numConvertedLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal", status: "Converted" });
+        SeasonalLeads.numJunkLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal", status: "Junk" });
 
         const leadsData = [
-            
-                {
-                    "title": "ALL Leads",
-                    "des": "Counts for All Leads",
-                    "status": AllLeads
-                },
-                {
-                    "title": "Regular ALL Leads ",
-                    "des": "Counts for All Leads",
-                    "status": RegularLeads.numAllLeads,
-                    "subList":[
-                        {
-                            "title": "Regular Pending Leads",
-                            "des": "Counts for Pending Leads",
-                            "key": "Pending",
-                            "status": RegularLeads.numPendingLeads
-                        },
-                        {
-                            "title": "Regular Converted Leads",
-                            "des": "Counts for Converted Leads",
-                            "key": "Converted",
-                            "status": RegularLeads.numConvertedLeads
-                        },
-                        {
-                            "title": "Regular Junk Leads",
-                            "des": "Counts for Junk Leads",
-                            "key": "Junk",
-                            "status": RegularLeads.numJunkLeads
-                        },
-                    ]
-                },
-                {
-                    "title": "Seasonal ALL Leads",
-                    "des": "Counts for All Leads",
-                    "status":SeasonalLeads.numAllLeads,
-                    "subList":[
-                        {
-                            "title": "Seasonal Pending Leads",
-                            "des": "Counts for Pending Leads",
-                            "key": "Pending",
-                            "status": SeasonalLeads.numPendingLeads
-                        },
-                        {
-                            "title": "Seasonal Converted Leads",
-                            "des": "Counts for Converted Leads",
-                            "key": "Converted",
-                            "status": SeasonalLeads.numConvertedLeads
-                        },
-                        {
-                            "title": "Seasonal Junk Leads",
-                            "des": "Counts for Junk Leads",
-                            "key": "Junk",
-                            "status": SeasonalLeads.numJunkLeads
-                        }
-                    ]
-                },
+
+            {
+                "title": "ALL Leads",
+                "des": "Counts for All Leads",
+                "status": AllLeads
+            },
+            {
+                "title": "Regular ALL Leads ",
+                "des": "Counts for All Leads",
+                "status": RegularLeads.numAllLeads,
+                "subList": [
+                    {
+                        "title": "Regular Pending Leads",
+                        "des": "Counts for Pending Leads",
+                        "key": "Pending",
+                        "status": RegularLeads.numPendingLeads
+                    },
+                    {
+                        "title": "Regular Converted Leads",
+                        "des": "Counts for Converted Leads",
+                        "key": "Converted",
+                        "status": RegularLeads.numConvertedLeads
+                    },
+                    {
+                        "title": "Regular Junk Leads",
+                        "des": "Counts for Junk Leads",
+                        "key": "Junk",
+                        "status": RegularLeads.numJunkLeads
+                    },
+                ]
+            },
+            {
+                "title": "Seasonal ALL Leads",
+                "des": "Counts for All Leads",
+                "status": SeasonalLeads.numAllLeads,
+                "subList": [
+                    {
+                        "title": "Seasonal Pending Leads",
+                        "des": "Counts for Pending Leads",
+                        "key": "Pending",
+                        "status": SeasonalLeads.numPendingLeads
+                    },
+                    {
+                        "title": "Seasonal Converted Leads",
+                        "des": "Counts for Converted Leads",
+                        "key": "Converted",
+                        "status": SeasonalLeads.numConvertedLeads
+                    },
+                    {
+                        "title": "Seasonal Junk Leads",
+                        "des": "Counts for Junk Leads",
+                        "key": "Junk",
+                        "status": SeasonalLeads.numJunkLeads
+                    }
+                ]
+            },
         ];
         //console.log(leadsData);
-        
+
         res.send({
             success: true,
             statusCode: 200,
-            data: leadsData 
+            data: leadsData
         });
     } catch (error) {
         console.error(error);
         res.send({
             success: false,
             statusCode: 500,
-            message: 'Internal server error' 
+            message: 'Internal server error'
         });
     }
 };
 
 exports.getconvertedLeads = async (req, res) => {
     try {
-      const decode = req.query;
-      const consultantId = decode.consultantId;
-  
-      // Fetch all converted leads for the consultant
-      const allConvertedLeads = await ConvertedLeadModel.find({ consultant_code: consultantId });
-  
-      // Separate seasonal and regular leads
-      const seasonalLeads = allConvertedLeads.filter(lead => lead.leadType === "Seasonal");
-      const regularLeads = allConvertedLeads.filter(lead => lead.leadType === "Regular");
-  
-      // Calculate totals for all leads
-      const { totalAmount, totalCommission } = calculateTotals(allConvertedLeads);
-      
-      // Calculate totals for seasonal leads
-      const { totalAmount: seasonalTotalAmount, totalCommission: seasonalTotalCommission } = calculateTotals(seasonalLeads);
-      
-      // Calculate totals for regular leads
-      const { totalAmount: regularTotalAmount, totalCommission: regularTotalCommission } = calculateTotals(regularLeads);
-  
-      // Prepare data response
-      const earningData = {
-        all: { totalAmount, totalCommission },
-        seasonal: { seasonalTotalAmount, seasonalTotalCommission },
-        regular: { regularTotalAmount, regularTotalCommission }
-      };
-  
-      const leadsData = {
-        allConvertedLeads,
-        seasonalLeads,
-        regularLeads
-      };
-  
-      // Respond with the calculated data
-      res.send({
-        success: true,
-        statusCode: 200,
-        earnings: earningData,
-        leads: leadsData,
-      });
-  
+        const decode = req.query;
+        const consultantId = decode.consultantId;
+
+        // Fetch all converted leads for the consultant
+        const allConvertedLeads = await ConvertedLeadModel.find({ consultant_code: consultantId });
+
+        // Separate seasonal and regular leads
+        const seasonalLeads = allConvertedLeads.filter(lead => lead.leadType === "Seasonal");
+        const regularLeads = allConvertedLeads.filter(lead => lead.leadType === "Regular");
+
+        // Calculate totals for all leads
+        const { totalAmount, totalCommission } = calculateTotals(allConvertedLeads);
+
+        // Calculate totals for seasonal leads
+        const { totalAmount: seasonalTotalAmount, totalCommission: seasonalTotalCommission } = calculateTotals(seasonalLeads);
+
+        // Calculate totals for regular leads
+        const { totalAmount: regularTotalAmount, totalCommission: regularTotalCommission } = calculateTotals(regularLeads);
+
+        // Prepare data response
+        const earningData = [
+            {
+                "title": "ALL Earnings",
+                "des": "Total earnings for all leads",
+                "status": {
+                    "totalAmount": totalAmount,
+                    "totalCommission": totalCommission
+                }
+            },
+            {
+                "title": "Regular ALL Earnings",
+                "des": "Total earnings for all regular leads",
+                "status": {
+                    "totalAmount": regularTotalAmount,
+                    "totalCommission": regularTotalCommission
+                },
+                "subList": [
+                    {
+                        "title": "Regular Total Amount",
+                        "des": "Total amount from regular leads",
+                        "key": "RegularTotalAmount",
+                        "status": regularTotalAmount
+                    },
+                    {
+                        "title": "Regular Total Commission",
+                        "des": "Total commission from regular leads",
+                        "key": "RegularTotalCommission",
+                        "status": regularTotalCommission
+                    }
+                ]
+            },
+            {
+                "title": "Seasonal ALL Earnings",
+                "des": "Total earnings for all seasonal leads",
+                "status": {
+                    "totalAmount": seasonalTotalAmount,
+                    "totalCommission": seasonalTotalCommission
+                },
+                "subList": [
+                    {
+                        "title": "Seasonal Total Amount",
+                        "des": "Total amount from seasonal leads",
+                        "key": "SeasonalTotalAmount",
+                        "status": seasonalTotalAmount
+                    },
+                    {
+                        "title": "Seasonal Total Commission",
+                        "des": "Total commission from seasonal leads",
+                        "key": "SeasonalTotalCommission",
+                        "status": seasonalTotalCommission
+                    }
+                ]
+            }
+        ];
+
+
+        const leadsData = {
+            allConvertedLeads,
+            seasonalLeads,
+            regularLeads
+        };
+
+        // Respond with the calculated data
+        res.send({
+            success: true,
+            statusCode: 200,
+            earnings: earningData,
+            leads: leadsData,
+        });
+
     } catch (error) {
-      console.error(error);
-      res.status(500).send({
-        success: false,
-        statusCode: 500,
-        message: 'Internal server error',
-      });
+        console.error(error);
+        res.status(500).send({
+            success: false,
+            statusCode: 500,
+            message: 'Internal server error',
+        });
     }
-  };
-  
+};
+
 exports.getconvertedleadsview = async (req, res) => {
     const leadId = req.params.leadId;
     const Leads = await ConvertedLeadModel.findById(leadId);
@@ -495,23 +545,23 @@ exports.getconvertedleadsview = async (req, res) => {
         res.send({
             success: true,
             statusCode: 200,
-            data:Leads
+            data: Leads
         });
     } catch (error) {
         console.error(error);
         res.send({
             success: false,
             statusCode: 500,
-            message: 'Internal server error' 
+            message: 'Internal server error'
         });
     }
 };
 
-exports.getpendingLeads  = async (req, res) => {
+exports.getpendingLeads = async (req, res) => {
     const authHeader = req.headers.authorization;
     const authtoken = authHeader.split(" ")[1];
-    const decode = jwt.verify(authtoken,token)
-      const consultantId = decode.UserId;
+    const decode = jwt.verify(authtoken, token)
+    const consultantId = decode.UserId;
     // const decode = req.body
     // const consultantId = decode.UserId;
     const pendingLeads = await LeadModel.find({ consultant: consultantId, status: "Pending" }).populate("consultant");
@@ -519,14 +569,14 @@ exports.getpendingLeads  = async (req, res) => {
         res.send({
             success: true,
             statusCode: 200,
-            data:pendingLeads
+            data: pendingLeads
         });
     } catch (error) {
         console.error(error);
         res.send({
             success: false,
             statusCode: 500,
-            message: 'Internal server error' 
+            message: 'Internal server error'
         });
     }
 };
@@ -538,14 +588,14 @@ exports.getleadsview = async (req, res) => {
         res.send({
             success: true,
             statusCode: 200,
-            data:Leads
+            data: Leads
         });
     } catch (error) {
         console.error(error);
         res.send({
             success: false,
             statusCode: 500,
-            message: 'Internal server error' 
+            message: 'Internal server error'
         });
     }
 };
@@ -554,15 +604,14 @@ exports.getleadsview = async (req, res) => {
 const calculateTotals = (leads) => {
     let totalAmount = 0;
     let totalCommission = 0;
-  
+
     leads.forEach(lead => {
-      lead.invoice.forEach(inv => {
-        totalAmount += parseFloat(inv.totalamount);
-        totalCommission += parseFloat(inv.commission);
-      });
+        lead.invoice.forEach(inv => {
+            totalAmount += parseFloat(inv.totalamount);
+            totalCommission += parseFloat(inv.commission);
+        });
     });
-  
+
     return { totalAmount, totalCommission };
-  };
-  
-  
+};
+
