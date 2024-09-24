@@ -148,7 +148,6 @@ router.post("/consultant/addLeads", middleware.ensureconsultantLoggedIn, async (
 		if (!consultantDetails) {
 			return res.status(404).send({ message: 'Consultant not found' });
 		}
-		consultantDetails.calculateLifetimeCycleNumber();
 		const leadcycle = calculateLeadCycle(params.leadType, currentDate)
 		let leadNumber = 1;
 		let cycleKey = `${currentYear}-${leadcycle.Label}`;

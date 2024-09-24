@@ -6,9 +6,10 @@ const UserModel = require("../models/user.js");
 const LeadModel = require("../models/lead.models.js");
 const ConvertedLeadModel = require("../models/convertedLead.model.js");
 const JunkLeadModel = require("../models/junkLead.model.js");
-const { calculateCycle, calculateLeadCycle, generateLeadID ,calculateLifetimeCycleNumber} = require("../helpers/sample.js");
-const { addLead } = require("../utility/bitrix.js");
+const { calculateCycle,} = require("../helpers/sample.js");
+
 const { Consultant_Wellcome } = require("../utility/email.util.js");
+const { addLead } = require("../controllers/lead.controller.js");
 
 
 router.get("/admin/dashboard", middleware.ensureAdminLoggedIn, async (req, res) => {
@@ -314,95 +315,11 @@ router.get("/admin/addLeads", middleware.ensureAdminLoggedIn, async (req, res) =
 
 
 });
-router.post("/admin/addLeads", async (req, res) => {
-	let params = req.body;
-	
-	try {
-		const currentDate = new Date();
-        const currentYear = currentDate.getFullYear();
-        const consultantDetails = await UserModel.findById(params.consultant);
-
-        if (!consultantDetails) {
-			req.flash("warning", "Consultant not found");
-			res.redirect("/admin/addLeads");
-        }
-        consultantDetails.calculateLifetimeCycleNumber();
-        const leadcycle = calculateLeadCycle(params.leadType, currentDate)
-
-        let leadNumber = 1;
-        let cycleKey = `${currentYear}-${leadcycle.Label}`;
-
-        if (params.leadType === 'Seasonal') {
-            leadNumber = (consultantDetails.leadsPerCycle.seasonal.get(cycleKey) || 0) + 1;
-            consultantDetails.leadsPerCycle.seasonal.set(cycleKey, leadNumber);
-        } else {
-            leadNumber = (consultantDetails.leadsPerCycle.regular.get(cycleKey) || 0) + 1;
-            consultantDetails.leadsPerCycle.regular.set(cycleKey, leadNumber);
-        }
-
-        const leadID = generateLeadID(consultantDetails.code, params.leadType, leadcycle.Label, consultantDetails.consultantLifetimeCycleNumber, leadNumber, params.pincode);
-        //console.log(leadID);
-
-        const duplicatecode = await LeadModel.find({ leadID: leadID });
-
-        if (duplicatecode != "") {
-			req.flash("warning", "leadID already exist.");
-			res.redirect("/admin/addLeads");
-        }
-
-        const formattedEvents = params.events.map(event => ({
-            name: event.name || 'Unnamed Event',
-            date: new Date(event.date), // Ensure date is a Date object
-            location: event.location || 'Not specified',
-            timing: event.timing || 'Not specified',
-        }));
-        const packageData = {
-            name: params.package.packageName || 'NA',
-            subname: params.package.subname || 'NA',
-            addonS: params.package.addOns ? params.package.addOns.split(',').map(item => item.trim()) : [],
-            amount: parseFloat(params.package.amount) || 0
-        }
-        const LeadData = {
-            consultant: consultantDetails._id,
-            consultant_code: consultantDetails.code,
-            consultant_mobile_no: consultantDetails.mobile_no,
-            consultant_email_id: consultantDetails.email_id,
-            name: params.name,
-            email: params.email,
-            phone: params.phone,
-            events: formattedEvents,
-            pincode: params.pincode,
-            eventSpecialsName: params.eventSpecialsName,
-            specialCode: params.specialCode,
-            leadType: params.leadType,
-            status: params.status,
-            leadID: leadID,
-            cycle: { label: leadcycle.Label, number: leadcycle.Number, year: leadcycle.year },
-            currentDate: currentDate,
-            package: packageData
-        };
-        const bitrixres = await addLead(LeadData);
-        if (bitrixres.status) {
-            await consultantDetails.save();
-            const lead = new LeadModel({
-                ...LeadData,
-                bitrixres: {   
-                    leadno: bitrixres.leadno || '',
-                    message: bitrixres.message || '' }
-            });
-            await lead.save();
-			req.flash("success", "Lead successfully added");
-			res.redirect("/admin/Leads/all");
-        } else {
-			req.flash("error", `${bitrixres.error}`);
-			res.redirect("/admin/addLeads");
-        }
-	} catch (error) {
-		req.flash("error", "Internal server error");
-		res.redirect("/admin/addLeads");
-		console.error(error);
-	}
+router.post('/admin/addLeads', middleware.ensureAdminLoggedIn, async (req, res) => 	{
+    // Web form request (uses req.flash and redirection)
+    await addLead(req, res, true);
 });
+
 
 
 module.exports = router;

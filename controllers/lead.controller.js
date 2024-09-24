@@ -2,30 +2,79 @@ const { calculateCycle, calculateLeadCycle, generateLeadID } = require('../helpe
 const LeadModel = require('../models/lead.models');
 const UserModel = require('../models/user');
 const jwt = require('jsonwebtoken');
-const { addLead } = require('../utility/bitrix');
 const ConvertedLeadModel = require('../models/convertedLead.model');
 const JunkLeadModel = require('../models/junkLead.model');
+const { bitrixaddLead } = require('../utility/bitrix');
 const token = process.env.token
-exports.addLead = async (req, res) => {
-    // const authtoken = authHeader.split(" ")[1];
-    // const decode = jwt.verify(authtoken,token)
-    //const consultantDetails = await UserModel.findById(decode.UserId);
+exports.addLead = async (req, res, isWebForm = false) => {
+    
     let params = req.body;
-    try {
+    // let params ={
+    //     consultant: 'C001',
+    //     name: 'Satyajeet Joshi',
+    //     email: 'patilrutvik501@gmail.com',
+    //     phone: '9137898236',
+    //     events: [
+    //       {
+    //         name: 'party',
+    //         location: 'kalyan',
+    //         date: '2024-09-30',
+    //         timing: '6-10 pm'
+    //       }
+    //     ],
+    //     pincode: '421102',
+    //     eventSpecialsName: 'Satyajeet ',
+    //     specialCode: 'Special 123',
+    //     leadType: 'Regular',
+    //     status: 'Pending',
+    //     package: {
+    //       packageName: 'silver',
+    //       subname: 'test',
+    //       addOns: 'test,test2',
+    //       amount: '1212'
+    //     }
+    //   }
 
+
+    try {
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear();
-        const consultantDetails = await UserModel.findById(params.consultant);
+
+        let consultantDetails;
+        if (isWebForm) {
+            consultantDetails = await UserModel.find({ code: params.consultant });
+            if (consultantDetails.length === 0) {
+                return res.send({
+                    success: false,
+                    statusCode: 404,
+                    message: 'Consultant not found'
+                });
+            }
+            consultantDetails = consultantDetails[0];  // Get the first consultant from the array
+        } else {
+            consultantDetails = await UserModel.findById(params.consultant);
+            if (!consultantDetails) {
+                return res.send({
+                    success: false,
+                    statusCode: 404,
+                    message: 'Consultant not found'
+                });
+            }
+        }
 
         if (!consultantDetails) {
-            return res.send({
-                success: false,
-                statusCode: 404,
-                message: 'Consultant not found'
-            });
+            const errorMsg = 'Consultant not found';
+            if (isWebForm) {
+                req.flash('warning', errorMsg);
+                return res.redirect('/admin/addLeads');
+            } else {
+                return res.status(404).send({
+                    success: false,
+                    message: errorMsg
+                });
+            }
         }
-        consultantDetails.calculateLifetimeCycleNumber();
-        const leadcycle = calculateLeadCycle(params.leadType, currentDate)
+        const leadcycle = calculateLeadCycle(params.leadType, currentDate);
 
         let leadNumber = 1;
         let cycleKey = `${currentYear}-${leadcycle.Label}`;
@@ -39,35 +88,41 @@ exports.addLead = async (req, res) => {
         }
 
         const leadID = generateLeadID(consultantDetails.code, params.leadType, leadcycle.Label, consultantDetails.consultantLifetimeCycleNumber, leadNumber, params.pincode);
-        //console.log(leadID);
 
         const duplicatecode = await LeadModel.find({ leadID: leadID });
-
-        if (duplicatecode != "") {
-            return res.send({
-                success: false,
-                statusCode: 400,
-                message: "leadID already exist."
-            });
+        if (duplicatecode.length > 0) {
+            const errorMsg = 'LeadID already exists.';
+            if (isWebForm) {
+                req.flash('warning', errorMsg);
+                return res.redirect('/admin/addLeads');
+            } else {
+                return res.status(400).send({
+                    success: false,
+                    message: errorMsg
+                });
+            }
         }
 
         const formattedEvents = params.events.map(event => ({
             name: event.name || 'Unnamed Event',
-            date: new Date(event.date), // Ensure date is a Date object
+            date: new Date(event.date),
             location: event.location || 'Not specified',
             timing: event.timing || 'Not specified',
         }));
+
         const packageData = {
             name: params.package.packageName || 'NA',
             subname: params.package.subname || 'NA',
             addonS: params.package.addOns ? params.package.addOns.split(',').map(item => item.trim()) : [],
             amount: parseFloat(params.package.amount) || 0
-        }
+        };
+
         const LeadData = {
             consultant: consultantDetails._id,
             consultant_code: consultantDetails.code,
             consultant_mobile_no: consultantDetails.mobile_no,
             consultant_email_id: consultantDetails.email_id,
+            consultant_name: consultantDetails.name,
             name: params.name,
             email: params.email,
             phone: params.phone,
@@ -82,38 +137,56 @@ exports.addLead = async (req, res) => {
             currentDate: currentDate,
             package: packageData
         };
-        const bitrixres = await addLead(LeadData);
+
+        const bitrixres = await bitrixaddLead(LeadData);
+
         if (bitrixres.status) {
             await consultantDetails.save();
             const lead = new LeadModel({
                 ...LeadData,
-                bitrixres: {   
+                bitrixres: {
                     leadno: bitrixres.leadno || '',
-                    message: bitrixres.message || '' }
+                    message: bitrixres.message || ''
+                }
             });
             await lead.save();
-            res.send({
-                success: true,
-                statusCode: 201,
-                message: 'Lead added successfully',
-                data: lead
-            });
+
+            if (isWebForm) {
+                req.flash('success', 'Lead successfully added');
+                return res.redirect('/admin/Leads/all');
+            } else {
+                return res.status(201).send({
+                    success: true,
+                    message: 'Lead added successfully',
+                    data: lead
+                });
+            }
         } else {
-            res.send({
-                success: false,
-                statusCode: bitrixres.statusCode,
-                message: bitrixres.error
-            });
+            if (isWebForm) {
+                req.flash('error', bitrixres.error);
+                return res.redirect('/admin/addLeads');
+            } else {
+                return res.status(bitrixres.statusCode).send({
+                    success: false,
+                    message: bitrixres.error
+                });
+            }
         }
     } catch (error) {
         console.error(error);
-        res.send({
-            success: false,
-            statusCode: 500,
-            message: 'Internal server error'
-        });
+        const errorMsg = 'Internal server error';
+        if (isWebForm) {
+            req.flash('error', errorMsg);
+            return res.redirect('/admin/addLeads');
+        } else {
+            return res.status(500).send({
+                success: false,
+                message: errorMsg
+            });
+        }
     }
 };
+
 
 
 exports.getAllLeads = async (req, res) => {
@@ -364,17 +437,65 @@ exports.getDashboardData = async (req, res) => {
 };
 
 exports.getconvertedLeads = async (req, res) => {
-    // const authHeader = req.headers.authorization;
-    // const authtoken = authHeader.split(" ")[1];
-    // const decode = jwt.verify(authtoken,token)
-    const decode = req.body
-    const consultantId = decode.UserId;
-    const ConvertedLeads = await ConvertedLeadModel.find({ consultant: consultantId,}).populate("consultant");
+    try {
+      const decode = req.query;
+      const consultantId = decode.consultantId;
+  
+      // Fetch all converted leads for the consultant
+      const allConvertedLeads = await ConvertedLeadModel.find({ consultant_code: consultantId });
+  
+      // Separate seasonal and regular leads
+      const seasonalLeads = allConvertedLeads.filter(lead => lead.leadType === "Seasonal");
+      const regularLeads = allConvertedLeads.filter(lead => lead.leadType === "Regular");
+  
+      // Calculate totals for all leads
+      const { totalAmount, totalCommission } = calculateTotals(allConvertedLeads);
+      
+      // Calculate totals for seasonal leads
+      const { totalAmount: seasonalTotalAmount, totalCommission: seasonalTotalCommission } = calculateTotals(seasonalLeads);
+      
+      // Calculate totals for regular leads
+      const { totalAmount: regularTotalAmount, totalCommission: regularTotalCommission } = calculateTotals(regularLeads);
+  
+      // Prepare data response
+      const earningData = {
+        all: { totalAmount, totalCommission },
+        seasonal: { seasonalTotalAmount, seasonalTotalCommission },
+        regular: { regularTotalAmount, regularTotalCommission }
+      };
+  
+      const leadsData = {
+        allConvertedLeads,
+        seasonalLeads,
+        regularLeads
+      };
+  
+      // Respond with the calculated data
+      res.send({
+        success: true,
+        statusCode: 200,
+        earnings: earningData,
+        leads: leadsData,
+      });
+  
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({
+        success: false,
+        statusCode: 500,
+        message: 'Internal server error',
+      });
+    }
+  };
+  
+exports.getconvertedleadsview = async (req, res) => {
+    const leadId = req.params.leadId;
+    const Leads = await ConvertedLeadModel.findById(leadId);
     try {
         res.send({
             success: true,
             statusCode: 200,
-            data:ConvertedLeads
+            data:Leads
         });
     } catch (error) {
         console.error(error);
@@ -428,3 +549,20 @@ exports.getleadsview = async (req, res) => {
         });
     }
 };
+
+
+const calculateTotals = (leads) => {
+    let totalAmount = 0;
+    let totalCommission = 0;
+  
+    leads.forEach(lead => {
+      lead.invoice.forEach(inv => {
+        totalAmount += parseFloat(inv.totalamount);
+        totalCommission += parseFloat(inv.commission);
+      });
+    });
+  
+    return { totalAmount, totalCommission };
+  };
+  
+  

@@ -319,6 +319,13 @@ paths:
       tags:
         - Lead API
       description: Get all leads
+      parameters:
+      - name: consultantId
+        in: query
+        description: Consultant ID from decoded token
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Success
@@ -330,6 +337,13 @@ paths:
       tags:
         - Lead API
       description: Get leads count
+      parameters:
+      - name: consultantId
+        in: query
+        description: Consultant ID from decoded token
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Success
@@ -341,6 +355,13 @@ paths:
       tags:
         - Lead API
       description: Get dashboard data
+      parameters:
+      - name: consultantId
+        in: query
+        description: Consultant ID from decoded token
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Success
@@ -352,17 +373,51 @@ paths:
       tags:
         - Lead API
       description: Get converted leads
+      parameters:
+      - name: consultantId
+        in: query
+        description: Consultant ID from decoded token
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Success
         '400':
           description: Bad Request
 
+  /api/leadapi/getconvertedleadsview/{leadId}:
+    get:
+      tags:
+        - Lead API
+      description: Get detailed view of a lead
+      parameters:
+        - in: path
+          name: leadId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+        '404':
+          description: Lead not found
+        '500':
+          description: Internal server error
+
+
   /api/leadapi/getpendingLeads:
     get:
       tags:
         - Lead API
       description: Get pending leads
+      parameters:
+      - name: consultantId
+        in: query
+        description: Consultant ID from decoded token
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Success
@@ -448,6 +503,9 @@ paths:
                   items:
                     type: object
                     properties:
+                      number:
+                        type: string
+                        description: invoice name
                       name:
                         type: string
                         description: invoice name

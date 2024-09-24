@@ -35,14 +35,27 @@ const leadSchema = new mongoose.Schema(
     message: { type: String , default: ''},
   },  
   booking :  {
-    status: { type: String , default: ''},
+    status: { type: String , default: 'Pending'},
     package:{ type: String , default: ''},
     amount:{ type: Number , default: 0},
-    discountprec:{ type: Number , default: null},
+    commission:{ type: Number , default: null},
   },  
   conversionDate: { type: Date ,default: null},
   status: { type: String, enum: ['Pending', 'Converted', 'Junk'], default: 'Pending' },  
 }, { timestamps: true });
+
+
+leadSchema.pre('save', function(next) {
+  // Only set commission if it's not already set
+  if (this.booking.commission === null) {
+    if (this.leadType === 'Seasonal') {
+      this.booking.commission = 2; // 2%
+    } else if (this.leadType === 'Regular') {
+      this.booking.commission = 4; // 4%
+    }
+  }
+  next();
+});
 
 const LeadModel = mongoose.model('lead', leadSchema);
 
