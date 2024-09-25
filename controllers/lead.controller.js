@@ -437,12 +437,12 @@ exports.getDashboardData = async (req, res) => {
 };
 
 exports.getconvertedLeads = async (req, res) => {
-    // const authHeader = req.headers.authorization;
-    // const authtoken = authHeader.split(" ")[1];
-    // const decode = jwt.verify(authtoken, token)
+    const authHeader = req.headers.authorization;
+    const authtoken = authHeader.split(" ")[1];
+    const decode = jwt.verify(authtoken, token)
+    const consultantId = decode.UserId;
+    // const decode = req.body
     // const consultantId = decode.UserId;
-    const decode = req.query;
-    const consultantId = decode.consultantId;
     try {
         // Fetch all converted leads for the consultant
         const allConvertedLeads = await ConvertedLeadModel.find({ consultant_code: consultantId });
