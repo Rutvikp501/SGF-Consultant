@@ -120,231 +120,170 @@ const LeadData ={
     'fields[UF_CRM_1725961934686]': LeadData.package?.amount || '', // package amount
 };
 
+exports.getConvertedLead = async (req, res) => {
+    try {
+        let data = req.body;
 
-/// mail 
+        // Validate if the request body contains data
+        if (!data || Object.keys(data).length === 0) {
+            return res.status(400).json({
+                status: false,
+                message: 'Request body is missing or invalid',
+            });
+        }
 
-const nodemailer = require('nodemailer')
-require('dotenv').config();
-const path = require('path')
-const assetsPath = path.join(__dirname, '..', 'assets');
+        // Find consultant details using the consultant code
+        const consultantDetails = await User.findOne({ code: data.consultant });
+        if (!consultantDetails) {
+            return res.status(404).json({
+                success: false,
+                message: 'Consultant not found',
+            });
+        }
+        console.log(consultantDetails);
 
-const pdfPath = path.join(assetsPath, 'RUTVIK-PATIL-CV-.pdf');
-const imagePath = path.join(assetsPath, 'image.jpg');
+        // Calculate lead cycle and other relevant info
+        consultantDetails.calculateLifetimeCycleNumber();
+        const leadCycle = calculateLeadCycle(data.leadType, new Date());
+        const currentYear = new Date().getFullYear();
+        let leadNumber = 1;
+        let cycleKey = `${currentYear}-${leadCycle.Label}`;
+        let commissionPercentage = 2; // Default commission
 
-async function sendMailer(EmailData) {
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        host: 'smtp.gmail.com',
-        port: 587,
-        auth: {
-            user: process.env.RUTVIK,
-            pass: process.env.RAPP_PASS
-            // user: process.env.USERS,
-            // pass: process.env.APP_PASS
-        },
-        tls: { rejectUnauthorized: false },
+        // First check if the lead already exists in the converted leads collection
+        const { leadID } = data;
+        let convertedLead = await ConvertedLeadModel.findOne({ leadID });
 
-        debug: true
-    });
+        if (!convertedLead) {
+            // If not found in converted leads, check in pending leads
+            const pendingLead = await LeadModel.findOne({ leadID });
 
-    const mailOptions = {
-        from: {
-            name: 'Rutvik Patil',
-            address: process.env.USERS
-        },
-        to: EmailData.To,
-        subject: EmailData.subject,
-        text: EmailData.text,
-        //html: '<b>Testing Send mail</b>',
-        attachments: [
-            {
-                filename: 'RUTVIK-PATIL-CV-.pdf',
-                path: pdfPath,
-                contentType: "application/pdf"
-            },
-            // {
-            //     filename:'image.jpg',
-            //     path:imagePath,
-            //     contentType:"image/jpg"
-            // },
-        ]
+            // Update the consultant's lead cycle details
+            let totalConvertedLeadsInCycle;
+            let isSeasonal = data.leadType === 'Seasonal';
+            let convertedLeadsPerCycle = consultantDetails.convertedLeadsPerCycle[isSeasonal ? 'seasonal' : 'regular'];
 
-    };
+            totalConvertedLeadsInCycle = convertedLeadsPerCycle.get(cycleKey) || 0;
 
-    // console.log(mailOptions);
-    const info = await transporter.sendMail(mailOptions);
-    // console.log(info)
-    return info;
-};
-
-async function Profile_Contact(EmailData) {
-    const data = {
-        To: "patilrutvik501@gmail.com",
-        subject: `Contact`,
-        html: `<p>msg from :  ${EmailData.Email} </p>
-                   <p>${EmailData.Message}</p>`,
-    };
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        host: 'smtp.gmail.com',
-        port: 587,
-        auth: {
-            user: process.env.RUTVIK,
-            pass: process.env.RAPP_PASS
-            // user: process.env.USERS,
-            // pass: process.env.APP_PASS
-        },
-        tls: { rejectUnauthorized: false },
-
-        debug: true
-    });
-
-    const mailOptions = {
-        from: {
-            name: 'Rutvik Patil',
-            address: process.env.USERS
-        },
-        to: data.To,
-        subject: data.subject,
-        text: data.text,
-        html: data.html,
-
-
-    };
-
-    // console.log(mailOptions);
-    const info = await transporter.sendMail(mailOptions);
-    // console.log(info)
-    return info;
-};
-
-async function YES_NO(EmailData) {
-    const data = EmailData
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        host: 'smtp.gmail.com',
-        port: 587,
-        auth: {
-            user: process.env.RUTVIK,
-            pass: process.env.RAPP_PASS
-            // user: process.env.USERS,
-            // pass: process.env.APP_PASS
-        },
-        tls: { rejectUnauthorized: false },
-
-        debug: true
-    });
-
-    const mailOptions = {
-        from: {
-            name: 'Rutvik Patil',
-            address: process.env.USERS
-        },
-        to: data.To,
-        subject: data.subject,
-        text: data.text,
-        html: data.html,
-
-
-    };
-
-    // console.log(mailOptions);
-    const info = await transporter.sendMail(mailOptions);
-    // console.log(info)
-    return info;
-};
-
-async function sendFile( EmailData) {
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        host: 'smtp.gmail.com',
-        port: 587,
-        auth: {
-            user: process.env.RUTVIK,
-            pass: process.env.RAPP_PASS
-            // user: process.env.USERS,
-            // pass: process.env.APP_PASS
-        },
-        tls: { rejectUnauthorized: false },
-
-        debug: true
-    });
-
-    const mailOptions = {
-        from: 'Rutvik Patil',
-        to: EmailData.email,
-        subject: ``,
-        html: `<p>Hello ${EmailData.name}</p>
-        <p>I am a Full-stack Developer.  I have specialized in backend development, With expertise in building secured backend APIs, utilizing Node.js and Express.js to create and manage RESTful APIs. 
-        My expertise extends to database management, particularly in MongoDB, Furthermore, my proficiency in crafting responsive front-end pages with HTML, CSS, JavaScript, and EJSand React underscores my commitment to user-centered design. Additionally, I've experience in tools like Gitlab/Github, and Postman.
-        </P>
-        <p>I have attached my resume for your review and look forward to hear from you.</p>
-        
-        `,
-        attachments: [
-            {
-                filename: 'RUTVIK-PATIL-CV-.pdf',
-                path: pdfPath,
-                contentType: "application/pdf"
-            },
-            // {
-            //     filename:'image.jpg',
-            //     path:imagePath,
-            //     contentType:"image/jpg"
-            // },
-        ]
-    };
-    // console.log(mailOptions);
-    const info = await transporter.sendMail(mailOptions);
-    // console.log(info)
-    return info;
-}
-
-async function sendFileMailer(extentionType, buffer, EmailData) {
-    let EmailTo = 'patilrutvik501@gmail.com';
-    let sheetmailer;
-    let type;
-    if (extentionType == "pdf") {
-        sheetmailer = 'application/pdf'
-        type = ".pdf";
-    }
-    else {
-        sheetmailer = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        type = ".xlsx";
-    }
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        host: 'smtp.gmail.com',
-        port: 587,
-        auth: {
-            user: process.env.RUTVIK,
-            pass: process.env.RAPP_PASS
-            // user: process.env.USERS,
-            // pass: process.env.APP_PASS
-        },
-        tls: { rejectUnauthorized: false },
-
-        debug: true
-    });
-
-    const mailOptions = {
-        from: 'Rutvik Patil',
-        to: EmailTo,
-        subject: `testing pdf mail send `,
-        html: '',
-        attachments: [
-            {
-                content: buffer,
-                filename: `testing pdf mail send`,
-                contentType:
-                    sheetmailer
+            // Calculate commission percentage
+            if (totalConvertedLeadsInCycle >= 1 && totalConvertedLeadsInCycle <= 3) {
+                commissionPercentage = 2;
+            } else if (totalConvertedLeadsInCycle >= 4 && totalConvertedLeadsInCycle <= 7) {
+                commissionPercentage = 3;
+            } else if (totalConvertedLeadsInCycle > 7) {
+                commissionPercentage = 4;
             }
-        ]
-    };
-    // console.log(mailOptions);
-    const info = await transporter.sendMail(mailOptions);
-    // console.log(info)
-    return info;
-}
 
-module.exports = { sendMailer, Profile_Contact, sendFileMailer ,sendFile,YES_NO};
+            // Add the 14-day retention logic for seasonal leads
+            if (isSeasonal && leadCycle.daysIntoNewCycle <= 14) {
+                let previousCycleKey = `${currentYear - 1}-${leadCycle.Label}`;
+                let previousCycleLeads = convertedLeadsPerCycle.get(previousCycleKey) || 0;
+                if (previousCycleLeads > 7 && totalConvertedLeadsInCycle >= 1) {
+                    commissionPercentage = 4; // Retain 4% if converted 1+ leads in the first 14 days
+                }
+            }
+
+            // Increment the converted lead count for this cycle
+            totalConvertedLeadsInCycle++;
+            convertedLeadsPerCycle.set(cycleKey, totalConvertedLeadsInCycle);
+
+            if (!pendingLead) {
+                return res.status(404).json({
+                    status: false,
+                    message: 'Pending lead not found',
+                });
+            }
+
+            // Prepare the lead data for conversion
+            const leadData = {
+                consultant: pendingLead.consultant,
+                consultant_code: pendingLead.consultant_code,
+                leadID: pendingLead.leadID,
+                name: pendingLead.name,
+                email: pendingLead.email,
+                phone: pendingLead.phone,
+                convertedLeadCycle: {
+                    label: leadCycle.Label,
+                    number: leadCycle.Number,
+                    year: leadCycle.Year,
+                },
+                events: pendingLead.events,
+                pincode: pendingLead.pincode,
+                eventSpecialsName: pendingLead.eventSpecialsName || '',
+                specialCode: pendingLead.specialCode || '',
+                leadType: pendingLead.leadType,
+                packages: pendingLead.package || {},
+                invoice: data.invoice || [], // Handle invoice separately below
+                conversionDate: new Date(),
+                commission: `${commissionPercentage}%`, // Add commission
+            };
+
+            // Ensure that the required invoice fields are present
+            if (data.invoice && data.invoice.length > 0) {
+                const requiredInvoiceFields = ['percentage', 'totalamount', 'paymentstatus'];
+                data.invoice.forEach((inv) => {
+                    requiredInvoiceFields.forEach((field) => {
+                        if (!inv[field]) {
+                            throw new Error(`Invoice field '${field}' is required`);
+                        }
+                    });
+                });
+            }
+
+            // Create a new converted lead
+            convertedLead = new ConvertedLeadModel(leadData);
+            await convertedLead.save();
+
+            // Remove the lead from the pending leads collection after conversion
+            await LeadModel.deleteOne({ leadID });
+        } else {
+            // If the lead is already converted, update the invoice
+            if (data.invoice && data.invoice.length > 0) {
+                data.invoice.forEach(newInvoice => {
+                    const existingInvoiceIndex = convertedLead.invoice.findIndex(
+                        inv => inv.name === newInvoice.name || inv.number === newInvoice.number
+                    );
+
+                    if (existingInvoiceIndex > -1) {
+                        // If an invoice with the same name or number exists, update it
+                        convertedLead.invoice[existingInvoiceIndex] = { ...convertedLead.invoice[existingInvoiceIndex], ...newInvoice };
+                    } else {
+                        // If the invoice doesn't exist, add it
+                        convertedLead.invoice.push(newInvoice);
+                    }
+                });
+            }
+
+            // Update other lead data if necessary
+            await ConvertedLeadModel.findByIdAndUpdate(
+                convertedLead._id,
+                { $set: { invoice: convertedLead.invoice } },
+                { new: true }
+            );
+        }
+
+        // Save consultant details
+        await consultantDetails.save();
+
+        // Return success response with updated converted lead data
+        return res.status(200).json({
+            status: true,
+            message: 'Converted lead updated successfully',
+            data: convertedLead,
+        });
+
+    } catch (err) {
+        console.error('Error in getConvertedLead:', err.message);
+        if (err.message.includes('Invoice field')) {
+            return res.status(400).json({
+                status: false,
+                error: err.message,
+            });
+        } else {
+            return res.status(500).json({
+                status: false,
+                error: 'An internal server error occurred: ' + err.message,
+            });
+        }
+    }
+};
