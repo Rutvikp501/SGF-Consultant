@@ -475,10 +475,8 @@ exports.getconvertedLeads = async (req, res) => {
             {
                 "title": "Regular ALL Earnings",
                 "des": "Total earnings for all regular leads",
-                "status": {
-                    "totalAmount": regularTotalAmount,
-                    "totalCommission": regularTotalCommission
-                },
+                "status":  regularTotalCommission,
+               
                 "subList": [
                     {
                         "title": "Regular Total Amount",
@@ -497,10 +495,7 @@ exports.getconvertedLeads = async (req, res) => {
             {
                 "title": "Seasonal ALL Earnings",
                 "des": "Total earnings for all seasonal leads",
-                "status": {
-                    "totalAmount": seasonalTotalAmount,
-                    "totalCommission": seasonalTotalCommission
-                },
+                "status":seasonalTotalCommission,
                 "subList": [
                     {
                         "title": "Seasonal Total Amount",

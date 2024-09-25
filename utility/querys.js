@@ -35,9 +35,9 @@ const calculateCycleAndLeadNumber = async (data, consultantDetails,leadType) => 
       if (leadNumber >= 1 && leadNumber <= 3) {
         commissionPercentage = 2;
       } else if (leadNumber >= 4 && leadNumber <= 7) {
-        commissionPercentage = 3;
+        commissionPercentage = 3.5;
       } else if (leadNumber > 7) {
-        commissionPercentage = 4;
+        commissionPercentage = 4.5;
       }
   
       // Handle 14-day retention for 4% commission
@@ -53,10 +53,10 @@ const calculateCycleAndLeadNumber = async (data, consultantDetails,leadType) => 
     } else if (leadType === 'Regular') {
         
       // Regular leads commission calculation
-      if (leadNumber >= 1 && leadNumber <= 4) {
-        commissionPercentage = 3;
-      } else if (leadNumber > 4) {
+      if (leadNumber >= 1 && leadNumber <= 3) {
         commissionPercentage = 4;
+      } else if (leadNumber > 3) {
+        commissionPercentage = 7;
       }
     }
   
