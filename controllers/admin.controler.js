@@ -353,7 +353,7 @@ exports.resetPassword = async (req, res) => {
       user.otp = undefined;
       user.otpExpires = undefined;
 
-      //await user.save();
+      await user.save();
       res.send({ success: true,
         statusCode: 200, 
         message: 'Password has been updated.' });
