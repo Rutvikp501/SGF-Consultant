@@ -440,7 +440,7 @@ exports.getconvertedLeads = async (req, res) => {
     const authHeader = req.headers.authorization;
     const authtoken = authHeader.split(" ")[1];
     const decode = jwt.verify(authtoken, token)
-    const consultantId = decode.UserId;
+    const consultantId = decode.UserId|| "66ab659fdec07a2c29fd9609";
     // const decode = req.body
     // const consultantId = decode.UserId;
     try {

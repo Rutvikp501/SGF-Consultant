@@ -343,7 +343,7 @@ exports.resetPassword = async (req, res) => {
     });
 
     if (!user) {
-        return  res.send({ success: true,
+        return  res.send({ success: false,
             statusCode: 400, 
             message: 'OTP is invalid or has expired.' });
     }
