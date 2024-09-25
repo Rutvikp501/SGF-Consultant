@@ -340,12 +340,12 @@ exports.getLeadscount = async (req, res) => {
 };
 
 exports.getDashboardData = async (req, res) => {
-    // const authHeader = req.headers.authorization;
-    // const authtoken = authHeader.split(" ")[1];
-    // const decode = jwt.verify(authtoken, token)
-    // const consultantId = decode.UserId || "66ab659fdec07a2c29fd9609";
-    const decode = req.query
-    const consultantId = decode.consultantId;
+    const authHeader = req.headers.authorization;
+    const authtoken = authHeader.split(" ")[1];
+    const decode = jwt.verify(authtoken, token)
+    const consultantId = decode.UserId || "66ab659fdec07a2c29fd9609";
+    // const decode = req.query
+    // const consultantId = decode.consultantId;
     const RegularLeads = {};
     const SeasonalLeads = {};
     try {
@@ -438,13 +438,13 @@ exports.getDashboardData = async (req, res) => {
 };
 
 exports.getconvertedLeads = async (req, res) => {
-    // const authHeader = req.headers.authorization;
-    // const authtoken = authHeader.split(" ")[1];
-    // const decode = jwt.verify(authtoken, token)
-    // const consultantId = decode.UserId|| "66ab659fdec07a2c29fd9609";
+    const authHeader = req.headers.authorization;
+    const authtoken = authHeader.split(" ")[1];
+    const decode = jwt.verify(authtoken, token)
+    const consultantId = decode.UserId|| "66ab659fdec07a2c29fd9609";
     
-    const decode = req.query
-    const consultantId = decode.consultantId;
+    // const decode = req.query
+    // const consultantId = decode.consultantId;
     try {
         // Fetch all converted leads for the consultant
         const allConvertedLeads = await ConvertedLeadModel.find({ consultant_code: consultantId });
@@ -563,12 +563,12 @@ exports.getconvertedleadsview = async (req, res) => {
 };
 
 exports.getpendingLeads = async (req, res) => {
-    // const authHeader = req.headers.authorization;
-    // const authtoken = authHeader.split(" ")[1];
-    // const decode = jwt.verify(authtoken, token)
-    // const consultantId = decode.UserId;
-    const decode = req.query
-    const consultantId = decode.consultantId;
+    const authHeader = req.headers.authorization;
+    const authtoken = authHeader.split(" ")[1];
+    const decode = jwt.verify(authtoken, token)
+    const consultantId = decode.UserId;
+    // const decode = req.query
+    // const consultantId = decode.consultantId;
     const pendingLeads = await LeadModel.find({ consultant: consultantId, status: "Pending" }).populate("consultant");
     try {
         res.send({
