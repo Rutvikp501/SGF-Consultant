@@ -313,7 +313,7 @@ exports.getConvertedLead1 = async (req, res) => {
 exports.getConvertedLead = async (req, res) => {
     try {
       let data = req.body;
-  
+      const { leadID } = data;
       // Validate the request body
       if (!data || Object.keys(data).length === 0) {
         return res.status(400).json({
@@ -330,15 +330,17 @@ exports.getConvertedLead = async (req, res) => {
           message: 'Consultant not found',
         });
       }
-  
+
+      let leadType = (await ConvertedLeadModel.findOne({ leadID }) || await LeadModel.findOne({ leadID }))?.leadType;
+
       // Calculate current cycle, year, and lead number
-      const { cycleKey, leadNumber, totalLeadsConverted } = await calculateCycleAndLeadNumber(data, consultantDetails);
+      const { cycleKey, leadNumber, totalLeadsConverted } = await calculateCycleAndLeadNumber(data, consultantDetails,leadType);
   
       // Calculate commission percentage based on lead type
-      const commissionPercentage = calculateCommissionPercentage(data, leadNumber, totalLeadsConverted, cycleKey);
+      const commissionPercentage = calculateCommissionPercentage(data, leadNumber, totalLeadsConverted, cycleKey,leadType);
   
       // Process lead conversion
-      const convertedLead = await processLeadConversion(data, consultantDetails, leadNumber, commissionPercentage, cycleKey);
+      const convertedLead = await processLeadConversion(data, consultantDetails, leadNumber, commissionPercentage, cycleKey,leadType);
   
       // Save consultant details
       await consultantDetails.save();

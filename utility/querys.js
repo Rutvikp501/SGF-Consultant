@@ -4,8 +4,8 @@ const { calculateLeadCycle } = require("../helpers/sample");
 const ConvertedLeadModel = require("../models/convertedLead.model");
 const LeadModel = require("../models/lead.models");
 
-const calculateCycleAndLeadNumber = async (data, consultantDetails) => {
-    const leadCycle = calculateLeadCycle(data.leadType, new Date());
+const calculateCycleAndLeadNumber = async (data, consultantDetails,leadType) => {
+    const leadCycle = calculateLeadCycle(leadType, new Date());
     const currentYear = new Date().getFullYear();
     const cycleKey = `${currentYear}-${leadCycle.Label}`;
     
@@ -13,7 +13,7 @@ const calculateCycleAndLeadNumber = async (data, consultantDetails) => {
     let totalLeadsConverted = 0;
     
     // Check for seasonal or regular lead type
-    if (data.leadType === 'Seasonal') {
+    if (leadType === 'Seasonal') {
       totalLeadsConverted = consultantDetails.convertedLeadsPerCycle.seasonal.get(cycleKey) || 0;
       leadNumber = totalLeadsConverted + 1;
     } else {
@@ -25,13 +25,12 @@ const calculateCycleAndLeadNumber = async (data, consultantDetails) => {
   };
   
   // Function to calculate commission percentage
-  const calculateCommissionPercentage = (data, leadNumber, totalLeadsConverted, cycleKey) => {
-    
-    console.log(data.leadType);
+  const calculateCommissionPercentage = (data, leadNumber, totalLeadsConverted, cycleKey,leadType) => {
+ 
     
     let commissionPercentage = 2; // Default to 2%
   
-    if (data.leadType === 'Seasonal') {
+    if (leadType === 'Seasonal') {
       // Seasonal leads commission calculation
       if (leadNumber >= 1 && leadNumber <= 3) {
         commissionPercentage = 2;
@@ -43,7 +42,7 @@ const calculateCycleAndLeadNumber = async (data, consultantDetails) => {
   
       // Handle 14-day retention for 4% commission
       const currentDate = new Date();
-      const leadCycle = calculateLeadCycle(data.leadType, new Date());
+      const leadCycle = calculateLeadCycle(leadType, new Date());
       const nextCycleStart = calculateNextCycleStartDate(leadCycle);
       const fourteenDaysAfterCycle = new Date(nextCycleStart);
       fourteenDaysAfterCycle.setDate(fourteenDaysAfterCycle.getDate() + 14);
@@ -51,8 +50,7 @@ const calculateCycleAndLeadNumber = async (data, consultantDetails) => {
       if (currentDate <= fourteenDaysAfterCycle && totalLeadsConverted > 0) {
         commissionPercentage = 4;
       }
-    } else if (data.leadType === 'Regular') {
-        console.log(leadNumber, totalLeadsConverted,data.leadType);
+    } else if (leadType === 'Regular') {
         
       // Regular leads commission calculation
       if (leadNumber >= 1 && leadNumber <= 4) {
@@ -65,9 +63,7 @@ const calculateCycleAndLeadNumber = async (data, consultantDetails) => {
     return commissionPercentage;
   };
 
-const processLeadConversion = async (data, consultantDetails, leadNumber, commissionPercentage, cycleKey) => {
-    console.log(leadNumber, commissionPercentage, cycleKey);
-    
+const processLeadConversion = async (data, consultantDetails, leadNumber, commissionPercentage, cycleKey,leadType) => {
     const { leadID } = data;
   
     // Check if the lead already exists in converted leads
@@ -82,7 +78,7 @@ const processLeadConversion = async (data, consultantDetails, leadNumber, commis
       }
   
       // Update the consultant's lead cycle details
-      if (data.leadType === 'Seasonal') {
+      if (leadType === 'Seasonal') {
         consultantDetails.convertedLeadsPerCycle.seasonal.set(cycleKey, leadNumber);
       } else {
         consultantDetails.convertedLeadsPerCycle.regular.set(cycleKey, leadNumber);
