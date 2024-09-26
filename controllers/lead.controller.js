@@ -43,7 +43,7 @@ exports.addLead = async (req, res, isWebForm = false) => {
 
         let consultantDetails;
         if (isWebForm) {
-            consultantDetails = await UserModel.find({ code: params.consultant });
+            consultantDetails = await UserModel.findById(params.consultant);
             if (consultantDetails.length === 0) {
                 return res.send({
                     success: false,

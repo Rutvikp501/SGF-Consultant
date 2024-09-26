@@ -310,6 +310,7 @@ exports.getConvertedLead1 = async (req, res) => {
         }
     }
 };
+
 exports.getConvertedLead = async (req, res) => {
     try {
       let data = req.body;
