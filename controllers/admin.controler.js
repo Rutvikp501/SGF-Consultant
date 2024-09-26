@@ -104,9 +104,10 @@ exports.GetSearchedUser = async (req, res,next) => {
 exports.Login = async (req, res) => {
     let { email_id, password } = req.body;
 
+
     try {
-        const user = await UserModel.findOne({ email_id });
-        
+       // const user = await UserModel.findOne({ email_id });
+        const user = await UserModel.findOne({ email_id: { $regex: new RegExp('^' + email_id + '$', 'i') } });
         if (user) {
             // Compare the entered password with the stored hashed password
             bcrypt.compare(password, user.password, (err, isMatch) => {

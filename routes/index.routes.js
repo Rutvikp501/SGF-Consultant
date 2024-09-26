@@ -13,6 +13,7 @@ router.get('/leadapi/getDashboardData', leadController.getDashboardData);
 
 router.get('/leadapi/getconvertedLeads', leadController.getconvertedLeads);
 router.get('/leadapi/getconvertedleadsview/:leadId', leadController.getconvertedleadsview);
+router.get('/leadapi/getconvertedLeadsCommission', leadController.getconvertedLeadsCommission);
 
 router.get('/leadapi/getpendingLeads', leadController.getpendingLeads);
 router.post('/leadapi/getSearchedlead', leadController.getSearchedlead);

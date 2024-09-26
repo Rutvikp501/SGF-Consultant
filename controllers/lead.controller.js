@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const ConvertedLeadModel = require('../models/convertedLead.model');
 const JunkLeadModel = require('../models/junkLead.model');
 const { bitrixaddLead } = require('../utility/bitrix');
+const getCommissionexcel = require('../utility/excel.util');
 const token = process.env.token
 exports.addLead = async (req, res, isWebForm = false) => {
 
@@ -453,6 +454,45 @@ exports.getconvertedLeads = async (req, res) => {
         const seasonalLeads = allConvertedLeads.filter(lead => lead.leadType === "Seasonal");
         const regularLeads = allConvertedLeads.filter(lead => lead.leadType === "Regular");
 
+        const leadsData = {
+            allConvertedLeads,
+            seasonalLeads,
+            regularLeads
+        };
+
+        // Respond with the calculated data
+        res.send({
+            success: true,
+            statusCode: 200,
+            leads: leadsData,
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            success: false,
+            statusCode: 500,
+            message: 'Internal server error',
+        });
+    }
+};
+
+exports.getconvertedLeadsCommission = async (req, res) => {
+    const authHeader = req.headers.authorization;
+    const authtoken = authHeader.split(" ")[1];
+    const decode = jwt.verify(authtoken, token)
+    const consultantId = decode.UserId|| "66ab659fdec07a2c29fd9609";
+    
+    // const decode = req.query
+    // const consultantId = decode.consultantId;
+    try {
+        // Fetch all converted leads for the consultant
+        const allConvertedLeads = await ConvertedLeadModel.find({ consultant: consultantId });
+
+        // Separate seasonal and regular leads
+        const seasonalLeads = allConvertedLeads.filter(lead => lead.leadType === "Seasonal");
+        const regularLeads = allConvertedLeads.filter(lead => lead.leadType === "Regular");
+
         // Calculate totals for all leads
         const { totalAmount, totalCommission } = calculateTotals(allConvertedLeads);
 
@@ -510,19 +550,11 @@ exports.getconvertedLeads = async (req, res) => {
             }
         ];
 
-
-        const leadsData = {
-            allConvertedLeads,
-            seasonalLeads,
-            regularLeads
-        };
-
         // Respond with the calculated data
         res.send({
             success: true,
             statusCode: 200,
             earnings: earningData,
-            leads: leadsData,
         });
 
     } catch (error) {
@@ -539,10 +571,12 @@ exports.getconvertedleadsview = async (req, res) => {
     const leadId = req.params.leadId;
     const Leads = await ConvertedLeadModel.findById(leadId);
     try {
+        const excelBuffer = await getCommissionexcel(Leads);
         res.send({
             success: true,
             statusCode: 200,
-            data: Leads
+            data: Leads,
+            excelBuffer:excelBuffer
         });
     } catch (error) {
         console.error(error);

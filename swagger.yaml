@@ -405,6 +405,23 @@ paths:
         '500':
           description: Internal server error
 
+  /api/leadapi/getconvertedLeadsCommission:
+    get:
+      tags:
+        - Lead API
+      description: Get converted leads Commission
+      parameters:
+      - name: consultantId
+        in: query
+        description: Consultant ID from decoded token
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
 
   /api/leadapi/getpendingLeads:
     get:
