@@ -6,7 +6,10 @@ const ConvertedLeadModel = require('../models/convertedLead.model');
 const JunkLeadModel = require('../models/junkLead.model');
 const { bitrixaddLead } = require('../utility/bitrix');
 const getCommissionexcel = require('../utility/excel.util');
+const packagesModel = require('../models/packages.model');
 const token = process.env.token
+
+
 exports.addLead = async (req, res, isWebForm = false) => {
 
     let params = req.body;
@@ -187,8 +190,6 @@ exports.addLead = async (req, res, isWebForm = false) => {
         }
     }
 };
-
-
 
 exports.getAllLeads = async (req, res) => {
     let { status } = req.body;
@@ -631,6 +632,39 @@ exports.getleadsview = async (req, res) => {
     }
 };
 
+exports.packages = async (req, res, isWebForm = false) => {
+
+    try {
+        const { type } = req.query;
+        if (!type || (type !== 'Regular' && type !== 'Seasonal')) {
+            return res.send({
+                success: false,
+                statusCode: 400,
+                message: 'Invalid type. Must be "Regular" or "Seasonal".' 
+            });
+        }
+        const packages = await packagesModel.find({ type: type }, 'name');
+        if (packages.length === 0) {
+            return res.send({
+                success: false,
+                statusCode: 404,
+               message: `No packages found for type "${type}"`
+            });
+        }
+        return res.send({
+            success: true,
+            statusCode: 200,
+            packages: packages.map(pkg => pkg.name)
+        });
+    } catch (error) {
+        console.error(error);
+        res.send({
+            success: false,
+            statusCode: 500,
+            message: 'Internal server error'
+        });
+    }
+};
 
 const calculateTotals = (leads) => {
     let totalAmount = 0;

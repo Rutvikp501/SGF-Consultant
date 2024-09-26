@@ -360,7 +360,7 @@ exports.getConvertedLead = async (req, res) => {
         error: 'An internal server error occurred: ' + err.message,
       });
     }
-  };
+};
 
 
 exports.getJunkLeadsLead = async () => {
