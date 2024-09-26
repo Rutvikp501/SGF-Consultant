@@ -331,6 +331,7 @@ exports.forgotPassword = async (req, res) => {
 exports.resetPassword = async (req, res) => {
   const { otp,email_id,newPassword } = req.body;
   
+  
     // const valid = validatePassword(Password)
     // if(valid){
     //     return res.status(400).send({message:valid[0]})
@@ -341,7 +342,6 @@ exports.resetPassword = async (req, res) => {
       otp,
       otpExpires: { $gt: Date.now() } // Check if OTP is valid and not expired
     });
-
     if (!user) {
         return  res.send({ success: false,
             statusCode: 400, 

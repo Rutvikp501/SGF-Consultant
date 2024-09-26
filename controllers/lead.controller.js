@@ -447,7 +447,7 @@ exports.getconvertedLeads = async (req, res) => {
     // const consultantId = decode.consultantId;
     try {
         // Fetch all converted leads for the consultant
-        const allConvertedLeads = await ConvertedLeadModel.find({ consultant_code: consultantId });
+        const allConvertedLeads = await ConvertedLeadModel.find({ consultant: consultantId });
 
         // Separate seasonal and regular leads
         const seasonalLeads = allConvertedLeads.filter(lead => lead.leadType === "Seasonal");
