@@ -323,22 +323,18 @@ exports.getDashboardData = async (req, res) => {
     const RegularLeads = {};
     const SeasonalLeads = {};
     try {
-       // let AllLeads = await LeadModel.countDocuments({ consultant: consultantId, });
+        let AllLeads = await LeadModel.countDocuments({ consultant: consultantId, });
         // Regular Leads Counts
         RegularLeads.numPendingLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Regular", status: "Pending" });
         RegularLeads.numAllLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Regular" });
-        RegularLeads.numConvertedLeads = await ConvertedLeadModel.countDocuments({ consultant: consultantId, leadType: "Regular",});//
+        RegularLeads.numConvertedLeads = await ConvertedLeadModel.countDocuments({ consultant: consultantId, leadType: "Regular",});
         RegularLeads.numJunkLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Regular", status: "Junk" });
 
         // Seasonal Leads Counts  
         SeasonalLeads.numPendingLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal", status: "Pending" });
         SeasonalLeads.numAllLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal" });
-        SeasonalLeads.numConvertedLeads = await ConvertedLeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal",});//
+        SeasonalLeads.numConvertedLeads = await ConvertedLeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal",});
         SeasonalLeads.numJunkLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal", status: "Junk" });
-
-        const AllRegularLeads =RegularLeads.numAllLeads + RegularLeads.numConvertedLeads
-        const AllSeasonalLeads =SeasonalLeads.numConvertedLeads + SeasonalLeads.numPendingLeads
-        const AllLeads = AllRegularLeads+AllSeasonalLeads
 
         const leadsData = [
 
@@ -350,7 +346,7 @@ exports.getDashboardData = async (req, res) => {
             {
                 "title": "Regular ALL Leads ",
                 "des": "Counts for All Leads",
-                "status": AllRegularLeads,
+                "status": RegularLeads.numAllLeads,
                 "subList": [
                     {
                         "title": "Regular Pending Leads",
@@ -375,7 +371,7 @@ exports.getDashboardData = async (req, res) => {
             {
                 "title": "Seasonal ALL Leads",
                 "des": "Counts for All Leads",
-                "status": AllSeasonalLeads,
+                "status": SeasonalLeads.numAllLeads,
                 "subList": [
                     {
                         "title": "Seasonal Pending Leads",
@@ -420,21 +416,24 @@ exports.getconvertedLeads = async (req, res) => {
     const authtoken = authHeader.split(" ")[1];
     const decode = jwt.verify(authtoken, token)
     const consultantId = decode.UserId|| "66ab659fdec07a2c29fd9609";
-    const leadType = req.params.leadType
+    
     // const decode = req.query
     // const consultantId = decode.consultantId;
     try {
-      
-        let leadsData = [];
-        
-        if (leadType === "Seasonal") {
-            leadsData = await ConvertedLeadModel.find({ leadType: "Seasonal", consultant: consultantId });
-        } else if (leadType === "Regular") {
-            leadsData = await ConvertedLeadModel.find({ leadType: "Regular", consultant: consultantId });
-        } else {
-            leadsData = await ConvertedLeadModel.find({ consultant: consultantId });
-        }
+        // Fetch all converted leads for the consultant
+        const allConvertedLeads = await ConvertedLeadModel.find({ consultant: consultantId });
 
+        // Separate seasonal and regular leads
+        const seasonalLeads = allConvertedLeads.filter(lead => lead.leadType === "Seasonal");
+        const regularLeads = allConvertedLeads.filter(lead => lead.leadType === "Regular");
+
+        const leadsData = {
+            allConvertedLeads,
+            seasonalLeads,
+            regularLeads
+        };
+
+        // Respond with the calculated data
         res.send({
             success: true,
             statusCode: 200,
@@ -450,7 +449,6 @@ exports.getconvertedLeads = async (req, res) => {
         });
     }
 };
-
 exports.getconvertedLeadsCommission = async (req, res) => {
     const authHeader = req.headers.authorization;
     const authtoken = authHeader.split(" ")[1];

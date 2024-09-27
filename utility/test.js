@@ -287,3 +287,39 @@ exports.getConvertedLead = async (req, res) => {
         }
     }
 };
+
+exports.getconvertedLeads = async (req, res) => {
+    const authHeader = req.headers.authorization;
+    const authtoken = authHeader.split(" ")[1];
+    const decode = jwt.verify(authtoken, token)
+    const consultantId = decode.UserId|| "66ab659fdec07a2c29fd9609";
+    const leadType = req.params.leadType
+    // const decode = req.query
+    // const consultantId = decode.consultantId;
+    try {
+      
+        let leadsData = [];
+        
+        if (leadType === "Seasonal") {
+            leadsData = await ConvertedLeadModel.find({ leadType: "Seasonal", consultant: consultantId });
+        } else if (leadType === "Regular") {
+            leadsData = await ConvertedLeadModel.find({ leadType: "Regular", consultant: consultantId });
+        } else {
+            leadsData = await ConvertedLeadModel.find({ consultant: consultantId });
+        }
+
+        res.send({
+            success: true,
+            statusCode: 200,
+            leads: leadsData,
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            success: false,
+            statusCode: 500,
+            message: 'Internal server error',
+        });
+    }
+};
