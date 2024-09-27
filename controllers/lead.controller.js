@@ -10,47 +10,24 @@ const packagesModel = require('../models/packages.model');
 const token = process.env.token
 
 
-exports.addLead = async (req, res, isWebForm = false) => {
+exports.addLead = async (req, res) => {
 
     let params = req.body;
+    console.log(params);
+    
     try {
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear();
 
-        let consultantDetails;
-        if (isWebForm) {
-            consultantDetails = await UserModel.findById(params.consultant);
-            if (consultantDetails.length === 0) {
-                return res.send({
-                    success: false,
-                    statusCode: 404,
-                    message: 'Consultant not found'
-                });
-            }
-            consultantDetails = consultantDetails[0];  // Get the first consultant from the array
-        } else {
-            consultantDetails = await UserModel.findById(params.consultant);
-            if (!consultantDetails) {
-                return res.send({
-                    success: false,
-                    statusCode: 404,
-                    message: 'Consultant not found'
-                });
-            }
+        let consultantDetails = await UserModel.findById(params.consultant);
+        if (!consultantDetails) {
+            return res.send({
+                success: false,
+                statusCode: 404,
+                message: 'Consultant not found'
+            });
         }
 
-        if (!consultantDetails) {
-            const errorMsg = 'Consultant not found';
-            if (isWebForm) {
-                req.flash('warning', errorMsg);
-                return res.redirect('/admin/addLeads');
-            } else {
-                return res.status(404).send({
-                    success: false,
-                    message: errorMsg
-                });
-            }
-        }
         const leadcycle = calculateLeadCycle(params.leadType, currentDate);
 
         let leadNumber = 1;
@@ -68,16 +45,11 @@ exports.addLead = async (req, res, isWebForm = false) => {
 
         const duplicatecode = await LeadModel.find({ leadID: leadID });
         if (duplicatecode.length > 0) {
-            const errorMsg = 'LeadID already exists.';
-            if (isWebForm) {
-                req.flash('warning', errorMsg);
-                return res.redirect('/admin/addLeads');
-            } else {
-                return res.status(400).send({
-                    success: false,
-                    message: errorMsg
-                });
-            }
+            return res.send({
+                success: false,
+                statusCode: 400,
+                message: 'LeadID already exists.'
+            });
         }
 
         const formattedEvents = params.events.map(event => ({
@@ -128,41 +100,30 @@ exports.addLead = async (req, res, isWebForm = false) => {
             });
             await lead.save();
 
-            if (isWebForm) {
-                req.flash('success', 'Lead successfully added');
-                return res.redirect('/admin/Leads/all');
-            } else {
-                return res.status(201).send({
-                    success: true,
-                    message: 'Lead added successfully',
-                    data: lead
-                });
-            }
+            return res.send({
+                success: true,
+                statusCode: 201,
+                message: 'Lead added successfully',
+                data: lead
+            });
+
         } else {
-            if (isWebForm) {
-                req.flash('error', bitrixres.error);
-                return res.redirect('/admin/addLeads');
-            } else {
-                return res.status(bitrixres.statusCode).send({
-                    success: false,
-                    message: bitrixres.error
-                });
-            }
+            return res.send({
+                success: false,
+                statusCode: bitrixres.statusCode,
+                message: bitrixres.error
+            });
         }
     } catch (error) {
         console.error(error);
-        const errorMsg = 'Internal server error';
-        if (isWebForm) {
-            req.flash('error', errorMsg);
-            return res.redirect('/admin/addLeads');
-        } else {
-            return res.status(500).send({
-                success: false,
-                message: errorMsg
-            });
-        }
+        return res.send({
+            success: false,
+            statusCode: 500,
+            message: 'Internal server error'
+        });
     }
 };
+
 
 exports.getAllLeads = async (req, res) => {
     let { status } = req.body;

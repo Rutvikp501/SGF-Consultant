@@ -316,8 +316,89 @@ router.get("/admin/addLeads", middleware.ensureAdminLoggedIn, async (req, res) =
 
 });
 router.post('/admin/addLeads', middleware.ensureAdminLoggedIn, async (req, res) => 	{
-    // Web form request (uses req.flash and redirection)
-    await addLead(req, res, true);
+    let params = req.body;
+	try {
+		const currentDate = new Date();
+		const currentYear = currentDate.getFullYear();
+		const { cycleLabel, cycleNumber } = calculateCycle(currentDate);
+		const consultantDetails = await User.findOne({ code: params.consultant });
+
+		// Check if consultant exists
+		if (!consultantDetails) {
+			return res.status(404).send({ message: 'Consultant not found' });
+		}
+		consultantDetails.calculateLifetimeCycleNumber();
+		const leadcycle = calculateLeadCycle(params.leadType, currentDate)
+		let leadNumber = 1;
+		let cycleKey = `${currentYear}-${leadcycle.Label}`;
+
+		if (params.leadType === 'Seasonal') {
+			leadNumber = (consultantDetails.leadsPerCycle.seasonal.get(cycleKey) || 0) + 1;
+			consultantDetails.leadsPerCycle.seasonal.set(cycleKey, leadNumber);
+		} else {
+			leadNumber = (consultantDetails.leadsPerCycle.regular.get(cycleKey) || 0) + 1;
+			consultantDetails.leadsPerCycle.regular.set(cycleKey, leadNumber);
+		}
+		const leadID = generateLeadID(consultantDetails.code, params.leadType, leadcycle.Label, consultantDetails.consultantLifetimeCycleNumber, leadNumber, params.pincode);
+		const duplicatecode = await LeadModel.find({ leadIDd: leadID });
+		if (duplicatecode != "") {
+			return res.send({
+				success: false,
+				statusCode: 400,
+				message: "leadID already exist."
+			});
+		}
+		await consultantDetails.save();
+		const formattedEvents = params.events.map(event => ({
+			name: event.name || 'Unnamed Event',
+			date: new Date(event.date), // Ensure date is a Date object
+			timing: event.timing || 'Not specified',
+		}));
+		const packageData = {
+			name: params.package.packageName || 'NA',
+			subname: params.package.subname || 'NA',
+			addonS: params.package.addOns ? params.package.addOns.split(',').map(item => item.trim()) : [],
+			amount: parseFloat(params.package.amount) || 0
+		}
+		const LeadData = {
+			consultant: consultantDetails._id,
+			consultant_code: consultantDetails.code,
+			consultant_mobile_no: consultantDetails.mobile_no,
+			consultant_email_id: consultantDetails.email_id,
+			name: params.name,
+			email: params.email,
+			phone: params.phone,
+			events: formattedEvents,
+			eventLocation: params.eventLocation,
+			pincode: params.pincode,
+			eventSpecialsName: params.eventSpecialsName,
+			specialCode: params.specialCode,
+			leadType: params.leadType,
+			status: params.status,
+			leadID: leadID,
+			cycle: { label: leadcycle.Label, number: leadcycle.Number, year: leadcycle.year },
+			package: packageData
+		};
+		let bitrixres = await addLead(LeadData)
+
+		const lead = new LeadModel({
+			...LeadData,
+			bitrixres: {
+				status: bitrixres.status || '',
+				message: bitrixres.message || ''
+			}
+		});
+
+		//console.log(lead);
+
+		await lead.save();
+
+		req.flash("success", "Lead successfully added");
+		res.redirect("/admin/Leads/all");
+	} catch (error) {
+		console.error(error);
+		res.status(500).send({ message: 'Internal server error' });
+	}
 });
 
 

@@ -31,8 +31,8 @@ exports.bitrixaddLead = async (LeadData) => {
             'fields[UF_CRM_1723870992344]': LeadData.currentDate || '', // currentDate
             'fields[UF_CRM_1723871015696]': LeadData.events?.[0]?.name || '', // BOOING NAME
             'fields[UF_CRM_1723871636157]': LeadData.events?.[0]?.date || '', // date from events array
-            'fields[UF_CRM_1726651078700]': LeadData.events?.[0]?.name || '', // date from events array
-            'fields[UF_CRM_1726823732500]': LeadData.name || '', // date from events array
+            'fields[UF_CRM_1726823732500]': LeadData.events?.[0]?.name || '', // date from events array
+            'fields[UF_CRM_1726651078700]': LeadData.name || '', // date from events array
             'fields[UF_CRM_1724929500047]': LeadData.leadType || '', // event_type (assuming it's mapped to leadType)
             'fields[UF_CRM_1726651303165]': LeadData.pincode || '', // event_type (assuming it's mapped to leadType)
             'fields[UF_CRM_1725627014795]': LeadData.events?.[0]?.date || '', // event_date from events array
@@ -40,7 +40,6 @@ exports.bitrixaddLead = async (LeadData) => {
             'fields[UF_CRM_1725627132023]': LeadData.specialCode || '', // specialCode
             'fields[UF_CRM_1725961934686]': LeadData.package?.amount || '', // package amount
         };
-        console.log(requestBody);
 
         const response = await axios.post(apiUrl, null, {
             params: requestBody,
