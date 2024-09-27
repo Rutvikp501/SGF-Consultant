@@ -13,33 +13,6 @@ const token = process.env.token
 exports.addLead = async (req, res, isWebForm = false) => {
 
     let params = req.body;
-    // let params ={
-    //     consultant: 'C001',
-    //     name: 'Satyajeet Joshi',
-    //     email: 'patilrutvik501@gmail.com',
-    //     phone: '9137898236',
-    //     events: [
-    //       {
-    //         name: 'party',
-    //         location: 'kalyan',
-    //         date: '2024-09-30',
-    //         timing: '6-10 pm'
-    //       }
-    //     ],
-    //     pincode: '421102',
-    //     eventSpecialsName: 'Satyajeet ',
-    //     specialCode: 'Special 123',
-    //     leadType: 'Regular',
-    //     status: 'Pending',
-    //     package: {
-    //       packageName: 'silver',
-    //       subname: 'test',
-    //       addOns: 'test,test2',
-    //       amount: '1212'
-    //     }
-    //   }
-
-
     try {
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear();
@@ -197,7 +170,6 @@ exports.getAllLeads = async (req, res) => {
     try {
         // const leads = await LeadModel.find();
         let leads;
-
         // Determine which model to query based on the status
         if (status === 'pending') {
             leads = await LeadModel.find({ status: 'pending' });
@@ -444,24 +416,21 @@ exports.getconvertedLeads = async (req, res) => {
     const authtoken = authHeader.split(" ")[1];
     const decode = jwt.verify(authtoken, token)
     const consultantId = decode.UserId|| "66ab659fdec07a2c29fd9609";
-    
+    const leadType = req.params.leadType
     // const decode = req.query
     // const consultantId = decode.consultantId;
     try {
-        // Fetch all converted leads for the consultant
-        const allConvertedLeads = await ConvertedLeadModel.find({ consultant: consultantId });
+      
+        let leadsData = [];
+        
+        if (leadType === "Seasonal") {
+            leadsData = await ConvertedLeadModel.find({ leadType: "Seasonal", consultant: consultantId });
+        } else if (leadType === "Regular") {
+            leadsData = await ConvertedLeadModel.find({ leadType: "Regular", consultant: consultantId });
+        } else {
+            leadsData = await ConvertedLeadModel.find({ consultant: consultantId });
+        }
 
-        // Separate seasonal and regular leads
-        const seasonalLeads = allConvertedLeads.filter(lead => lead.leadType === "Seasonal");
-        const regularLeads = allConvertedLeads.filter(lead => lead.leadType === "Regular");
-
-        const leadsData = {
-            allConvertedLeads,
-            seasonalLeads,
-            regularLeads
-        };
-
-        // Respond with the calculated data
         res.send({
             success: true,
             statusCode: 200,
@@ -633,7 +602,6 @@ exports.getleadsview = async (req, res) => {
 };
 
 exports.packages = async (req, res, isWebForm = false) => {
-
     try {
         const { type } = req.query;
         if (!type || (type !== 'Regular' && type !== 'Seasonal')) {

@@ -4,162 +4,183 @@ const { calculateLeadCycle } = require("../helpers/sample");
 const ConvertedLeadModel = require("../models/convertedLead.model");
 const LeadModel = require("../models/lead.models");
 
-const calculateCycleAndLeadNumber = async (data, consultantDetails,leadType) => {
-    const leadCycle = calculateLeadCycle(leadType, new Date());
-    const currentYear = new Date().getFullYear();
-    const cycleKey = `${currentYear}-${leadCycle.Label}`;
-    
-    let leadNumber = 1;
-    let totalLeadsConverted = 0;
-    
-    // Check for seasonal or regular lead type
-    if (leadType === 'Seasonal') {
+const calculateCycleAndLeadNumber = async (data, consultantDetails, leadType) => {
+  const leadCycle = calculateLeadCycle(leadType, new Date());
+  const currentYear = new Date().getFullYear();
+  const cycleKey = `${currentYear}-${leadCycle.Label}`;
+
+  let leadNumber = 1;
+  let totalLeadsConverted = 0;
+
+  // Check for seasonal or regular lead type
+  if (leadType === 'Seasonal') {
       totalLeadsConverted = consultantDetails.convertedLeadsPerCycle.seasonal.get(cycleKey) || 0;
       leadNumber = totalLeadsConverted + 1;
-    } else {
+  } else {
       totalLeadsConverted = consultantDetails.convertedLeadsPerCycle.regular.get(cycleKey) || 0;
       leadNumber = totalLeadsConverted + 1;
-    }
-    
-    return { cycleKey, leadNumber, totalLeadsConverted };
-  };
-  
-  // Function to calculate commission percentage
-  const calculateCommissionPercentage = (data, leadNumber, totalLeadsConverted, cycleKey,leadType) => {
- 
-    
-    let commissionPercentage = 2; // Default to 2%
-  
-    if (leadType === 'Seasonal') {
-      // Seasonal leads commission calculation
+  }
+
+  return { cycleKey, leadNumber, totalLeadsConverted };
+};
+
+// Commission Calculation
+const calculateCommissionPercentage = (leadNumber, totalLeadsConverted, leadType) => {
+  let commissionPercentage = 2; // Default 2% for all leads
+
+  if (leadType === 'Seasonal') {
+      // Seasonal lead commission calculation
       if (leadNumber >= 1 && leadNumber <= 3) {
-        commissionPercentage = 2;
+          commissionPercentage = 2;
       } else if (leadNumber >= 4 && leadNumber <= 7) {
-        commissionPercentage = 3.5;
+          commissionPercentage = 3.5;
       } else if (leadNumber > 7) {
-        commissionPercentage = 4.5;
+          commissionPercentage = 4.5;
       }
-  
-      // Handle 14-day retention for 4% commission
+
+      // Handle 14-day retention for higher commission
       const currentDate = new Date();
-      const leadCycle = calculateLeadCycle(leadType, new Date());
-      const nextCycleStart = calculateNextCycleStartDate(leadCycle);
+      const nextCycleStart = calculateNextCycleStartDate(calculateLeadCycle(leadType));
       const fourteenDaysAfterCycle = new Date(nextCycleStart);
       fourteenDaysAfterCycle.setDate(fourteenDaysAfterCycle.getDate() + 14);
-  
-      if (currentDate <= fourteenDaysAfterCycle && totalLeadsConverted > 0) {
-        commissionPercentage = 4;
-      }
-    } else if (leadType === 'Regular') {
-        
-      // Regular leads commission calculation
-      if (leadNumber >= 1 && leadNumber <= 3) {
-        commissionPercentage = 4;
-      } else if (leadNumber > 3) {
-        commissionPercentage = 7;
-      }
-    }
-  
-    return commissionPercentage;
-  };
 
-const processLeadConversion = async (data, consultantDetails, leadNumber, commissionPercentage, cycleKey,leadType) => {
-    const { leadID } = data;
-  
-    // Check if the lead already exists in converted leads
-    let convertedLead = await ConvertedLeadModel.findOne({ leadID });
-  
-    if (!convertedLead) {
+      if (currentDate <= fourteenDaysAfterCycle && totalLeadsConverted > 0) {
+          commissionPercentage = 4.5;
+      }
+
+  } else if (leadType === 'Regular') {
+      // Regular lead commission calculation
+      if (leadNumber >= 1 && leadNumber <= 3) {
+          commissionPercentage = 4;
+      } else if (leadNumber > 3) {
+          commissionPercentage = 7;
+      }
+  }
+  return commissionPercentage;
+};
+
+// Lead Conversion Process
+const processLeadConversion = async (data, consultantDetails, leadNumber, commissionPercentage, cycleKey, leadType) => {
+  const { leadID } = data;
+
+  // Check if the lead already exists in converted leads
+  let convertedLead = await ConvertedLeadModel.findOne({ leadID });
+
+  if (!convertedLead) {
       // Lead not found in converted leads, check in pending leads
       const pendingLead = await LeadModel.findOne({ leadID });
-  
+
       if (!pendingLead) {
-        throw new Error('Pending lead not found');
+          throw new Error('Pending lead not found');
       }
-  
-      // Update the consultant's lead cycle details
-      if (leadType === 'Seasonal') {
-        consultantDetails.convertedLeadsPerCycle.seasonal.set(cycleKey, leadNumber);
-      } else {
-        consultantDetails.convertedLeadsPerCycle.regular.set(cycleKey, leadNumber);
-      }
-  
-      // Combine the logic for preparing lead data and updating invoice
-      const leadData = {
-        consultant: pendingLead.consultant,
-        consultant_code: pendingLead.consultant_code,
-        leadID: pendingLead.leadID,
-        name: pendingLead.name,
-        email: pendingLead.email,
-        phone: pendingLead.phone,
-        convertedLeadCycle: {
-          label: cycleKey,
-          number: leadNumber,
-          year: new Date().getFullYear(),
-        },
-        events: pendingLead.events,
-        pincode: pendingLead.pincode,
-        eventSpecialsName: pendingLead.eventSpecialsName || '',
-        specialCode: pendingLead.specialCode || '',
-        leadType: pendingLead.leadType,
-        packages: pendingLead.package || {},
-        invoice: data.invoice || [],
-        conversionDate: new Date(),
-      };
-  
-      // When creating a new converted lead
-if (data.invoice && data.invoice.length > 0) {
-    data.invoice.forEach((inv) => {
-        const commission = (inv.totalamount * commissionPercentage) / 100;
-        inv.percentage = commissionPercentage + "%"; // Add the commission percentage
-        inv.commission = commission.toFixed(2);
-    });
-    leadData.invoice = data.invoice;
-}
 
-// Create a new converted lead
-convertedLead = new ConvertedLeadModel(leadData);
-await convertedLead.save();
-
-// Remove the lead from the pending leads collection after conversion
-await LeadModel.deleteOne({ leadID });
-} else {
-    // Lead already converted, update the invoice directly
-    if (data.invoice && data.invoice.length > 0) {
-        data.invoice.forEach((newInvoice) => {
-            const existingInvoiceIndex = convertedLead.invoice.findIndex(
-                (inv) => inv.name === newInvoice.name
-            );
-
-            if (existingInvoiceIndex > -1) {
-                // Update the existing invoice
-                convertedLead.invoice[existingInvoiceIndex] = {
-                    ...convertedLead.invoice[existingInvoiceIndex],
-                    ...newInvoice,
-                };
-                // Also set the percentage and commission
-                convertedLead.invoice[existingInvoiceIndex].percentage = commissionPercentage + "%";
-                convertedLead.invoice[existingInvoiceIndex].commission = ((newInvoice.totalamount * commissionPercentage) / 100).toFixed(2);
-            } else {
-                // Add a new invoice if it doesn't exist
-                newInvoice.percentage = commissionPercentage + "%"; // Set the commission percentage
-                newInvoice.commission = ((newInvoice.totalamount * commissionPercentage) / 100).toFixed(2); // Calculate the commission
-                convertedLead.invoice.push(newInvoice);
-            }
-        });
+      if (typeof consultantDetails.convertedLeadsPerCycle !== 'object' || consultantDetails.convertedLeadsPerCycle === null) {
+        consultantDetails.convertedLeadsPerCycle = {
+            seasonal: new Map(),  // Initialize as a Map
+            regular: new Map()     // Initialize as a Map
+        };
     }
-}
+    
+    // Initialize seasonal and regular as empty Maps if they don't exist
+    if (!(consultantDetails.convertedLeadsPerCycle.seasonal instanceof Map)) {
+        consultantDetails.convertedLeadsPerCycle.seasonal = new Map();
+    }
+    
+    if (!(consultantDetails.convertedLeadsPerCycle.regular instanceof Map)) {
+        consultantDetails.convertedLeadsPerCycle.regular = new Map();
+    }
+    
+    // Update the consultant's lead cycle details
+    if (leadType === 'Seasonal') {
+        consultantDetails.convertedLeadsPerCycle.seasonal.set(cycleKey, leadNumber);
+    } else {
+        consultantDetails.convertedLeadsPerCycle.regular.set(cycleKey, leadNumber);
+    }
 
-// Update the converted lead with the new invoice data
-await ConvertedLeadModel.findByIdAndUpdate(
-    convertedLead._id,
-    { $set: { invoice: convertedLead.invoice } },
-    { new: true }
-);
+      // Prepare lead data for conversion
+      const leadData = {
+          consultant: pendingLead.consultant,
+          consultant_code: pendingLead.consultant_code,
+          leadID: pendingLead.leadID,
+          name: pendingLead.name,
+          email: pendingLead.email,
+          phone: pendingLead.phone,
+          convertedLeadCycle: {
+              label: cycleKey,
+              number: leadNumber,
+              year: new Date().getFullYear(),
+          },
+          events: pendingLead.events,
+          pincode: pendingLead.pincode,
+          eventSpecialsName: pendingLead.eventSpecialsName || '',
+          specialCode: pendingLead.specialCode || '',
+          leadType: pendingLead.leadType,
+          packages: pendingLead.package || {},
+          invoice: data.invoice || [],
+          conversionDate: new Date(),
+      };
 
-  
-    return convertedLead;
-  };
-  
+      // Add commission calculation for invoices
+      if (data.invoice && data.invoice.length > 0) {
+          data.invoice.forEach((inv) => {
+              const commission = (inv.totalamount * commissionPercentage) / 100;
+              inv.percentage = commissionPercentage + "%"; // Add the commission percentage
+              inv.commission = commission.toFixed(2);
+          });
+          leadData.invoice = data.invoice;
+      }
+
+      // Create a new converted lead
+      convertedLead = new ConvertedLeadModel(leadData);
+      await convertedLead.save();
+
+      // Remove the lead from the pending leads collection after conversion
+      await LeadModel.deleteOne({ leadID });
+  } else {
+      // If the lead is already converted, update the invoice
+      if (data.invoice && data.invoice.length > 0) {
+          data.invoice.forEach((newInvoice) => {
+              const existingInvoiceIndex = convertedLead.invoice.findIndex(
+                  (inv) => inv.name === newInvoice.name
+              );
+
+              if (existingInvoiceIndex > -1) {
+                  // Update the existing invoice
+                  convertedLead.invoice[existingInvoiceIndex] = {
+                      ...convertedLead.invoice[existingInvoiceIndex],
+                      ...newInvoice,
+                  };
+                  convertedLead.invoice[existingInvoiceIndex].percentage = commissionPercentage + "%";
+                  convertedLead.invoice[existingInvoiceIndex].commission = ((newInvoice.totalamount * commissionPercentage) / 100).toFixed(2);
+              } else {
+                  // Add a new invoice if it doesn't exist
+                  newInvoice.percentage = commissionPercentage + "%";
+                  newInvoice.commission = ((newInvoice.totalamount * commissionPercentage) / 100).toFixed(2);
+                  convertedLead.invoice.push(newInvoice);
+              }
+          });
+      }
+
+      // Update the converted lead with the new invoice data
+      await ConvertedLeadModel.findByIdAndUpdate(
+          convertedLead._id,
+          { $set: { invoice: convertedLead.invoice } },
+          { new: true }
+      );
+  }
+
+  return convertedLead;
+};
+
+
+const calculateNextCycleStartDate = (leadCycle) => {
+  const { startDate } = leadCycle; // Assuming the cycle object has a startDate
+
+  // Assuming lead cycles last for 2 months (adjust this as per your actual cycle length)
+  let nextCycleStart = new Date(startDate);
+  nextCycleStart.setMonth(nextCycleStart.getMonth() + 2); // Move to the next cycle (add 2 months)
+
+  return nextCycleStart;
+};
 
   module.exports = { calculateCycleAndLeadNumber,calculateCommissionPercentage,processLeadConversion };

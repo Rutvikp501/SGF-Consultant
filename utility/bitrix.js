@@ -313,54 +313,65 @@ exports.getConvertedLead1 = async (req, res) => {
 
 exports.getConvertedLead = async (req, res) => {
     try {
-      let data = req.body;
-      const { leadID } = data;
-      // Validate the request body
-      if (!data || Object.keys(data).length === 0) {
-        return res.status(400).json({
-          status: false,
-          message: 'Request body is missing or invalid',
-        });
-      }
-  
-      // Find consultant details using the consultant code
-      const consultantDetails = await User.findOne({ code: data.consultant });
-      if (!consultantDetails) {
-        return res.status(404).json({
-          success: false,
-          message: 'Consultant not found',
-        });
-      }
+        let data = req.body;
+        const { leadID } = data;
 
-      let leadType = (await ConvertedLeadModel.findOne({ leadID }) || await LeadModel.findOne({ leadID }))?.leadType;
+        // Validate the request body
+        if (!data || Object.keys(data).length === 0) {
+            return res.status(400).json({
+                status: false,
+                message: 'Request body is missing or invalid',
+            });
+        }
 
-      // Calculate current cycle, year, and lead number
-      const { cycleKey, leadNumber, totalLeadsConverted } = await calculateCycleAndLeadNumber(data, consultantDetails,leadType);
-  
-      // Calculate commission percentage based on lead type
-      const commissionPercentage = calculateCommissionPercentage(data, leadNumber, totalLeadsConverted, cycleKey,leadType);
-  
-      // Process lead conversion
-      const convertedLead = await processLeadConversion(data, consultantDetails, leadNumber, commissionPercentage, cycleKey,leadType);
-  
-      // Save consultant details
-      await consultantDetails.save();
-  
-      // Return success response with updated converted lead data
-      return res.status(200).json({
-        status: true,
-        message: 'Converted lead updated successfully',
-        data: convertedLead,
-      });
-  
+        // Find consultant details using the consultant code
+        const consultantDetails = await User.findOne({ code: data.consultant });
+        if (!consultantDetails) {
+            return res.status(404).json({
+                success: false,
+                message: 'Consultant not found',
+            });
+        }
+
+        // Get lead type from converted or pending leads
+        let leadType = (await ConvertedLeadModel.findOne({ leadID }) || await LeadModel.findOne({ leadID }))?.leadType;
+
+        // Calculate current cycle, year, and lead number
+        const { cycleKey, leadNumber, totalLeadsConverted } = await calculateCycleAndLeadNumber(data, consultantDetails, leadType);
+
+        // Calculate commission percentage based on lead type
+        const commissionPercentage = calculateCommissionPercentage(leadNumber, totalLeadsConverted, leadType);
+
+        // Process lead conversion
+        const convertedLead = await processLeadConversion(data, consultantDetails, leadNumber, commissionPercentage, cycleKey, leadType);
+
+        // Save last commission percentage based on lead type
+        if (leadType === 'Seasonal') {
+            consultantDetails.lastCommissionPercentage.seasonal = commissionPercentage;
+        } else {
+            consultantDetails.lastCommissionPercentage.regular = commissionPercentage;
+        }
+
+        // Save consultant details
+        await consultantDetails.save();
+
+        // Return success response with updated converted lead data
+        return res.status(200).json({
+            status: true,
+            message: 'Converted lead updated successfully',
+            data: convertedLead,
+        });
+
     } catch (err) {
-      console.error('Error in getConvertedLead:', err.message);
-      return res.status(500).json({
-        status: false,
-        error: 'An internal server error occurred: ' + err.message,
-      });
+        console.error('Error in getConvertedLead:', err.message);
+        return res.status(500).json({
+            status: false,
+            error: 'An internal server error occurred: ' + err.message,
+        });
     }
 };
+
+
 
 
 exports.getJunkLeadsLead = async () => {
