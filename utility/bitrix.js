@@ -7,6 +7,8 @@ const { calculateLeadCycle } = require('../helpers/sample');
 const { calculateCycleAndLeadNumber, calculateCommissionPercentage, processLeadConversion } = require('./querys');
 
 exports.bitrixaddLead = async (LeadData) => {
+    console.log(LeadData);
+    
     try {
         const apiUrl = `https://swaptography.bitrix24.in/rest/8/t6107s6fsf94wfo9/crm.lead.add.json`;
 
@@ -29,7 +31,7 @@ exports.bitrixaddLead = async (LeadData) => {
             'fields[UF_CRM_1723872311251]': LeadData.events?.[0]?.location || '', // event_location from city
             'fields[UF_CRM_1725958658829]': LeadData.leadID || '', // leadID
             'fields[UF_CRM_1723870992344]': LeadData.currentDate || '', // currentDate
-            'fields[UF_CRM_1723871015696]': LeadData.events?.[0]?.name || '', // BOOING NAME
+            'fields[UF_CRM_1723871015696]': LeadData.events?.[0]?.name || '', // BOOKING NAME
             'fields[UF_CRM_1723871636157]': LeadData.events?.[0]?.date || '', // date from events array
             'fields[UF_CRM_1726823732500]': LeadData.events?.[0]?.name || '', // date from events array
             'fields[UF_CRM_1726651078700]': LeadData.name || '', // date from events array
@@ -39,6 +41,7 @@ exports.bitrixaddLead = async (LeadData) => {
             'fields[UF_CRM_1725627051950]': LeadData.eventSpecialsName || '', // eventSpecialsName
             'fields[UF_CRM_1725627132023]': LeadData.specialCode || '', // specialCode
             'fields[UF_CRM_1725961934686]': LeadData.package?.amount || '', // package amount
+            'fields[UF_CRM_1724912903]': LeadData.package?.name || '', // service name / Package
         };
 
         const response = await axios.post(apiUrl, null, {

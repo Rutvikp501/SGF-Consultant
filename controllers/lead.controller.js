@@ -60,10 +60,10 @@ exports.addLead = async (req, res) => {
         }));
 
         const packageData = {
-            name: params.package.packageName || 'NA',
-            subname: params.package.subname || 'NA',
-            addonS: params.package.addOns ? params.package.addOns.split(',').map(item => item.trim()) : [],
-            amount: parseFloat(params.package.amount) || 0
+            name: params.serviceName || 'NA',
+            subname: params.package?.subname || 'NA',
+            addonS: params.package?.addOns ? params.package.addOns.split(',').map(item => item.trim()) : [],
+            amount: parseFloat(params.package?.amount) || 0
         };
 
         const LeadData = {
