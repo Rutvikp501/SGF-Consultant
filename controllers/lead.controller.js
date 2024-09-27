@@ -323,18 +323,22 @@ exports.getDashboardData = async (req, res) => {
     const RegularLeads = {};
     const SeasonalLeads = {};
     try {
-        let AllLeads = await LeadModel.countDocuments({ consultant: consultantId, });
+       // let AllLeads = await LeadModel.countDocuments({ consultant: consultantId, });
         // Regular Leads Counts
         RegularLeads.numPendingLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Regular", status: "Pending" });
         RegularLeads.numAllLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Regular" });
-        RegularLeads.numConvertedLeads = await ConvertedLeadModel.countDocuments({ consultant: consultantId, leadType: "Regular",});
+        RegularLeads.numConvertedLeads = await ConvertedLeadModel.countDocuments({ consultant: consultantId, leadType: "Regular",});//
         RegularLeads.numJunkLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Regular", status: "Junk" });
 
         // Seasonal Leads Counts  
         SeasonalLeads.numPendingLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal", status: "Pending" });
         SeasonalLeads.numAllLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal" });
-        SeasonalLeads.numConvertedLeads = await ConvertedLeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal",});
+        SeasonalLeads.numConvertedLeads = await ConvertedLeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal",});//
         SeasonalLeads.numJunkLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal", status: "Junk" });
+
+        const AllRegularLeads =RegularLeads.numAllLeads + RegularLeads.numConvertedLeads
+        const AllSeasonalLeads =SeasonalLeads.numConvertedLeads + SeasonalLeads.numPendingLeads
+        const AllLeads = AllRegularLeads+AllSeasonalLeads
 
         const leadsData = [
 
@@ -346,7 +350,7 @@ exports.getDashboardData = async (req, res) => {
             {
                 "title": "Regular ALL Leads ",
                 "des": "Counts for All Leads",
-                "status": RegularLeads.numAllLeads,
+                "status": AllRegularLeads,
                 "subList": [
                     {
                         "title": "Regular Pending Leads",
@@ -371,7 +375,7 @@ exports.getDashboardData = async (req, res) => {
             {
                 "title": "Seasonal ALL Leads",
                 "des": "Counts for All Leads",
-                "status": SeasonalLeads.numAllLeads,
+                "status": AllSeasonalLeads,
                 "subList": [
                     {
                         "title": "Seasonal Pending Leads",
