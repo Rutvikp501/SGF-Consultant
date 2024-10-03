@@ -7,10 +7,10 @@ const { calculateLeadCycle } = require('../helpers/sample');
 const { calculateCycleAndLeadNumber, calculateCommissionPercentage, processLeadConversion } = require('./querys');
 
 exports.bitrixaddLead = async (LeadData) => {
-    console.log(LeadData);
     
     try {
-        const apiUrl = `https://swaptography.bitrix24.in/rest/8/t6107s6fsf94wfo9/crm.lead.add.json`;
+        const apiUrl = process.env.bitrixaddlead;
+        console.log(apiUrl);
 
         // Mapping the LeadData to the requestBody
         const requestBody = {
@@ -56,10 +56,10 @@ exports.bitrixaddLead = async (LeadData) => {
                 status: true,
                 statusCode: 200,
                 leadno: response.data.result,
-                message: 'Successfully added',
+                message: 'Successfully added on bitrix',
             };
         } else {
-            console.error("Failed to add lead:", response.error);
+            console.error("Failed to add lead To bitrix:", response.error);
             return {
                 status: false,
                 statusCode: response.status,
@@ -67,7 +67,7 @@ exports.bitrixaddLead = async (LeadData) => {
             };
         }
     } catch (err) {
-        console.error('Error adding lead:', err.message);
+        console.error('Error adding lead To bitrix:', err.message);
         return {
             status: false,
             statusCode: 500,

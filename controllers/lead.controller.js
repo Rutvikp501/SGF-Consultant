@@ -14,7 +14,6 @@ exports.addLead = async (req, res) => {
 
     let params = req.body;
     console.log(params);
-    
     try {
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear();
