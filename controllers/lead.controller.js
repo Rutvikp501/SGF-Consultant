@@ -13,7 +13,6 @@ const token = process.env.token
 exports.addLead = async (req, res) => {
 
     let params = req.body;
-    console.log(params);
     try {
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear();
@@ -285,19 +284,23 @@ exports.getDashboardData = async (req, res) => {
     const RegularLeads = {};
     const SeasonalLeads = {};
     try {
-        let AllLeads = await LeadModel.countDocuments({ consultant: consultantId, });
-        // Regular Leads Counts
         RegularLeads.numPendingLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Regular", status: "Pending" });
-        RegularLeads.numAllLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Regular" });
-        RegularLeads.numConvertedLeads = await ConvertedLeadModel.countDocuments({ consultant: consultantId, leadType: "Regular",});
-        RegularLeads.numJunkLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Regular", status: "Junk" });
+        RegularLeads.numConvertedLeads = await ConvertedLeadModel.countDocuments({ consultant: consultantId, leadType: "Regular" });
+        RegularLeads.numJunkLeads = await JunkLeadModel.countDocuments({ consultant: consultantId, leadType: "Regular", status: "Junk" });
+
+        // Total regular leads = pending + converted + junk
+        RegularLeads.numAllLeads = RegularLeads.numPendingLeads + RegularLeads.numConvertedLeads + RegularLeads.numJunkLeads;
 
         // Seasonal Leads Counts  
         SeasonalLeads.numPendingLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal", status: "Pending" });
-        SeasonalLeads.numAllLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal" });
-        SeasonalLeads.numConvertedLeads = await ConvertedLeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal",});
-        SeasonalLeads.numJunkLeads = await LeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal", status: "Junk" });
+        SeasonalLeads.numConvertedLeads = await ConvertedLeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal" });
+        SeasonalLeads.numJunkLeads = await JunkLeadModel.countDocuments({ consultant: consultantId, leadType: "Seasonal", status: "Junk" });
 
+        // Total seasonal leads = pending + converted + junk
+        SeasonalLeads.numAllLeads = SeasonalLeads.numPendingLeads + SeasonalLeads.numConvertedLeads + SeasonalLeads.numJunkLeads;
+
+        // Total all leads = regular leads + seasonal leads
+        let AllLeads  = RegularLeads.numAllLeads + SeasonalLeads.numAllLeads;
         const leadsData = [
 
             {

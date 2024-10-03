@@ -60,6 +60,7 @@ exports.GetUserData = async (req, res) => {
         console.log(error);
     }
 };
+
 exports.GetSearchedUser = async (req, res,next) => {
     try {
         const params = req.body || '';
@@ -159,7 +160,6 @@ exports.Login = async (req, res) => {
 
 exports.Register = async (req, res) => {
     const {user_code, user_name , email_id ,mobile_no,password,dateOfJoining ,role }=req.body
-    
     const getExistingUser = await UserModel.find({ email_id: email_id });  
     const duplicatecode = await UserModel.find({ code: user_code });  
     // const valid = validatePassword(password)

@@ -1,0 +1,53 @@
+<main>
+    <%- include('../partials/adminSidebar') %>
+
+    <div id="main-wrapper">
+
+        <p class="title">Add User</p>
+        <form action="/admin/addUser" method="POST" class="form">
+
+            <% if (typeof errors != 'undefined') { %>
+                <% errors.forEach(function(error) { %>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <%= error.msg %>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <% }); %>
+            <% } %>
+
+            <div class="gridf">
+                <label>
+                    <input type="text" name="user_code" class="input" id="user-code" value="<%= typeof user_code != 'undefined' ? user_code : '' %>" required>
+                    <span>User Code</span>
+                </label>
+                
+                <label>
+                    <input type="text" name="user_name" class="input" id="user-name" value="<%= typeof user_name != 'undefined' ? user_name : '' %>" required>
+                    <span>Name</span>
+                </label>
+
+                <label>
+                    <input type="email" name="email_id" class="input" id="email" value="<%= typeof email_id != 'undefined' ? email_id : '' %>" required>
+                    <span>Email Address</span>
+                </label>
+
+                <label>
+                    <input type="password" name="password1" class="input" id="password1" value="<%= typeof password1 != 'undefined' ? password1 : '' %>" required>
+                    <span>Password</span>
+                </label>
+
+                <label>
+                    <input type="date" name="dateOfJoining" class="input" id="date-of-joining" value="<%= typeof dateOfJoining != 'undefined' ? dateOfJoining : '' %>" required>
+                    <span>Date of Joining</span>
+                </label>
+
+
+
+
+            </div>
+            <button type="submit" class="submit d-block m-auto mt-4">Submit</button>
+
+        </form>
+
+    </div>
+</main>

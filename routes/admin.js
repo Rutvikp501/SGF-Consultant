@@ -10,6 +10,7 @@ const { calculateCycle,} = require("../helpers/sample.js");
 
 const { Consultant_Wellcome } = require("../utility/email.util.js");
 const { addLead } = require("../controllers/lead.controller.js");
+const packagesModel = require("../models/packages.model.js");
 
 
 router.get("/admin/dashboard", middleware.ensureAdminLoggedIn, async (req, res) => {
@@ -125,7 +126,6 @@ router.post("/admin/Leads/converte/:LeadsId", middleware.ensureAdminLoggedIn, as
 	}
 });
 
-
 router.post("/admin/Leads/reject/:LeadsId", middleware.ensureAdminLoggedIn, async (req, res) => {
 	//console.log(req.params,req.body);
 
@@ -181,6 +181,7 @@ router.get("/admin/consultants", middleware.ensureAdminLoggedIn, async (req, res
 		res.redirect("back");
 	}
 });
+
 router.get("/admin/admins", middleware.ensureAdminLoggedIn, async (req, res) => {
 	try {
 		const admin = await UserModel.find({ role: "admin" });
@@ -194,6 +195,7 @@ router.get("/admin/admins", middleware.ensureAdminLoggedIn, async (req, res) => 
 		res.redirect("back");
 	}
 });
+
 router.get("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) => {
 	try {
 		const agents = await UserModel.find({ role: "agent" });
@@ -207,6 +209,7 @@ router.get("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) =>
 
 
 });
+
 router.post("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) => {
 
 
@@ -304,7 +307,7 @@ router.put("/admin/profile", middleware.ensureAdminLoggedIn, async (req, res) =>
 
 router.get("/admin/addLeads", middleware.ensureAdminLoggedIn, async (req, res) => {
 	try {
-		const Leads = await LeadModel.find({ role: "agent" });
+		const Leads = await LeadModel.find();
 		res.render("admin/addLeads", { title: "List of Leads", Leads });
 	}
 	catch (err) {
@@ -315,6 +318,7 @@ router.get("/admin/addLeads", middleware.ensureAdminLoggedIn, async (req, res) =
 
 
 });
+
 router.post('/admin/addLeads', middleware.ensureAdminLoggedIn, async (req, res) => 	{
     let params = req.body;
 	try {
@@ -401,6 +405,31 @@ router.post('/admin/addLeads', middleware.ensureAdminLoggedIn, async (req, res) 
 	}
 });
 
+router.get("/admin/addpackages", middleware.ensureAdminLoggedIn, async (req, res) => {
+	try {
+		const packages = await packagesModel.find();
+		res.render("admin/addPackage", { title: "List of Packages", Leads });
+	}
+	catch (err) {
+		console.log(err);
+		req.flash("error", "Some error occurred on the server.")
+		res.redirect("back");
+	}
+
+
+});
+
+router.post('/admin/addLeads', middleware.ensureAdminLoggedIn, async (req, res) => 	{
+    let params = req.body;
+	console.log(params);
+	
+	try {
+	
+	} catch (error) {
+		console.error(error);
+		res.status(500).send({ message: 'Internal server error' });
+	}
+});
 
 
 module.exports = router;
