@@ -59,7 +59,7 @@ exports.addLead = async (req, res) => {
         }));
 
         const packageData = {
-            name: params.serviceName || 'NA',
+            name: params.package?.name || 'NA',
             subname: params.package?.subname || 'NA',
             addonS: params.package?.addOns ? params.package.addOns.split(',').map(item => item.trim()) : [],
             amount: parseFloat(params.package?.amount) || 0
@@ -74,6 +74,7 @@ exports.addLead = async (req, res) => {
             name: params.name,
             email: params.email,
             phone: params.phone,
+            homeaddress: params.homeaddress,
             events: formattedEvents,
             pincode: params.pincode,
             eventSpecialsName: params.eventSpecialsName,
@@ -107,10 +108,11 @@ exports.addLead = async (req, res) => {
             });
 
         } else {
+            console.error(bitrixres.error);
             return res.send({
                 success: false,
                 statusCode: bitrixres.statusCode,
-                message: bitrixres.error
+                message: `Error adding Lead Contact Sales Assistant`
             });
         }
     } catch (error) {
@@ -118,7 +120,7 @@ exports.addLead = async (req, res) => {
         return res.send({
             success: false,
             statusCode: 500,
-            message: 'Internal server error'
+            message: 'Error adding Lead Contact Sales Assistant'
         });
     }
 };

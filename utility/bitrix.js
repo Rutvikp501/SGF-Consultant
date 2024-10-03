@@ -10,11 +10,12 @@ exports.bitrixaddLead = async (LeadData) => {
     
     try {
         const apiUrl = process.env.bitrixaddlead;
-        console.log(apiUrl);
+        //console.log(apiUrl);
 
         // Mapping the LeadData to the requestBody
         const requestBody = {
-            'fields[NAME]': LeadData.name || '',
+            'fields[UF_CRM_1723871015696]': LeadData.name || '', // BOOKING NAME whos is doing booking
+            'fields[NAME]': LeadData.events?.[0]?.name || '', //event name 
             'fields[PHONE][0][VALUE]': `+91 ${LeadData.phone}` || '',
             'fields[PHONE][0][VALUE_TYPE]': 'WORK',
             'fields[EMAIL][0][VALUE]': LeadData.email || '',
@@ -23,26 +24,35 @@ exports.bitrixaddLead = async (LeadData) => {
             // 'fields[PHONE][1][VALUE_TYPE]': 'OTHER',
             'fields[EMAIL][1][VALUE]': LeadData.consultant_email_id || '',
             'fields[EMAIL][1][VALUE_TYPE]': 'OTHER',
+            'fields[UF_CRM_1724754601811]': LeadData.homeaddress || '', // homeaddress
+            'fields[UF_CRM_1723870992344]': LeadData.currentDate || '', // currentDate
+            
             'fields[UF_CRM_1725626932463]': LeadData.consultant_code || '', // consultant_code
             'fields[UF_CRM_1725958005830]': LeadData.consultant_mobile_no || '', // consultant_mobile_no
             'fields[UF_CRM_1725957892961]': LeadData.consultant_email_id || '', // consultant_email_id
             'fields[UF_CRM_1726770095504]': LeadData.consultant_name || '', // consultant_name
-            'fields[UF_CRM_1723871068885]': LeadData.events?.[0]?.location || '', // event_location from events array
-            'fields[UF_CRM_1723872311251]': LeadData.events?.[0]?.location || '', // event_location from city
+
             'fields[UF_CRM_1725958658829]': LeadData.leadID || '', // leadID
-            'fields[UF_CRM_1723870992344]': LeadData.currentDate || '', // currentDate
-            'fields[UF_CRM_1723871015696]': LeadData.events?.[0]?.name || '', // BOOKING NAME
-            'fields[UF_CRM_1723871636157]': LeadData.events?.[0]?.date || '', // date from events array
-            'fields[UF_CRM_1726823732500]': LeadData.events?.[0]?.name || '', // date from events array
-            'fields[UF_CRM_1726651078700]': LeadData.name || '', // date from events array
-            'fields[UF_CRM_1724929500047]': LeadData.leadType || '', // event_type (assuming it's mapped to leadType)
-            'fields[UF_CRM_1726651303165]': LeadData.pincode || '', // event_type (assuming it's mapped to leadType)
+            'fields[UF_CRM_1726162680849]': LeadData.eventSpecialsName || '', // Specials Name
+            
+            'fields[UF_CRM_1723872311251]': LeadData.events?.[0]?.location || '', // event_location from city
+            'fields[UF_CRM_1723871068885]': LeadData.events?.[0]?.location || '', // events address 
+            'fields[UF_CRM_1726651303165]': LeadData.pincode || '', // pincode
             'fields[UF_CRM_1725627014795]': LeadData.events?.[0]?.date || '', // event_date from events array
+            
+
+            'fields[UF_CRM_1724929500047]': LeadData.leadType || '', // event_type (assuming it's mapped to leadType)
+            'fields[UF_CRM_1726823732500]': LeadData.events?.[0]?.name || '', // date from events array
+            
+            'fields[UF_CRM_1726651078700]': LeadData.events?.[0]?.name || '', //Event Name
+            'fields[UF_CRM_1723871636157]': LeadData.events?.[0]?.date || '', // date from events array
             'fields[UF_CRM_1725627051950]': LeadData.eventSpecialsName || '', // eventSpecialsName
             'fields[UF_CRM_1725627132023]': LeadData.specialCode || '', // specialCode
+
             'fields[UF_CRM_1725961934686]': LeadData.package?.amount || '', // package amount
             'fields[UF_CRM_1724912903]': LeadData.package?.name || '', // service name / Package
         };
+        console.log(requestBody);
 
         const response = await axios.post(apiUrl, null, {
             params: requestBody,
