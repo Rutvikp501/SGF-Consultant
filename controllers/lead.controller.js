@@ -13,6 +13,7 @@ const token = process.env.token
 exports.addLead = async (req, res) => {
 
     let params = req.body;
+    
     try {
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear();

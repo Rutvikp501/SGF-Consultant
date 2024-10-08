@@ -52,7 +52,6 @@ exports.bitrixaddLead = async (LeadData) => {
             'fields[UF_CRM_1725961934686]': LeadData.package?.amount || '', // package amount
             'fields[UF_CRM_1724912903]': LeadData.package?.name || '', // service name / Package
         };
-        console.log(requestBody);
 
         const response = await axios.post(apiUrl, null, {
             params: requestBody,
