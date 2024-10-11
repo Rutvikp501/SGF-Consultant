@@ -20,8 +20,8 @@ exports.bitrixaddLead = async (LeadData) => {
             'fields[PHONE][0][VALUE_TYPE]': 'WORK',
             'fields[EMAIL][0][VALUE]': LeadData.email || '',
             'fields[EMAIL][0][VALUE_TYPE]': 'WORK',
-            // 'fields[PHONE][1][VALUE]': `+91 ${LeadData.consultant_mobile_no}` || '',
-            // 'fields[PHONE][1][VALUE_TYPE]': 'OTHER',
+            'fields[PHONE][1][VALUE]': `+91 ${LeadData.consultant_mobile_no}` || '',
+            'fields[PHONE][1][VALUE_TYPE]': 'OTHER',
             'fields[EMAIL][1][VALUE]': LeadData.consultant_email_id || '',
             'fields[EMAIL][1][VALUE_TYPE]': 'OTHER',
             'fields[UF_CRM_1724754601811]': LeadData.homeaddress || '', // homeaddress
