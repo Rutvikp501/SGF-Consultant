@@ -29,6 +29,12 @@ const userSchema = new mongoose.Schema({
 		name: { type: String, default: null},
 		mobile_no: { type: Number,default: null},
 	},
+	user_bank_details: {
+		bank_name: { type: String, default: null },
+		account_number: { type: String, default: null },
+		ifsc_code: { type: String, default: null },
+		branch_name: { type: String, default: null },
+	},
 	otp: { type: String, default: null },
 	otpExpires: { type: Date, default: null },
 }, { timestamps: true }

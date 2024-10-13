@@ -15,79 +15,121 @@
                 <% }); %>
             <% } %>
 
-            <div class="gridf">
-                <label>
-                    <input type="text" name="user_code" class="input" id="user-code" value="<%= typeof user_code != 'undefined' ? user_code : '' %>" required>
-                    <span>User Code</span>
-                </label>
-                
-                <label>
-                    <input type="text" name="user_name" class="input" id="user-name" value="<%= typeof user_name != 'undefined' ? user_name : '' %>" required>
-                    <span>Name</span>
-                </label>
+            <!-- User Information Section -->
+            <div class="section">
+                <h3>User Information</h3>
+                <div class="gridf">
+                    <label>
+                        <input type="text" name="user_code" class="input" id="user-code" value="<%= typeof user_code != 'undefined' ? user_code : '' %>" required>
+                        <span>User Code</span>
+                    </label>
 
-                <label>
-                    <input type="email" name="email_id" class="input" id="email" value="<%= typeof email_id != 'undefined' ? email_id : '' %>" required>
-                    <span>Email Address</span>
-                </label>
+                    <label>
+                        <input type="text" name="user_name" class="input" id="user-name" value="<%= typeof user_name != 'undefined' ? user_name : '' %>" required>
+                        <span>Name</span>
+                    </label>
 
-                <label>
-                    <input type="password" name="password1" class="input" id="password1" value="<%= typeof password1 != 'undefined' ? password1 : '' %>" required>
-                    <span>Password</span>
-                </label>
+                    <label>
+                        <input type="email" name="email_id" class="input" id="email" value="<%= typeof email_id != 'undefined' ? email_id : '' %>" required>
+                        <span>Email Address</span>
+                    </label>
 
-                <label>
-                    <input type="date" name="dateOfJoining" class="input" id="date-of-joining" value="<%= typeof dateOfJoining != 'undefined' ? dateOfJoining : '' %>" required>
-                    <span>Date of Joining</span>
-                </label>
+                    <label>
+                        <input type="text" name="password1" class="input" id="password1" value="<%= typeof password1 != 'undefined' ? password1 : '' %>" required>
+                        <span>Password</span>
+                    </label>
 
-                <label>
-                    <input type="tel" name="mobile_no" class="input" id="mobile-no" value="<%= typeof mobile_no != 'undefined' ? mobile_no : '' %>" required>
-                    <span>Mobile Number</span>
-                </label>
+                    <label>
+                        <input type="date" name="dateOfJoining" class="input" id="date-of-joining" value="<%= typeof dateOfJoining != 'undefined' ? dateOfJoining : '' %>" required>
+                        <span>Date of Joining</span>
+                    </label>
 
-                <label>
-                    <select class="input" name="role" id="role">
-                        <option value="consultant">Consultant</option>
-                        <option value="admin">Admin</option>
-                        <option value="partners">Partners</option>
-                    </select>
-                    <span>Signup as</span>
-                </label>
+                    <label>
+                        <input type="tel" name="mobile_no" class="input" id="mobile-no" value="<%= typeof mobile_no != 'undefined' ? mobile_no : '' %>" required>
+                        <span>Mobile Number</span>
+                    </label>
 
-                <label id="sales-assistant-name-field">
-                    <input type="text" name="sales_assistan_name" class="input" id="sales-assistan-name" value="<%= typeof sales_assistan_name != 'undefined' ? sales_assistan_name : '' %>">
-                    <span>Sales Assistant Name</span>
-                </label>
-
-                <label id="sales-assistant-mobile-field">
-                    <input type="tel" name="sales_assistan_mobile_no" class="input" id="sales-assistan-mobile-no" value="<%= typeof sales_assistan_mobile_no != 'undefined' ? sales_assistan_mobile_no : '' %>">
-                    <span>Sales Assistant Mobile No.</span>
-                </label>
-
-
+                    <label>
+                        <select class="input" name="role" id="role">
+                            <option value="" disabled selected>Select User Type</option>
+                            <option value="consultant">Consultant</option>
+                            <option value="admin">Admin</option>
+                            <option value="partners">Partners</option>
+                        </select>
+                        <span>Signup as</span>
+                    </label>
+                </div>
             </div>
-            <button type="submit" class="submit d-block m-auto mt-4">Submit</button>
 
+            <!-- Sales Assistant Section -->
+            <div class="section" id="sales-assistant-section">
+                <h3>Sales Assistant Information</h3>
+                <div class="gridf">
+                    <label id="sales-assistant-name-field">
+                        <input type="text" name="sales_assistan_name" class="input" id="sales-assistan-name" value="<%= typeof sales_assistan_name != 'undefined' ? sales_assistan_name : '' %>">
+                        <span>Sales Assistant Name</span>
+                    </label>
+            
+                    <label id="sales-assistant-mobile-field">
+                        <input type="tel" name="sales_assistan_mobile_no" class="input" id="sales-assistan-mobile-no" value="<%= typeof sales_assistan_mobile_no != 'undefined' ? sales_assistan_mobile_no : '' %>">
+                        <span>Sales Assistant Mobile No.</span>
+                    </label>
+                </div>
+            </div>
+
+
+            <!-- Bank Details Section -->
+            <div class="section">
+                <h3>Bank Details</h3>
+                <div class="gridf">
+                    <label>
+                        <input type="text" name="bank_name" class="input" id="bank-name" value="<%= typeof bank_name != 'undefined' ? bank_name : '' %>" required>
+                        <span>Bank Name</span>
+                    </label>
+
+                    <label>
+                        <input type="text" name="account_number" class="input" id="account-number" value="<%= typeof account_number != 'undefined' ? account_number : '' %>" required>
+                        <span>Account Number</span>
+                    </label>
+
+                    <label>
+                        <input type="text" name="ifsc_code" class="input" id="ifsc-code" value="<%= typeof ifsc_code != 'undefined' ? ifsc_code : '' %>" required>
+                        <span>IFSC Code</span>
+                    </label>
+
+                    <label>
+                        <input type="text" name="branch_name" class="input" id="branch-name" value="<%= typeof branch_name != 'undefined' ? branch_name : '' %>" required>
+                        <span>Branch Name</span>
+                    </label>
+
+                </div>
+            </div>
+
+            <button type="submit" class="submit d-block m-auto mt-4">Submit</button>
         </form>
 
     </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const roleSelect = document.getElementById('role');
-            const salesAssistantNameField = document.getElementById('sales-assistant-name-field');
-            const salesAssistantMobileField = document.getElementById('sales-assistant-mobile-field');
-
+            const salesAssistantSection = document.getElementById('sales-assistant-section');
+            const salesAssistantInputs = salesAssistantSection.querySelectorAll('input');
+    
             function toggleSalesAssistantFields() {
-                if (roleSelect.value === 'admin') {
-                    salesAssistantNameField.style.display = 'none';
-                    salesAssistantMobileField.style.display = 'none';
+                if (roleSelect.value === 'admin' || roleSelect.value === '') {
+                    salesAssistantSection.style.display = 'none';
+                    salesAssistantInputs.forEach(input => {
+                        input.disabled = true; // Disable the inputs
+                    });
                 } else {
-                    salesAssistantNameField.style.display = 'block';
-                    salesAssistantMobileField.style.display = 'block';
+                    salesAssistantSection.style.display = 'block';
+                    salesAssistantInputs.forEach(input => {
+                        input.disabled = false; // Enable the inputs
+                    });
                 }
             }
-
+    
             toggleSalesAssistantFields();
             roleSelect.addEventListener('change', toggleSalesAssistantFields);
         });

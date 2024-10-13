@@ -6,7 +6,7 @@ const UserModel = require("../models/user.js");
 const LeadModel = require("../models/lead.models.js");
 const ConvertedLeadModel = require("../models/convertedLead.model.js");
 const JunkLeadModel = require("../models/junkLead.model.js");
-const { calculateCycle,} = require("../helpers/sample.js");
+const { calculateCycle, } = require("../helpers/sample.js");
 
 const { Consultant_Wellcome } = require("../utility/email.util.js");
 const { addLead } = require("../controllers/lead.controller.js");
@@ -213,7 +213,7 @@ router.get("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) =>
 router.post("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) => {
 
 
-	const { email_id, password1, role, user_code, user_name, mobile_no, dateOfJoining, isAdmin,sales_assistan_name, sales_assistan_mobile_no } = req.body;
+	const { email_id, password1, role, user_code, user_name, mobile_no, dateOfJoining, isAdmin, sales_assistan_name, sales_assistan_mobile_no, bank_name, account_number, ifsc_code, branch_name } = req.body;
 	let errors = [];
 	if (!email_id || !password1 || !user_code || !user_name || !mobile_no || !dateOfJoining) {
 		errors.push({ msg: "Please fill in all the fields" });
@@ -222,7 +222,9 @@ router.post("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) =
 	if (password1.length < 4) {
 		errors.push({ msg: "Password length should be at least 4 characters" });
 	}
-
+	if (!bank_name || !account_number || !ifsc_code || !branch_name) {
+		errors.push({ msg: "Please fill in all bank details" });
+	}
 	if (errors.length > 0) {
 		return res.render("/admin/addUser", {
 			title: "addUser",
@@ -268,10 +270,16 @@ router.post("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) =
 				name: sales_assistan_name || null,
 				mobile_no: sales_assistan_mobile_no || null,
 			},
+			user_bank_details: {
+				bank_name: bank_name || null,
+				account_number: account_number || null,
+				ifsc_code: ifsc_code || null,
+				branch_name: branch_name || null,
+			},
 			currentcycle: { label: cycleLabel, number: cycleNumber }
 		});
 		await newUser.save();
-		await Consultant_Wellcome(newUser,password1); // wellcome mail 
+		await Consultant_Wellcome(newUser, password1); // wellcome mail 
 		req.flash("success", "User  successfully added ");
 		res.redirect("/admin/consultants");
 
@@ -319,8 +327,8 @@ router.get("/admin/addLeads", middleware.ensureAdminLoggedIn, async (req, res) =
 
 });
 
-router.post('/admin/addLeads', middleware.ensureAdminLoggedIn, async (req, res) => 	{
-    let params = req.body;
+router.post('/admin/addLeads', middleware.ensureAdminLoggedIn, async (req, res) => {
+	let params = req.body;
 	try {
 		const currentDate = new Date();
 		const currentYear = currentDate.getFullYear();
@@ -419,12 +427,12 @@ router.get("/admin/addpackages", middleware.ensureAdminLoggedIn, async (req, res
 
 });
 
-router.post('/admin/addLeads', middleware.ensureAdminLoggedIn, async (req, res) => 	{
-    let params = req.body;
+router.post('/admin/addLeads', middleware.ensureAdminLoggedIn, async (req, res) => {
+	let params = req.body;
 	console.log(params);
-	
+
 	try {
-	
+
 	} catch (error) {
 		console.error(error);
 		res.status(500).send({ message: 'Internal server error' });
