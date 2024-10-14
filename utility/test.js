@@ -323,3 +323,90 @@ exports.getconvertedLeads = async (req, res) => {
         });
     }
 };
+
+router.post("/admin/addUser", middleware.ensureAdminLoggedIn, upload, async (req, res) => {
+    const { email_id, password1, role, user_code, user_name, mobile_no, dateOfJoining, sales_assistan_name, sales_assistan_mobile_no, bank_name, account_number, ifsc_code, branch_name } = req.body;
+    let errors = [];
+	// console.log(req.body,req.files?.aadhaarFile,req.files?.panFile);
+    // // Check required fields
+    if (!email_id || !password1 || !user_code || !user_name || !mobile_no || !dateOfJoining) {
+        errors.push({ msg: "Please fill in all the fields" });
+    }
+
+    if (password1.length < 4) {
+        errors.push({ msg: "Password length should be at least 4 characters" });
+    }
+
+    if (!bank_name || !account_number || !ifsc_code || !branch_name) {
+        errors.push({ msg: "Please fill in all bank details" });
+    }
+
+    // If there are errors, re-render the form with error messages
+    if (errors.length > 0) {
+        return res.render("admin/addUser", {
+            title: "Add User",
+            errors, email_id, password1, user_code, user_name, mobile_no, dateOfJoining
+        });
+    }
+
+    try {
+        // Check for existing email and user code
+        const getExistingUser = await UserModel.findOne({ email_id: email_id });
+        const duplicateCode = await UserModel.findOne({ code: user_code });
+
+        if (getExistingUser) {
+            errors.push({ msg: "This Email is already registered. Please try another email." });
+            return res.render("admin/addUser", {
+                title: "Add User",
+                errors, email_id, password1, user_code, user_name, mobile_no, dateOfJoining
+            });
+        }
+
+        if (duplicateCode) {
+            return res.status(400).send({ success: "failed", message: "User code already exists." });
+        }
+
+        // Encrypt the password
+        const salt = bcrypt.genSaltSync(10);
+        const hash = bcrypt.hashSync(password1, salt);
+
+        // Calculate cycle
+        const date = new Date(dateOfJoining); // Parse date string
+        const { cycleLabel, cycleNumber } = calculateCycle(date);
+
+        // Create new user
+        const newUser = new UserModel({
+            code: user_code,
+            name: user_name,
+            email_id: email_id,
+            mobile_no: mobile_no,
+            role: role,
+            password: hash,
+            dateOfJoining: date,
+            sales_assistan: {
+                name: sales_assistan_name || null,
+                mobile_no: sales_assistan_mobile_no || null,
+            },
+            user_bank_details: {
+                bank_name: bank_name || null,
+                account_number: account_number || null,
+                ifsc_code: ifsc_code || null,
+                branch_name: branch_name || null,
+            },
+            currentcycle: { label: cycleLabel, number: cycleNumber },
+            profileFile: req.files.profileFile ? req.files.profileFile[0].filename : null, // Store the profile file
+            aadhaarFile: req.files.aadhaarFile ? req.files.aadhaarFile[0].filename : null, // Store the Aadhaar file
+            panFile: req.files.panFile ? req.files.panFile[0].filename : null // Store the PAN file
+        });
+
+        await newUser.save();
+        await Consultant_Wellcome(newUser, password1); // Send welcome email
+        req.flash("success", "User successfully added");
+        res.redirect("/admin/consultants");
+
+    } catch (err) {
+        console.log(err);
+        req.flash("error", "Some error occurred on the server.");
+        res.redirect("back");
+    }
+});

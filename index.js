@@ -47,6 +47,7 @@ app.use((req, res, next) => {
     res.locals.warning = req.flash("warning");
     next();
 });
+app.use('/uploads', express.static('uploads'));
 const swaggerUI = require('swagger-ui-express');
 const YAML = require("yamljs");
 const swaggerDocument = YAML.load(path.join(__dirname, '/swagger.yaml'));
@@ -79,3 +80,8 @@ app.listen(port, console.log(`Server is running at http://localhost:${port}`));
 // APP_PASS=uxzc tuzs dlkq awvw
 // RUTVIK=patilrutvik501@gmail.com
 // RAPP_PASS=mnzt tvan wirp byum
+// cloudinary_name=delhmpkrr
+// cloudinary_key	=597523488622468
+// cloudinary_secret	=597523488622468
+// cloudinary_env_variable=_QefFlpdSIFThBUc6zPTv7D-b90
+// CLOUDINARY_URL=cloudinary://597523488622468:_QefFlpdSIFThBUc6zPTv7D-b90@delhmpkrr	

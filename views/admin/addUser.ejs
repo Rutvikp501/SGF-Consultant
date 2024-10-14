@@ -4,8 +4,7 @@
     <div id="main-wrapper">
 
         <p class="title">Add User</p>
-        <form action="/admin/addUser" method="POST" class="form">
-
+        <form action="/admin/addUser" method="POST" enctype="multipart/form-data" class="form">
             <% if (typeof errors != 'undefined') { %>
                 <% errors.forEach(function(error) { %>
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -16,6 +15,7 @@
             <% } %>
 
             <!-- User Information Section -->
+
             <div class="section">
                 <h3>User Information</h3>
                 <div class="gridf">
@@ -45,7 +45,7 @@
                     </label>
 
                     <label>
-                        <input type="tel" name="mobile_no" class="input" id="mobile-no" value="<%= typeof mobile_no != 'undefined' ? mobile_no : '' %>" required>
+                        <input type="tel" name="mobile_no" class="input" id="mobile-no" pattern="[0-9]{10}" value="<%= typeof mobile_no != 'undefined' ? mobile_no : '' %>" required>
                         <span>Mobile Number</span>
                     </label>
 
@@ -60,7 +60,16 @@
                     </label>
                 </div>
             </div>
-
+            <div class="section">
+                <h3>Profile Picture</h3>
+                <div class="gridf">
+                    <label>
+                        <input type="file" name="profilePicture" class="input" id="profile-picture" accept="image/*,application/pdf">
+                        <span>Upload Profile Picture</span>
+                    </label>
+                </div>
+            </div>
+            
             <!-- Sales Assistant Section -->
             <div class="section" id="sales-assistant-section">
                 <h3>Sales Assistant Information</h3>
@@ -77,6 +86,21 @@
                 </div>
             </div>
 
+            <!-- Aadhaar and PAN Upload -->
+            <div class="section">
+                <h3>Document Upload</h3>
+                <div class="gridf">
+                    <label>
+                        <input type="file" name="aadhaarFile" class="input" accept="image/*,application/pdf" required>
+                        <span>Upload Aadhaar Photo</span>
+                    </label>
+
+                    <label>
+                        <input type="file" name="panFile" class="input" accept="image/*,application/pdf" required>
+                        <span>Upload PAN Photo</span>
+                    </label>
+                </div>
+            </div>
 
             <!-- Bank Details Section -->
             <div class="section">
@@ -101,7 +125,6 @@
                         <input type="text" name="branch_name" class="input" id="branch-name" value="<%= typeof branch_name != 'undefined' ? branch_name : '' %>" required>
                         <span>Branch Name</span>
                     </label>
-
                 </div>
             </div>
 

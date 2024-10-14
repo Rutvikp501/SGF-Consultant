@@ -7,6 +7,8 @@ const userSchema = new mongoose.Schema({
 	email_id: { type: String, required: true, unique: true },
 	password: { type: String, required: true },
 	role: { type: String, required: true },
+	address: { type: String, required: true },
+	profilePicture: { type: String },
 	dateOfJoining: { type: Date,  },
 	cycle: {
 		label: { type: String },
@@ -35,6 +37,8 @@ const userSchema = new mongoose.Schema({
 		ifsc_code: { type: String, default: null },
 		branch_name: { type: String, default: null },
 	},
+	aadhaarPhotoUrl: { type: String, default: null },  // Aadhaar photo URL
+    panPhotoUrl: { type: String, default: null },      // PAN photo URL
 	otp: { type: String, default: null },
 	otpExpires: { type: Date, default: null },
 }, { timestamps: true }

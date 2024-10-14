@@ -11,7 +11,36 @@ const { calculateCycle, } = require("../helpers/sample.js");
 const { Consultant_Wellcome } = require("../utility/email.util.js");
 const { addLead } = require("../controllers/lead.controller.js");
 const packagesModel = require("../models/packages.model.js");
+const multer = require('multer');
+const path = require('path');
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/'); // Specify the directory to store uploaded files
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}-${file.originalname}`); // Add a timestamp to prevent overwriting files
+    }
+});
 
+// Filter files (optional, ensures only image or PDF files are accepted)
+const fileFilter = (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (ext === '.png' || ext === '.jpg' || ext === '.jpeg' || ext === '.pdf') {
+        cb(null, true); // Accept the file
+    } else {
+        cb(new Error('Only images and PDFs are allowed!'), false); // Reject the file
+    }
+};
+
+// Configure multer for handling file uploads
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 1024 * 1024 * 10 }, // Limit file size to 10MB
+}).fields([
+    { name: 'profileFile', maxCount: 1 },      // For profile file (image/pdf)
+    { name: 'aadhaarFile', maxCount: 1 },      // For Aadhaar file (image/pdf)
+    { name: 'panFile', maxCount: 1 }           // For PAN file (image/pdf)
+]);
 
 router.get("/admin/dashboard", middleware.ensureAdminLoggedIn, async (req, res) => {
 	const numAdmins = await UserModel.countDocuments({ role: "admin" });
@@ -211,86 +240,93 @@ router.get("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) =>
 });
 
 router.post("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) => {
+    const { email_id, password1, role, user_code, user_name, mobile_no, dateOfJoining, sales_assistan_name, sales_assistan_mobile_no, bank_name, account_number, ifsc_code, branch_name } = req.body;
+    let errors = [];
+	// console.log(req.body,req.files?.aadhaarFile,req.files?.panFile);
+    // // Check required fields
+    if (!email_id || !password1 || !user_code || !user_name || !mobile_no || !dateOfJoining) {
+        errors.push({ msg: "Please fill in all the fields" });
+    }
 
+    // if (password1.length < 4) {
+    //     errors.push({ msg: "Password length should be at least 4 characters" });
+    // }
 
-	const { email_id, password1, role, user_code, user_name, mobile_no, dateOfJoining, isAdmin, sales_assistan_name, sales_assistan_mobile_no, bank_name, account_number, ifsc_code, branch_name } = req.body;
-	let errors = [];
-	if (!email_id || !password1 || !user_code || !user_name || !mobile_no || !dateOfJoining) {
-		errors.push({ msg: "Please fill in all the fields" });
-	}
+    if (!bank_name || !account_number || !ifsc_code || !branch_name) {
+        errors.push({ msg: "Please fill in all bank details" });
+    }
 
-	if (password1.length < 4) {
-		errors.push({ msg: "Password length should be at least 4 characters" });
-	}
-	if (!bank_name || !account_number || !ifsc_code || !branch_name) {
-		errors.push({ msg: "Please fill in all bank details" });
-	}
-	if (errors.length > 0) {
-		return res.render("/admin/addUser", {
-			title: "addUser",
-			errors, email_id, password1, user_code, user_name, mobile_no, dateOfJoining, isAdmin
-		});
-	}
+    // If there are errors, re-render the form with error messages
+    if (errors.length > 0) {
+        return res.render("admin/addUser", {
+            title: "Add User",
+            errors, email_id, password1, user_code, user_name, mobile_no, dateOfJoining
+        });
+    }
 
-	try {
-		// Check for existing email and user code
-		const getExistingUser = await UserModel.findOne({ email_id: email_id });
-		const duplicateCode = await UserModel.findOne({ code: user_code });
+    try {
+        // Check for existing email and user code
+        const getExistingUser = await UserModel.findOne({ email_id: email_id });
+        const duplicateCode = await UserModel.findOne({ code: user_code });
 
-		if (getExistingUser) {
-			errors.push({ msg: "This Email is already registered. Please try another email." });
-			return res.render("/admin/addUser", {
-				title: "addUser",
-				errors, email_id, password1, user_code, user_name, mobile_no, dateOfJoining, isAdmin
-			});
-		}
+        if (getExistingUser) {
+            errors.push({ msg: "This Email is already registered. Please try another email." });
+            return res.render("admin/addUser", {
+                title: "Add User",
+                errors, email_id, password1, user_code, user_name, mobile_no, dateOfJoining
+            });
+        }
 
-		if (duplicateCode) {
-			return res.status(400).send({ success: "failed", message: "User code already exists." });
-		}
+        if (duplicateCode) {
+            return res.status(400).send({ success: "failed", message: "User code already exists." });
+        }
 
-		// Encrypt the password
-		const salt = bcrypt.genSaltSync(10);
-		const hash = bcrypt.hashSync(password1, salt);
+        // Encrypt the password
+        const salt = bcrypt.genSaltSync(10);
+        const hash = bcrypt.hashSync(password1, salt);
 
-		// Calculate cycle
-		const date = new Date(dateOfJoining); // Parse date string
-		const { cycleLabel, cycleNumber } = calculateCycle(date);
+        // Calculate cycle
+        const date = new Date(dateOfJoining); // Parse date string
+        const { cycleLabel, cycleNumber } = calculateCycle(date);
 
-		// Create new user
-		const newUser = new UserModel({
-			code: user_code,
-			name: user_name,
-			email_id: email_id,
-			mobile_no: mobile_no,
-			role: role,
-			password: hash,
-			dateOfJoining: date,
-			sales_assistan: {
-				name: sales_assistan_name || null,
-				mobile_no: sales_assistan_mobile_no || null,
-			},
-			user_bank_details: {
-				bank_name: bank_name || null,
-				account_number: account_number || null,
-				ifsc_code: ifsc_code || null,
-				branch_name: branch_name || null,
-			},
-			currentcycle: { label: cycleLabel, number: cycleNumber }
-		});
-		await newUser.save();
-		await Consultant_Wellcome(newUser, password1); // wellcome mail 
-		req.flash("success", "User  successfully added ");
-		res.redirect("/admin/consultants");
+        // Create new user
+        const newUser = new UserModel({
+            code: user_code,
+            name: user_name,
+            email_id: email_id,
+            mobile_no: mobile_no,
+            role: role,
+            password: hash,
+            dateOfJoining: date,
+            sales_assistan: {
+                name: sales_assistan_name || null,
+                mobile_no: sales_assistan_mobile_no || null,
+            },
+            user_bank_details: {
+                bank_name: bank_name || null,
+                account_number: account_number || null,
+                ifsc_code: ifsc_code || null,
+                branch_name: branch_name || null,
+            },
+            currentcycle: { label: cycleLabel, number: cycleNumber },
+            profileFile: req.files.profileFile ? req.files.profileFile[0].filename : null, // Store the profile file
+            aadhaarFile: req.files.aadhaarFile ? req.files.aadhaarFile[0].filename : null, // Store the Aadhaar file
+            panFile: req.files.panFile ? req.files.panFile[0].filename : null // Store the PAN file
+        });
 
-	} catch (err) {
-		console.log(err);
-		req.flash("error", "Some error occurred on the server.");
-		res.redirect("back");
-	}
+        await newUser.save();
+        await Consultant_Wellcome(newUser, password1); // Send welcome email
+        req.flash("success", "User successfully added");
+        res.redirect("/admin/consultants");
 
-
+    } catch (err) {
+        console.log(err);
+        req.flash("error", "Some error occurred on the server.");
+        res.redirect("back");
+    }
 });
+
+
 
 router.get("/admin/profile", middleware.ensureAdminLoggedIn, (req, res) => {
 	res.render("admin/profile", { title: "My profile" });
