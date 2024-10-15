@@ -9,8 +9,10 @@ async function Consultant_Wellcome(EmailData, password1) {
         host: 'smtp.gmail.com',
         port: 587,
         auth: {
-            user: process.env.RUTVIK,
-            pass: process.env.RAPP_PASS
+            // user: process.env.RUTVIK,
+            // pass: process.env.RAPP_PASS
+            user: process.env.USERS,
+            pass: process.env.APP_PASS
         },
         tls: { rejectUnauthorized: false },
         debug: true
