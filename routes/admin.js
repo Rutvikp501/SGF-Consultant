@@ -242,7 +242,6 @@ router.get("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) =>
 router.post("/admin/addUser", middleware.ensureAdminLoggedIn,upload, async (req, res) => {
     const { email_id, password1, role, user_code, user_name, mobile_no, dateOfJoining, user_address,sales_assistan_name, sales_assistan_mobile_no, bank_name, account_number, ifsc_code, branch_name } = req.body;
     let errors = [];
-	console.log(req.body);
 	
 	// console.log(req.body,req.files?.aadhaarFile,req.files?.panFile);
     // // Check required fields
