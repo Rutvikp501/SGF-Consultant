@@ -7,9 +7,10 @@ const userSchema = new mongoose.Schema({
 	email_id: { type: String, required: true, unique: true },
 	password: { type: String, required: true },
 	role: { type: String, required: true },
-	address: { type: String, required: true },
+	user_address: { type: String,},
 	profilePicture: { type: String },
 	dateOfJoining: { type: Date,  },
+	subscriptionDate: { type: Date, default: new Date() },
 	cycle: {
 		label: { type: String },
 		number: { type: Number }

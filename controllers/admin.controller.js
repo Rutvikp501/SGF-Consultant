@@ -292,7 +292,6 @@ exports.Update = async (req, res) => {
         return res.status(400).send({ message: valid[0] })
     }
     try {
-
         if (getExistingUser != "") {
             return res.send({ success: "failed", message: "Email already exist." });
         } else {

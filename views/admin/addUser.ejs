@@ -50,13 +50,17 @@
                     </label>
 
                     <label>
-                        <select class="input" name="role" id="role">
+                        <select class="input" name="role" id="role" required>
                             <option value="" disabled selected>Select User Type</option>
                             <option value="consultant">Consultant</option>
                             <option value="admin">Admin</option>
                             <option value="partners">Partners</option>
                         </select>
                         <span>Signup as</span>
+                    </label>
+                    <label>
+                        <input type="text" name="user_address" class="input" id="user-address" value="<%= typeof user_address != 'undefined' ? user_address : '' %>" >
+                        <span>Address</span>
                     </label>
                 </div>
             </div>
@@ -91,12 +95,12 @@
                 <h3>Document Upload</h3>
                 <div class="gridf">
                     <label>
-                        <input type="file" name="aadhaarFile" class="input" accept="image/*,application/pdf" required>
+                        <input type="file" name="aadhaarFile" class="input" accept="image/*,application/pdf" >
                         <span>Upload Aadhaar Photo</span>
                     </label>
 
                     <label>
-                        <input type="file" name="panFile" class="input" accept="image/*,application/pdf" required>
+                        <input type="file" name="panFile" class="input" accept="image/*,application/pdf" >
                         <span>Upload PAN Photo</span>
                     </label>
                 </div>
@@ -107,22 +111,22 @@
                 <h3>Bank Details</h3>
                 <div class="gridf">
                     <label>
-                        <input type="text" name="bank_name" class="input" id="bank-name" value="<%= typeof bank_name != 'undefined' ? bank_name : '' %>" required>
+                        <input type="text" name="bank_name" class="input" id="bank-name" value="<%= typeof bank_name != 'undefined' ? bank_name : '' %>" >
                         <span>Bank Name</span>
                     </label>
 
                     <label>
-                        <input type="text" name="account_number" class="input" id="account-number" value="<%= typeof account_number != 'undefined' ? account_number : '' %>" required>
+                        <input type="text" name="account_number" class="input" id="account-number" value="<%= typeof account_number != 'undefined' ? account_number : '' %>" >
                         <span>Account Number</span>
                     </label>
 
                     <label>
-                        <input type="text" name="ifsc_code" class="input" id="ifsc-code" value="<%= typeof ifsc_code != 'undefined' ? ifsc_code : '' %>" required>
+                        <input type="text" name="ifsc_code" class="input" id="ifsc-code" value="<%= typeof ifsc_code != 'undefined' ? ifsc_code : '' %>" >
                         <span>IFSC Code</span>
                     </label>
 
                     <label>
-                        <input type="text" name="branch_name" class="input" id="branch-name" value="<%= typeof branch_name != 'undefined' ? branch_name : '' %>" required>
+                        <input type="text" name="branch_name" class="input" id="branch-name" value="<%= typeof branch_name != 'undefined' ? branch_name : '' %>" >
                         <span>Branch Name</span>
                     </label>
                 </div>

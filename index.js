@@ -71,17 +71,4 @@ const port = process.env.PORT;
 app.listen(port, console.log(`Server is running at http://localhost:${port}`));
 
 
-
-// PORT = 5001
-// #MONGO_URI='mongodb+srv://patilrutvik501:patilrutvik501@smallprojects.1bzonhg.mongodb.net/'
-// MONGO_URI='mongodb://127.0.0.1:27017/SGFDATABASE1'
-// token="R@U#V$I%K&",
-// USERS=rutvik.gainn@gmail.com
-// APP_PASS=uxzc tuzs dlkq awvw
-// RUTVIK=patilrutvik501@gmail.com
-// RAPP_PASS=mnzt tvan wirp byum
-// cloudinary_name=delhmpkrr
-// cloudinary_key	=597523488622468
-// cloudinary_secret	=597523488622468
-// cloudinary_env_variable=_QefFlpdSIFThBUc6zPTv7D-b90
-// CLOUDINARY_URL=cloudinary://597523488622468:_QefFlpdSIFThBUc6zPTv7D-b90@delhmpkrr	
+	

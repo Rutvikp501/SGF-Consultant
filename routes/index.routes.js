@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const leadController = require('../controllers/lead.controller');
-const Admin  = require('../controllers/admin.controler');
+const Admin  = require('../controllers/admin.controller');
 const bitrix = require('../utility/bitrix');
 
 

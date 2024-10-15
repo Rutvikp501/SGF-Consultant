@@ -44,13 +44,13 @@ const upload = multer({
 
 router.get("/admin/dashboard", middleware.ensureAdminLoggedIn, async (req, res) => {
 	const numAdmins = await UserModel.countDocuments({ role: "admin" });
-	const numAgents = await UserModel.countDocuments({ role: "consultant" });
+	const numconsultant = await UserModel.countDocuments({ role: "consultant" });
 	const numPendingLeads = await LeadModel.countDocuments({ status: "Pending" });
 	const numConvertedLeads = await LeadModel.countDocuments({ status: "Converted" });
 	const numJunkLeads = await LeadModel.countDocuments({ status: "Junk" });
 	res.render("admin/dashboard", {
 		title: "Dashboard",
-		numAdmins, numAgents, numPendingLeads, numConvertedLeads, numJunkLeads,
+		numAdmins, numconsultant, numPendingLeads, numConvertedLeads, numJunkLeads,
 	});
 });
 
@@ -227,8 +227,8 @@ router.get("/admin/admins", middleware.ensureAdminLoggedIn, async (req, res) => 
 
 router.get("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) => {
 	try {
-		const agents = await UserModel.find({ role: "agent" });
-		res.render("admin/addUser", { title: "List of agents", agents });
+		const users = await UserModel.find();
+		res.render("admin/addUser", { title: "List of users",  users});
 	}
 	catch (err) {
 		console.log(err);
@@ -239,9 +239,11 @@ router.get("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) =>
 
 });
 
-router.post("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) => {
-    const { email_id, password1, role, user_code, user_name, mobile_no, dateOfJoining, sales_assistan_name, sales_assistan_mobile_no, bank_name, account_number, ifsc_code, branch_name } = req.body;
+router.post("/admin/addUser", middleware.ensureAdminLoggedIn,upload, async (req, res) => {
+    const { email_id, password1, role, user_code, user_name, mobile_no, dateOfJoining, user_address,sales_assistan_name, sales_assistan_mobile_no, bank_name, account_number, ifsc_code, branch_name } = req.body;
     let errors = [];
+	console.log(req.body);
+	
 	// console.log(req.body,req.files?.aadhaarFile,req.files?.panFile);
     // // Check required fields
     if (!email_id || !password1 || !user_code || !user_name || !mobile_no || !dateOfJoining) {
@@ -252,9 +254,9 @@ router.post("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) =
     //     errors.push({ msg: "Password length should be at least 4 characters" });
     // }
 
-    if (!bank_name || !account_number || !ifsc_code || !branch_name) {
-        errors.push({ msg: "Please fill in all bank details" });
-    }
+    // if (!bank_name || !account_number || !ifsc_code || !branch_name) {
+    //     errors.push({ msg: "Please fill in all bank details" });
+    // }
 
     // If there are errors, re-render the form with error messages
     if (errors.length > 0) {
@@ -298,6 +300,7 @@ router.post("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) =
             role: role,
             password: hash,
             dateOfJoining: date,
+            user_address: user_address,
             sales_assistan: {
                 name: sales_assistan_name || null,
                 mobile_no: sales_assistan_mobile_no || null,
@@ -315,7 +318,7 @@ router.post("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) =
         });
 
         await newUser.save();
-        await Consultant_Wellcome(newUser, password1); // Send welcome email
+        await Consultant_Wellcome(newUser, password1,role); // Send welcome email
         req.flash("success", "User successfully added");
         res.redirect("/admin/consultants");
 
