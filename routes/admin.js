@@ -6,41 +6,12 @@ const UserModel = require("../models/user.js");
 const LeadModel = require("../models/lead.models.js");
 const ConvertedLeadModel = require("../models/convertedLead.model.js");
 const JunkLeadModel = require("../models/junkLead.model.js");
+const packagesModel = require("../models/packages.model.js");
 const { calculateCycle, } = require("../helpers/sample.js");
-
 const { Consultant_Wellcome } = require("../utility/email.util.js");
 const { addLead } = require("../controllers/lead.controller.js");
-const packagesModel = require("../models/packages.model.js");
-const multer = require('multer');
-const path = require('path');
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/'); // Specify the directory to store uploaded files
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`); // Add a timestamp to prevent overwriting files
-    }
-});
+const { cloudinaryUpload } = require('../config/cloudinary');
 
-// Filter files (optional, ensures only image or PDF files are accepted)
-const fileFilter = (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    if (ext === '.png' || ext === '.jpg' || ext === '.jpeg' || ext === '.pdf') {
-        cb(null, true); // Accept the file
-    } else {
-        cb(new Error('Only images and PDFs are allowed!'), false); // Reject the file
-    }
-};
-
-// Configure multer for handling file uploads
-const upload = multer({
-    storage: storage,
-    limits: { fileSize: 1024 * 1024 * 10 }, // Limit file size to 10MB
-}).fields([
-    { name: 'profileFile', maxCount: 1 },      // For profile file (image/pdf)
-    { name: 'aadhaarFile', maxCount: 1 },      // For Aadhaar file (image/pdf)
-    { name: 'panFile', maxCount: 1 }           // For PAN file (image/pdf)
-]);
 
 router.get("/admin/dashboard", middleware.ensureAdminLoggedIn, async (req, res) => {
 	const numAdmins = await UserModel.countDocuments({ role: "admin" });
@@ -239,23 +210,17 @@ router.get("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) =>
 
 });
 
-router.post("/admin/addUser", middleware.ensureAdminLoggedIn,upload, async (req, res) => {
-    const { email_id, password1, role, user_code, user_name, mobile_no, dateOfJoining, user_address,sales_assistan_name, sales_assistan_mobile_no, bank_name, account_number, ifsc_code, branch_name } = req.body;
+
+// Controller to handle adding a new user and uploading files to Cloudinary
+router.post("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) => {
+    const { email_id, password1, role, user_code, user_name, mobile_no, dateOfJoining, user_address, sales_assistan_name, sales_assistan_mobile_no, bank_name, account_number, ifsc_code, branch_name } = req.body;
     let errors = [];
-	
-	// console.log(req.body,req.files?.aadhaarFile,req.files?.panFile);
-    // // Check required fields
+console.log(req.body);
+
+    // Check required fields
     if (!email_id || !password1 || !user_code || !user_name || !mobile_no || !dateOfJoining) {
         errors.push({ msg: "Please fill in all the fields" });
     }
-
-    // if (password1.length < 4) {
-    //     errors.push({ msg: "Password length should be at least 4 characters" });
-    // }
-
-    // if (!bank_name || !account_number || !ifsc_code || !branch_name) {
-    //     errors.push({ msg: "Please fill in all bank details" });
-    // }
 
     // If there are errors, re-render the form with error messages
     if (errors.length > 0) {
@@ -290,36 +255,55 @@ router.post("/admin/addUser", middleware.ensureAdminLoggedIn,upload, async (req,
         const date = new Date(dateOfJoining); // Parse date string
         const { cycleLabel, cycleNumber } = calculateCycle(date);
 
-        // Create new user
-        const newUser = new UserModel({
-            code: user_code,
-            name: user_name,
-            email_id: email_id,
-            mobile_no: mobile_no,
-            role: role,
-            password: hash,
-            dateOfJoining: date,
-            user_address: user_address,
-            sales_assistan: {
-                name: sales_assistan_name || null,
-                mobile_no: sales_assistan_mobile_no || null,
-            },
-            user_bank_details: {
-                bank_name: bank_name || null,
-                account_number: account_number || null,
-                ifsc_code: ifsc_code || null,
-                branch_name: branch_name || null,
-            },
-            currentcycle: { label: cycleLabel, number: cycleNumber },
-            profileFile: req.files.profileFile ? req.files.profileFile[0].filename : null, // Store the profile file
-            aadhaarFile: req.files.aadhaarFile ? req.files.aadhaarFile[0].filename : null, // Store the Aadhaar file
-            panFile: req.files.panFile ? req.files.panFile[0].filename : null // Store the PAN file
-        });
+        // Use Cloudinary's upload.fields to handle multiple files
+        const upload = await cloudinaryUpload();
 
-        await newUser.save();
-        await Consultant_Wellcome(newUser, password1,role); // Send welcome email
-        req.flash("success", "User successfully added");
-        res.redirect("/admin/consultants");
+        upload.fields([
+            { name: 'profilephoto', maxCount: 1 },
+            { name: 'panphoto', maxCount: 1 },
+            { name: 'adharphoto', maxCount: 1 }
+        ])(req, res, async (err) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).send('Error uploading images.');
+            }
+
+            // Get Cloudinary URLs of the uploaded images
+            const profilePhotoUrl = req.files.profilephoto ? req.files.profilephoto[0].path : null;
+            const panPhotoUrl = req.files.panphoto ? req.files.panphoto[0].path : null;
+            const adharPhotoUrl = req.files.adharphoto ? req.files.adharphoto[0].path : null;
+
+            // Create new user with uploaded file URLs
+            const newUser = new UserModel({
+                code: user_code,
+                name: user_name,
+                email_id: email_id,
+                mobile_no: mobile_no,
+                role: role,
+                password: hash,
+                dateOfJoining: date,
+                user_address: user_address,
+                sales_assistan: {
+                    name: sales_assistan_name || null,
+                    mobile_no: sales_assistan_mobile_no || null,
+                },
+                user_bank_details: {
+                    bank_name: bank_name || null,
+                    account_number: account_number || null,
+                    ifsc_code: ifsc_code || null,
+                    branch_name: branch_name || null,
+                },
+                currentcycle: { label: cycleLabel, number: cycleNumber },
+                profileFile: profilePhotoUrl,
+                aadhaarFile: adharPhotoUrl,
+                panFile: panPhotoUrl
+            });
+
+            await newUser.save();
+            await Consultant_Wellcome(newUser, password1, role); // Send welcome email
+            req.flash("success", "User successfully added");
+            res.redirect("/admin/consultants");
+        });
 
     } catch (err) {
         console.log(err);
@@ -327,6 +311,7 @@ router.post("/admin/addUser", middleware.ensureAdminLoggedIn,upload, async (req,
         res.redirect("back");
     }
 });
+
 
 
 

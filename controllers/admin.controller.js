@@ -7,33 +7,7 @@ const Enc_Dec = require('../helpers/Enc_Dec');
 const validatePassword = require('../helpers/PassValidation');
 const { SendOTP } = require('../helpers/email');
 const bcrypt = require("bcryptjs");
-const cloudinary = require('../config/cloudinary');
-const multer = require('multer');
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/'); // Specify the directory to store uploaded files
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`); // Add a timestamp to prevent overwriting files
-    }
-});
 
-// Filter files (optional, ensures only image or PDF files are accepted)
-const fileFilter = (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    if (ext === '.png' || ext === '.jpg' || ext === '.jpeg' || ext === '.pdf') {
-        cb(null, true); // Accept the file
-    } else {
-        cb(new Error('Only images and PDFs are allowed!'), false); // Reject the file
-    }
-};
-
-// Configure multer for handling file uploads
-const upload = multer({
-    storage: storage,
-    limits: { fileSize: 1024 * 1024 * 10 }, // Limit file size to 10MB
-    fileFilter: fileFilter
-});
 exports.GetAllUser = async (req, res) => {
     try {
         const User = await UserModel.find();
