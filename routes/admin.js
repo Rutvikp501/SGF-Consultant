@@ -291,18 +291,18 @@ const newUser = new UserModel({
 		  branch_name: branch_name || null,
 		},
 		currentcycle: { label: cycleLabel, number: cycleNumber },
-		profileFile: profilePhotoUrl,
-		aadhaarFile: adharPhotoUrl,
-		panFile: panPhotoUrl
+		// profileFile: profilePhotoUrl,
+		// aadhaarFile: adharPhotoUrl,
+		// panFile: panPhotoUrl
 	  });
   
-	  console.log(newUser);
+	//   console.log(newUser);
   
-	  // Save the new user to the database
-	  //await newUser.save();
+	  //Save the new user to the database
+	  await newUser.save();
   
-	  // Send welcome email
-	  // await Consultant_Wellcome(newUser, password1, role);
+	  //Send welcome email
+	  await Consultant_Wellcome(newUser, password1, role);
   
 	  // Send success message
 	  req.flash("success", "User successfully added");
