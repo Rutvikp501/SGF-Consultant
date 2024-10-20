@@ -9,8 +9,6 @@ async function Consultant_Wellcome(EmailData, password1) {
         host: 'smtp.gmail.com',
         port: 587,
         auth: {
-            // user: process.env.RUTVIK,
-            // pass: process.env.RAPP_PASS
             user: process.env.USERS,
             pass: process.env.APP_PASS
         },
@@ -22,6 +20,8 @@ async function Consultant_Wellcome(EmailData, password1) {
     let htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
     htmlTemplate = htmlTemplate
         .replace('{{name}}', EmailData.name)
+        .replace('{{name}}', EmailData.name)
+        .replace('{{name}}', EmailData.name)
         .replace('{{user_code}}', EmailData.code)
         .replace('{{email_id}}', EmailData.email_id)
         .replace('{{password}}', password1)
@@ -30,10 +30,10 @@ async function Consultant_Wellcome(EmailData, password1) {
         .replace('{{sales_assistan_mobile_no}}', EmailData.sales_assistan.mobile_no || 'N/A');
 
     const mailOptions = {
-        from: 'Swaptography Management <your-email@gmail.com>',  
+        from: 'Swaptography Management',  
         //to: 'patilrutvik501@gmail.com',
         to: EmailData.email_id,
-        subject: `Welcome to Swaptography, ${EmailData.name}!`,
+        subject: `Welcome to SwaptoGraphy Consultant Family – Registration Successful`,
         html: htmlTemplate,
     };
 

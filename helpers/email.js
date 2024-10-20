@@ -7,10 +7,10 @@ async function SendOTP( Email,otp) {
         host: 'smtp.gmail.com',
         port: 587,
         auth: {
-            // user: process.env.RUTVIK,
-            // pass: process.env.RAPP_PASS
-            user: process.env.USERS,
-            pass: process.env.APP_PASS
+            user: process.env.swap,
+            pass: process.env.swap_pass
+            // user: process.env.USERS,
+            // pass: process.env.APP_PASS
         },
         tls: { rejectUnauthorized: false },
 

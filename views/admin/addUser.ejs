@@ -58,6 +58,26 @@
                         </select>
                         <span>Signup as</span>
                     </label>
+                    <label>
+                        <input type="file" name="profilephoto" id="profilephoto" accept="image/*" ><br><br>
+                        <span>Profile Photo</span>
+                    </label>
+                    <label>
+                        <input type="text" name="user_city" class="input" id="user-city" value="<%= typeof user_city != 'undefined' ? user_city : '' %>" >
+                        <span>City</span>
+                    </label>
+                    <label>
+                        <input type="text" name="user_pincode" class="input" id="user-address" value="<%= typeof user_pincode != 'undefined' ? user_pincode : '' %>" >
+                        <span>Pincode</span>
+                    </label>
+                    <label>
+                        <input type="file" name="panphoto" id="panphoto" accept="image/*" ><br><br>
+                        <span>PAN Photo</span>
+                    </label>
+                    <label>
+                        <input type="file" name="adharphoto" id="adharphoto" accept="image/*" ><br><br>
+                        <span>Aadhaar Photo</span>
+                    </label>
                 </div>
             </div>
 
@@ -103,15 +123,8 @@
                     </label>
 
                 </div>
-            <!-- </div>
-            <label for="profilephoto">Upload Profile Photo:</label>
-            <input type="file" name="profilephoto" id="profilephoto" accept="image/*" required><br><br>
-        
-            <label for="panphoto">Upload PAN Photo:</label>
-            <input type="file" name="panphoto" id="panphoto" accept="image/*" required><br><br>
-        
-            <label for="adharphoto">Upload Aadhaar Photo:</label>
-            <input type="file" name="adharphoto" id="adharphoto" accept="image/*" required><br><br> -->
+             </div>
+
             <button type="submit" class="submit d-block m-auto mt-4">Submit</button>
         </form>
 

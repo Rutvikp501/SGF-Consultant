@@ -6,12 +6,11 @@ const UserModel = require("../models/user.js");
 const LeadModel = require("../models/lead.models.js");
 const ConvertedLeadModel = require("../models/convertedLead.model.js");
 const JunkLeadModel = require("../models/junkLead.model.js");
-const packagesModel = require("../models/packages.model.js");
 const { calculateCycle, } = require("../helpers/sample.js");
 const { Consultant_Wellcome } = require("../utility/email.util.js");
 const { addLead } = require("../controllers/lead.controller.js");
-const { cloudinaryUpload } = require('../config/cloudinary');
-
+const packagesModel = require("../models/packages.model.js");
+const { cloudinaryUpload } = require("../config/cloudinary.js");
 
 router.get("/admin/dashboard", middleware.ensureAdminLoggedIn, async (req, res) => {
 	const numAdmins = await UserModel.countDocuments({ role: "admin" });
@@ -199,7 +198,7 @@ router.get("/admin/admins", middleware.ensureAdminLoggedIn, async (req, res) => 
 router.get("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) => {
 	try {
 		const users = await UserModel.find();
-		res.render("admin/addUser", { title: "List of users", users });
+		res.render("admin/addUser", { title: "List of users",  users});
 	}
 	catch (err) {
 		console.log(err);
@@ -211,106 +210,120 @@ router.get("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) =>
 });
 
 
+// Add User Route
 router.post("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) => {
-	
+	console.log(req.body);
+  
 	const {
-		email_id, password1, role, user_code, user_name, mobile_no, dateOfJoining,
-		user_address, sales_assistan_name, sales_assistan_mobile_no, bank_name,
-		account_number, ifsc_code, branch_name
-	  } = req.body;
-	  let errors = [];
-	  let profilePhotoUrl ;
-	  let panPhotoUrl ;
-	  let adharPhotoUrl  ;
-	  if (!email_id || !password1 || !user_code || !user_name || !mobile_no || !dateOfJoining) {
-		errors.push({ msg: "Please fill in all the fields" });
-	  }
-	  // If there are errors, re-render the form with error messages
+	  email_id, password1, role, user_code, user_name, mobile_no, dateOfJoining,
+	  user_city, user_pincode, sales_assistan_name, sales_assistan_mobile_no, bank_name,
+	  account_number, ifsc_code, branch_name
+	} = req.body;
+  
+	let errors = [];
+	let profilePhotoUrl, panPhotoUrl, adharPhotoUrl;
+  
+	if (!email_id || !password1 || !user_code || !user_name || !mobile_no || !dateOfJoining) {
+	  errors.push({ msg: "Please fill in all the fields" });
+	}
+  
+	// If there are errors, re-render the form with error messages
 	if (errors.length > 0) {
+	  return res.render("admin/addUser", {
+		title: "Add User",
+		errors, email_id, password1, user_code, user_name, mobile_no, dateOfJoining
+	  });
+	}
+  
+	try {
+	  const getExistingUser = await UserModel.findOne({ email_id });
+	  const duplicateCode = await UserModel.findOne({ code: user_code });
+  
+	  if (getExistingUser) {
+		errors.push({ msg: "This Email is already registered. Please try another email." });
 		return res.render("admin/addUser", {
 		  title: "Add User",
 		  errors, email_id, password1, user_code, user_name, mobile_no, dateOfJoining
 		});
 	  }
-	try {
-		const getExistingUser = await UserModel.findOne({ email_id });
-		const duplicateCode = await UserModel.findOne({ code: user_code });
-
-		if (getExistingUser) {
-			errors.push({ msg: "This Email is already registered. Please try another email." });
-			return res.render("admin/addUser", {
-			  title: "Add User",
-			  errors, email_id, password1, user_code, user_name, mobile_no, dateOfJoining
-			});
-		  }
-	  
-		  if (duplicateCode) {
-			return res.status(400).send({ success: "failed", message: "User code already exists." });
-		  }
-	  
-		  // Encrypt the password
-		  const salt = bcrypt.genSaltSync(10);
-		  const hash = bcrypt.hashSync(password1, salt);
-	 
-		   // Calculate cycle
-	  const date = new Date(dateOfJoining); // Parse date string
-	  const { cycleLabel, cycleNumber } = calculateCycle(date);
-
-
-		// const upload = await cloudinaryUpload();
-		// upload.fields([
-		//   { name: 'profilephoto', maxCount: 1 },
-		//   { name: 'panphoto', maxCount: 1 },
-		//   { name: 'adharphoto', maxCount: 1 }
-		// ])(req, res, (err) => {
-		//   if (err) {
-		// 	return res.status(500).send('Error uploading images.');
-		//   }
-		//    profilePhotoUrl = req.files.profilephoto ? req.files.profilephoto[0].path : null;
-		//    panPhotoUrl = req.files.panphoto ? req.files.panphoto[0].path : null;
-		//    adharPhotoUrl = req.files.adharphoto ? req.files.adharphoto[0].path : null;
-		// });
-
-const newUser = new UserModel({
-		code: user_code,
-		name: user_name,
-		email_id,
-		mobile_no,
-		role,
-		password: hash,
-		dateOfJoining: date,
-		user_address,
-		sales_assistan: {
-		  name: sales_assistan_name || null,
-		  mobile_no: sales_assistan_mobile_no || null,
-		},
-		user_bank_details: {
-		  bank_name: bank_name || null,
-		  account_number: account_number || null,
-		  ifsc_code: ifsc_code || null,
-		  branch_name: branch_name || null,
-		},
-		currentcycle: { label: cycleLabel, number: cycleNumber },
-		// profileFile: profilePhotoUrl,
-		// aadhaarFile: adharPhotoUrl,
-		// panFile: panPhotoUrl
-	  });
   
-	//   console.log(newUser);
-  
-	  //Save the new user to the database
-	  await newUser.save();
-  
-	  //Send welcome email
-	  await Consultant_Wellcome(newUser, password1, role);
-  
-	  // Send success message
-	  req.flash("success", "User successfully added");
-	  res.redirect("/admin/consultants");
-	  } catch (err) {
-		console.error(err);
-		res.status(500).send('Failed to upload images.');
+	  if (duplicateCode) {
+		return res.status(400).send({ success: "failed", message: "User code already exists." });
 	  }
+  
+	  // Use the Cloudinary upload
+	  const upload = await cloudinaryUpload();
+  
+	  // Upload files (profilephoto, panphoto, adharphoto)
+	  upload.fields([
+		{ name: 'profilephoto', maxCount: 1 },
+		{ name: 'panphoto', maxCount: 1 },
+		{ name: 'adharphoto', maxCount: 1 }
+	  ])(req, res, async (err) => {
+		if (err) {
+		  console.error('Error uploading images:', err);
+		  return res.status(500).send({ success: "failed", message: 'Error uploading images.' });
+		}
+  
+		// Access Cloudinary URLs of the uploaded images
+		profilePhotoUrl = req.files.profilephoto ? req.files.profilephoto[0].path : null;
+		panPhotoUrl = req.files.panphoto ? req.files.panphoto[0].path : null;
+		adharPhotoUrl = req.files.adharphoto ? req.files.adharphoto[0].path : null;
+  
+		// Encrypt the password
+		const salt = bcrypt.genSaltSync(10);
+		const hash = bcrypt.hashSync(password1, salt);
+  
+		// Calculate cycle
+		const date = new Date(dateOfJoining); // Parse date string
+		const { regular, seasonal } = calculateCycle(date);
+  
+		// Create new user
+		const newUser = new UserModel({
+		  code: user_code,
+		  name: user_name,
+		  email_id: email_id,
+		  mobile_no: mobile_no,
+		  role: role,
+		  password: hash,
+		  dateOfJoining: date,
+		  city: user_city,
+		  pincode: user_pincode,
+		  sales_assistan: {
+			name: sales_assistan_name || null,
+			mobile_no: sales_assistan_mobile_no || null,
+		  },
+		  user_bank_details: {
+			bank_name: bank_name || null,
+			account_number: account_number || null,
+			ifsc_code: ifsc_code || null,
+			branch_name: branch_name || null,
+		  },
+		  currentcycle: {  
+			regular: { label: regular.cycleLabel, number: regular.cycleNumber },
+			seasonal: { label: seasonal.cycleLabel, number: seasonal.cycleNumber }
+		  },
+		  profileFile: profilePhotoUrl, // Store the profile photo URL
+		  aadhaarFile: adharPhotoUrl,  // Store the Aadhaar photo URL
+		  panFile: panPhotoUrl        // Store the PAN photo URL
+		});
+  
+		console.log(newUser);
+  
+		// Save the new user to the database
+		//await newUser.save();
+  
+		// Optionally, send welcome email
+		// await Consultant_Wellcome(newUser, password1, role);
+  
+		req.flash("success", "User successfully added");
+		res.redirect("/admin/consultants");
+	  });
+	} catch (err) {
+	  console.error(err);
+	  req.flash("error", "Some error occurred on the server.");
+	  res.redirect("back");
+	}
   });
   
 

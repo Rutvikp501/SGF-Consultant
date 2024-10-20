@@ -16,16 +16,29 @@ const parseDate = (dateString) => {
 
 const calculateCycle = () => {
   const date = new Date();
-  const startDate = new Date(date.getFullYear(), 0, 1);  // Start of the year
-  const days = Math.floor((date - startDate) / (24 * 60 * 60 * 1000));  // Days since start of the year
+  const startDate = new Date(date.getFullYear(), 0, 1); // Start of the year
+  const days = Math.floor((date - startDate) / (24 * 60 * 60 * 1000)); // Days since start of the year
 
-  // Calculate the cycle number (each cycle is 60 days)
-  const cycleNumber = Math.ceil((days + 1) / 60);  // Adding 1 to include the start of the first cycle in day count
+  // Calculate the regular cycle number (each cycle is 60 days)
+  const regularCycleNumber = Math.ceil((days + 1) / 60); // Regular cycles are in 60-day intervals
+  const regularCycleLabel = String.fromCharCode(64 + regularCycleNumber); // ASCII 'A' = 65, 'B' = 66, etc.
 
-  // Ensure cycle number falls within a reasonable range (e.g., 1-6)
-  const cycleLabel = String.fromCharCode(64 + cycleNumber);  // ASCII 'A' starts at 65, 'B' at 66, etc.
+  // Seasonal cycle based on months
+  const month = date.getMonth() + 1;
+  let seasonalCycleLabel = '';
+  let seasonalCycleNumber = 0;
 
-  return { cycleLabel: cycleLabel, cycleNumber: cycleNumber };
+  if (month <= 2) { seasonalCycleLabel = 'A'; seasonalCycleNumber = 1; } // January-February
+  else if (month <= 4) { seasonalCycleLabel = 'B'; seasonalCycleNumber = 2; } // March-April
+  else if (month <= 6) { seasonalCycleLabel = 'C'; seasonalCycleNumber = 3; } // May-June
+  else if (month <= 8) { seasonalCycleLabel = 'D'; seasonalCycleNumber = 4; } // July-August
+  else if (month <= 10) { seasonalCycleLabel = 'E'; seasonalCycleNumber = 5; } // September-October
+  else { seasonalCycleLabel = 'F'; seasonalCycleNumber = 6; } // November-December
+
+  return {
+    regular: { cycleLabel: regularCycleLabel, cycleNumber: regularCycleNumber, year: date.getFullYear() },
+    seasonal: { cycleLabel: seasonalCycleLabel, cycleNumber: seasonalCycleNumber, year: date.getFullYear() }
+  };
 };
 const calculateLeadCycle = (leadType, eventDate) => {
   
