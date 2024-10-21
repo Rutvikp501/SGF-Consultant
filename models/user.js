@@ -7,13 +7,13 @@ const userSchema = new mongoose.Schema({
 	email_id: { type: String, required: true, unique: true },
 	password: { type: String, required: true },
 	role: { type: String, required: true },
-	pincode: { type: String },
-	city: { type: String },
-	profilePicture: { type: String },
+	pincode: { type: String,default: null  },
+	city: { type: String,default: null  },
+	profilePhotoUrl: { type: String, default: null },
 	dateOfJoining: { type: Date },
 	subscriptionDate: { type: Date, default: new Date() },
 	subscriptionExpireDate: { type: Date },
-	cycles: {
+	currentcycle: {
 		regular: {
 			cycleLabel: { type: String },
 			cycleNumber: { type: Number },

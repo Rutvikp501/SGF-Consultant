@@ -1,0 +1,23 @@
+<main>
+    <%- include('../partials/adminSidebar') %>
+
+        <div id="main-wrapper">
+            <p class="title">Add Photos</p>
+
+            <div id="section">
+                <h3>Upload Photos</h3>
+                <form action="/admin/upload-multiple/<%= userId %>" method="POST" enctype="multipart/form-data">
+                    <!-- File upload fields -->
+                    <label for="profilephoto">Upload Profile Photo:</label>
+                    <input type="file" name="profilephoto" id="profilephoto" accept="image/*" required><br><br>
+                
+                    <label for="panphoto">Upload PAN Photo:</label>
+                    <input type="file" name="panphoto" id="panphoto" accept="image/*" required><br><br>
+                
+                    <label for="adharphoto">Upload Aadhaar Photo:</label>
+                    <input type="file" name="adharphoto" id="adharphoto" accept="image/*" required><br><br>
+                
+                    <button type="submit">Upload</button>
+        </div>
+        </div>
+</main>

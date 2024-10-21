@@ -33,6 +33,8 @@ router.delete('/adminapi/delete/:id', Admin.Delete);
 router.post('/adminapi/forgotPassword',Admin.forgotPassword)
 router.post('/adminapi/resetPassword',Admin.resetPassword)
 
+router.get('/exceluserdata',Admin.getuserexcel)
+
 router.post('/bitrix/convertedleads',bitrix.getConvertedLead)
 router.get('/packages', leadController.packages);
 

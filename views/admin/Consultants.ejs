@@ -2,23 +2,37 @@
 	<%- include('../partials/adminSidebar') %>
 	
 	<div id="main-wrapper">
-		
-		<!-- <div class="bg-white shadow-sm p-3">
-			<span class="me-3" id="sidebar-toggler-btn"><i class="fas fa-bars"></i></span>
-			<h5 class="m-0 color-theme d-inline-block">Dashboard</h5>
-		</div> -->
-		
+		<p class="title">Download User Data</p>
+
+		<!-- Filter Form for Download -->
+		<form id="filterForm" class="form-inline">
+			<div class="gridf" style="display: flex; align-items: center; gap: 10px;">
+				<label style="flex-grow: 1;">
+					<input type="text" name="pincode" id="pincode" class="input" placeholder="Enter Pincode">
+					<span>Pincode</span>
+				</label>
+				<label style="flex-grow: 1;">
+					<input type="text" name="city" id="city" class="input" placeholder="Enter City">
+					<span>City</span>
+				</label>
+				<button type="button" id="download-btn" class="submit" style="margin-bottom: 23px;">Download Excel</button>
+			</div>
+			
+		</form>
+
+		<!-- Table Section as before -->
 		<div class="tbl-header" style="max-height: 75%; overflow: auto;">
 			<table  cellpadding="0" cellspacing="0"  border="0">
 				<thead>
 					<tr>
 						<th scope="col">#</th>
-						<th scope="col">code</th>
-						<th scope="col">name</th>
+						<th scope="col">Code</th>
+						<th scope="col">Name</th>
 						<th scope="col">Email</th>
 						<th scope="col">Phone</th>
 						<th scope="col">Join date</th>
 						<th scope="col">Lifetime Cycle</th>
+						<th scope="col">Action</th> <!-- New column for Add/Update Photo -->
 					</tr>
 				</thead>
 			</table>
@@ -35,10 +49,53 @@
 							<td> <%= consultant[i].mobile_no %> </td>
 							<td> <%= consultant[i].dateOfJoining.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short"}) %> </td>
 							<td> <%= consultant[i].consultantLifetimeCycleNumber %> </td>
+							<td>
+								<!-- Add/Update Photo button -->
+								<a href="/admin/upload-multiple/<%= consultant[i]._id %>" class="submit"> Photo</a>
+							</td>
+						</tr>
 					<% } %>
 				</tbody>
 			</table>
 		</div>
-		
 	</div>
+
+	<script>
+		document.getElementById('download-btn').addEventListener('click', function() {
+			// Get the filter values
+			const pincode = document.getElementById('pincode').value;
+			const city = document.getElementById('city').value;
+
+			// Create the query string for the request
+			const queryParams = new URLSearchParams({
+				pincode: pincode,
+				city: city,
+			}).toString();
+
+			// Make a GET request to the API for the Excel download
+			fetch(`/api/exceluserdata?${queryParams}`, {
+				method: 'GET',
+			})
+			.then(response => {
+				if (response.ok) {
+					return response.blob(); // Get the file blob
+				} else {
+					throw new Error('Something went wrong!');
+				}
+			})
+			.then(blob => {
+				// Create a download link for the file
+				const url = window.URL.createObjectURL(new Blob([blob]));
+				const link = document.createElement('a');
+				link.href = url;
+				link.setAttribute('download', 'User_Data.xlsx'); // Set the download file name
+				document.body.appendChild(link);
+				link.click();
+				link.parentNode.removeChild(link); // Remove the link element
+			})
+			.catch(error => {
+				console.error('Error:', error);
+			});
+		});
+	</script>
 </main>

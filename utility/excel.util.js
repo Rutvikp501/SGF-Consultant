@@ -65,4 +65,49 @@ const getCommissionexcel = async (Leads) => {
     }
 };
 
-module.exports = getCommissionexcel;
+const getuserexcel = async (filteredConsultants) => {
+   // console.log(filteredConsultants);
+    
+    try {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Consultants');
+        
+            // Add headers to the worksheet
+            worksheet.columns = [
+                { header: '#', key: 'index', width: 5 },
+                { header: 'Code', key: 'code', width: 10 },
+                { header: 'Name', key: 'name', width: 20 },
+                { header: 'Email', key: 'email_id', width: 30 },
+                { header: 'Phone', key: 'mobile_no', width: 15 },
+                { header: 'Join Date', key: 'dateOfJoining', width: 20 },
+                { header: 'Lifetime Cycle', key: 'consultantLifetimeCycleNumber', width: 20 },
+                { header: 'Pincode', key: 'pincode', width: 10 },
+                { header: 'City', key: 'city', width: 15 }
+            ];
+        
+            // Add data to the worksheet
+            filteredConsultants.forEach((consultant, index) => {
+                worksheet.addRow({
+                    index: index + 1,
+                    code: consultant.code,
+                    name: consultant.name,
+                    email_id: consultant.email_id,
+                    mobile_no: consultant.mobile_no,
+                    dateOfJoining: consultant.dateOfJoining,
+                    consultantLifetimeCycleNumber: consultant.consultantLifetimeCycleNumber,
+                    pincode: consultant.pincode||"",
+                    city: consultant.city||""
+                });
+            });
+        
+            // Write workbook to buffer
+            const buffer = await workbook.xlsx.writeBuffer();
+            return buffer; // Return the buffer
+        }
+   catch (error) {
+        console.error(error);
+        throw new Error('Error generating Excel file: ' + error.message);
+    }}
+
+
+module.exports = {getCommissionexcel,getuserexcel};

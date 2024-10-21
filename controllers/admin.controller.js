@@ -7,6 +7,7 @@ const Enc_Dec = require('../helpers/Enc_Dec');
 const validatePassword = require('../helpers/PassValidation');
 const { SendOTP } = require('../helpers/email');
 const bcrypt = require("bcryptjs");
+const { getuserexcel } = require('../utility/excel.util');
 
 exports.GetAllUser = async (req, res) => {
     try {
@@ -403,5 +404,45 @@ exports.resetPassword = async (req, res) => {
             statusCode: 500,
             message: 'Error  resetting password.'
         });
+    }
+};
+
+exports.getuserexcel = async (req, res, next) => {
+    try {
+        const { pincode, city } = req.query || ''; 
+        const consultants = await UserModel.find({ role: "consultant" });
+        const mobile_no = 8108842956; // mobile number to filter
+        
+        const filteredConsultants = consultants.reduce((acc, consultant) => {
+            if (
+                (!pincode || consultant.pincode === pincode) ||
+                (!mobile_no || (consultant.sales_assistan.mobile_no === mobile_no)) ||
+                (!city || consultant.city === city)
+            ) {
+                acc.push(consultant); // Add matching consultant to the accumulator
+            }
+            return acc; // Return the accumulator for the next iteration
+        }, []);
+        // Log the filtered consultants
+        console.log('Filtered Consultants:', filteredConsultants);
+        
+        
+
+        // Generate Excel file buffer using the searched users
+        const excelBuffer = await getuserexcel(filteredConsultants);
+
+        // Set response headers for file download
+        res.setHeader(
+            'Content-Type',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        );
+        res.setHeader('Content-Disposition', 'attachment; filename=User_Data.xlsx');
+
+        // Send the buffer as a response
+        res.send(excelBuffer);
+
+    } catch (error) {
+        console.log(error);
+        next(error); // Pass the error to the error handling middleware
     }
 };

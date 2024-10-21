@@ -10,9 +10,6 @@
   "email_id": "rutvik72patil@gmail.com",
   "password": "$2a$10$du8c.I8geNGrIIlK2mvP6uEAMBl.e/X2PwHtW7uZlDj5.0viphbP2",
   "role": "consultant",
-  "pincode": "421102",
-  "city": "Ambivli",
-  "profilePhotoUrl": null,
   "dateOfJoining": {
     "$date": "2024-07-04T00:00:00.000Z"
   },
@@ -24,7 +21,6 @@
       "2024-J": 5
     }
   },
-  
   "createdAt": {
     "$date": "2024-09-06T07:04:08.812Z"
   },
@@ -46,17 +42,9 @@
     "regular": 4
   },
   "sales_assistan": {
-    "name": "Swapnil joshi ",
-    "mobile_no": 9137898236
+    "name": "Swapnil joshi",
+    "mobile_no": "8108842956"
   },
-  "user_bank_details": {
-    "bank_name": "testing Bank Name",
-    "account_number": "123 Account Number",
-    "ifsc_code": "1234 IFSC Code",
-    "branch_name": "1233 Branch Name"
-  },
-  "aadhaarPhotoUrl": null,
-  "panPhotoUrl": null,
   "otp": "7203",
   "otpExpires": {
     "$date": "2024-10-17T05:23:29.115Z"
@@ -74,9 +62,6 @@
   "email_id": "patilrutvik501@gmail.com",
   "password": "$2a$10$tNJeTgN3HmMl59Sc3CBaR.n0YEKT1bYz3psyjghQubMsQEXzGTeHK",
   "role": "admin",
-  "pincode": "421102",
-  "city": "Ambivli",
-  "profilePhotoUrl": null,
   "leadsPerCycle": {
     "seasonal": {},
     "regular": {}
@@ -109,9 +94,6 @@
   "email_id": "swaptographymanagement@gmail.com",
   "password": "$2a$10$YRMbi0p0r0nYj18AdBsvJemcBhB5NGmtGSdzh4a786QN8pKViq4hm",
   "role": "admin",
-  "pincode": "421102",
-  "city": "Ambivli",
-  "profilePhotoUrl": null,
   "dateOfJoining": {
     "$date": "2024-09-18T00:00:00.000Z"
   },
@@ -146,9 +128,6 @@
   "email_id": "rutvik.gainn@gmail.com",
   "password": "$2a$10$xkBwJWCtYngnDLuFOJ1eG.SqwcB9y4rf.m2cbw2II9GIX9YZ/XNs.",
   "role": "consultant",
-  "pincode": "421102",
-  "city": "Ambivli",
-  "profilePhotoUrl": null,
   "dateOfJoining": {
     "$date": "2024-09-26T00:00:00.000Z"
   },
@@ -189,9 +168,6 @@
   "email_id": "atishghaytadkar132@gmail.com",
   "password": "$2a$10$u466nSUNeEqerAGdPfa25ewf8yEM8grXbAmdlnGaIusHS4P/5uNxi",
   "role": "consultant",
-  "pincode": "421102",
-  "city": "Ambivli",
-  "profilePhotoUrl": null,
   "dateOfJoining": {
     "$date": "2024-09-28T00:00:00.000Z"
   },
@@ -234,9 +210,7 @@
   "email_id": "swaptography.itteam@gmail.com",
   "password": "$2a$10$VsiJfN1M5Nuj58wkon28DOUv08mE3eDE1OzdekPXG2W9TTJ/GDfg6",
   "role": "consultant",
-  "pincode": "421102",
-  "city": "Ambivli",
-  "profilePhotoUrl": null,
+  "user_address": "kalyan",
   "dateOfJoining": {
     "$date": "2024-10-16T00:00:00.000Z"
   },
@@ -294,7 +268,7 @@
   "role": "consultant",
   "pincode": "421102",
   "city": "Ambivli",
-  "profilePhotoUrl": null,
+  "profilePicture": null,
   "dateOfJoining": {
     "$date": "2024-10-26T00:00:00.000Z"
   },
