@@ -382,9 +382,45 @@ exports.getConvertedLead = async (req, res) => {
     }
 };
 
+exports.updateLeadstage = async () => {
+    try {
 
 
+            return {
+                status: true,
+                statusCode: 200,
+                message: 'Updated lead stage',
+            };
+      
+    } catch (err) {
+        console.error('Error lead stage', err.message);
+        return {
+            status: false,
+            statusCode: 500,
+            error: err.message
+        };
+    }
+}
 
+exports.updateLeadquotation = async () => {
+    try {
+
+
+            return {
+                status: true,
+                statusCode: 200,
+                message: 'Updated lead quotation',
+            };
+      
+    } catch (err) {
+        console.error('Error lead  quotation ', err.message);
+        return {
+            status: false,
+            statusCode: 500,
+            error: err.message
+        };
+    }
+}
 exports.getJunkLeadsLead = async () => {
     try {
         let data = {

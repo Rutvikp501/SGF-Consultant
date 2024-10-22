@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const ConvertedLeadModel = require('../models/convertedLead.model');
 const JunkLeadModel = require('../models/junkLead.model');
 const { bitrixaddLead } = require('../utility/bitrix');
-const getCommissionexcel = require('../utility/excel.util');
+const {getCommissionexcel} = require('../utility/excel.util');
 const packagesModel = require('../models/packages.model');
 const token = process.env.token
 
@@ -415,6 +415,7 @@ exports.getconvertedLeads = async (req, res) => {
         });
     }
 };
+
 exports.getconvertedLeadsCommission = async (req, res) => {
     const authHeader = req.headers.authorization;
     const authtoken = authHeader.split(" ")[1];
@@ -533,7 +534,10 @@ exports.getpendingLeads = async (req, res) => {
     const consultantId = decode.UserId;
     // const decode = req.query
     // const consultantId = decode.consultantId;
-    const pendingLeads = await LeadModel.find({ consultant: consultantId, status: "Pending" }).populate("consultant");
+    const pendingLeads = await LeadModel.find({ consultant: consultantId, status: "Pending" });
+    const RegularLeads = await LeadModel.find({ consultant: consultantId, leadType: "Regular" });
+    const SeasonalLeads = await LeadModel.find({ consultant: consultantId, leadType: "Seasonal" });
+
     try {
         res.send({
             success: true,
@@ -601,6 +605,57 @@ exports.packages = async (req, res, isWebForm = false) => {
         });
     }
 };
+
+exports.updateLeadstage = async (req, res) => {
+    try {
+        const leadId = req.params.leadId;
+        const Leads = await LeadModel.findById(leadId).populate("consultant");
+        let data = {
+            leadId:"",
+            ladId:"",
+            leadId:"",
+        }
+
+        return res.send({
+            success: true,
+            statusCode: 201,
+            message: 'Updated lead stage',
+        });
+      
+    } catch (err) {
+        console.error('Error updating lead stage', err.message);
+        return res.send({
+            success: false,
+            statusCode: 500,
+            message: 'Error updating lead stage'
+        });
+    }
+}
+
+exports.updateLeadquotation = async (req, res) => {
+    try {
+        const leadId = req.params.leadId;
+        const Leads = await LeadModel.findById(leadId).populate("consultant");
+        let data = {
+
+        }
+
+
+        return res.send({
+            success: true,
+            statusCode: 201,
+            message: 'Updated lead quotation',
+        });
+    } catch (err) {
+        console.error('Error updating lead quotation', err.message);
+        return res.send({
+            success: false,
+            statusCode: 500,
+            message: 'Error updating lead quotation'
+        });
+    }
+}
+
 
 const calculateTotals = (leads) => {
     let totalAmount = 0;
