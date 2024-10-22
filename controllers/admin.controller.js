@@ -131,7 +131,8 @@ exports.Login = async (req, res) => {
                         role: user.role,
                         user_code: user.code,
                         user_name: user.name,
-                        email_id: user.email_id
+                        email_id: user.email_id,
+                        profilePhotoUrl: user.profilePhotoUrl
                     };
                     let keyToken = jwt.sign(data, token);
 

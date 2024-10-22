@@ -18,7 +18,10 @@ const calculateCycle = () => {
   const date = new Date();
   const startDate = new Date(date.getFullYear(), 0, 1); // Start of the year
   const days = Math.floor((date - startDate) / (24 * 60 * 60 * 1000)); // Days since start of the year
-
+  
+  const monthNumber = date.getMonth();
+  const year = date.getFullYear();
+  const label = String.fromCharCode(65 + monthNumber);
   // Calculate the regular cycle number (each cycle is 60 days)
   const regularCycleNumber = Math.ceil((days + 1) / 60); // Regular cycles are in 60-day intervals
   const regularCycleLabel = String.fromCharCode(64 + regularCycleNumber); // ASCII 'A' = 65, 'B' = 66, etc.
@@ -36,7 +39,7 @@ const calculateCycle = () => {
   else { seasonalCycleLabel = 'F'; seasonalCycleNumber = 6; } // November-December
 
   return {
-    regular: { cycleLabel: regularCycleLabel, cycleNumber: regularCycleNumber, year: date.getFullYear() },
+    regular: { cycleLabel: label, cycleNumber: monthNumber + 1, year: year },
     seasonal: { cycleLabel: seasonalCycleLabel, cycleNumber: seasonalCycleNumber, year: date.getFullYear() }
   };
 };

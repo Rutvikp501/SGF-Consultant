@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
 	profilePhotoUrl: { type: String, default: null },
 	dateOfJoining: { type: Date },
 	subscriptionDate: { type: Date, default: new Date() },
-	subscriptionExpireDate: { type: Date },
+	subscriptionExpireDate: { type: Date ,default: new Date() },
 	currentcycle: {
 		regular: {
 			cycleLabel: { type: String },

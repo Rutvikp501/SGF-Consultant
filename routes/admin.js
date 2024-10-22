@@ -212,7 +212,6 @@ router.get("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) =>
 
 // Add User Route
 router.post("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) => {
-	console.log(req.body);
   
 	const {
 	  email_id, password1, role, user_code, user_name, mobile_no, dateOfJoining,
@@ -288,7 +287,7 @@ router.post("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) =
   
 	  // Save the new user to the database
 	  await newUser.save();
-  
+	  await Consultant_Wellcome(newUser, password1); 
 	  // Redirect to the upload photos route with the user's ID
 	  req.flash("success", "User successfully added. Please upload photos.");
 	  res.redirect("/admin/consultants");

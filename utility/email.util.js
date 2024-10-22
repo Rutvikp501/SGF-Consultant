@@ -9,8 +9,8 @@ async function Consultant_Wellcome(EmailData, password1) {
         host: 'smtp.gmail.com',
         port: 587,
         auth: {
-            user: process.env.USERS,
-            pass: process.env.APP_PASS
+            user: process.env.SWAP,
+            pass: process.env.SWAP_PASS
         },
         tls: { rejectUnauthorized: false },
         debug: true
@@ -20,12 +20,13 @@ async function Consultant_Wellcome(EmailData, password1) {
     let htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
     htmlTemplate = htmlTemplate
         .replace('{{name}}', EmailData.name)
-        .replace('{{name}}', EmailData.name)
-        .replace('{{name}}', EmailData.name)
         .replace('{{user_code}}', EmailData.code)
         .replace('{{email_id}}', EmailData.email_id)
         .replace('{{password}}', password1)
         .replace('{{role}}', EmailData.role)
+        .replace('{{regular}}', EmailData.currentcycle.regular.cycleLabel)
+        .replace('{{seasonal}}', EmailData.currentcycle.seasonal.cycleLabel)
+        .replace('{{dateOfJoining}}', EmailData.dateOfJoining)
         .replace('{{sales_assistan_name}}', EmailData.sales_assistan.name || 'N/A')
         .replace('{{sales_assistan_mobile_no}}', EmailData.sales_assistan.mobile_no || 'N/A');
 
@@ -33,7 +34,7 @@ async function Consultant_Wellcome(EmailData, password1) {
         from: 'Swaptography Management',  
         //to: 'patilrutvik501@gmail.com',
         to: EmailData.email_id,
-        subject: `Welcome to SwaptoGraphy Consultant Family – Registration Successful`,
+        subject: `CONSULTANT REGISTRATION SUCCEFUL!`,
         html: htmlTemplate,
     };
 

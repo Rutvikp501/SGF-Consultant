@@ -8,16 +8,23 @@
                 <h3>Upload Photos</h3>
                 <form action="/admin/upload-multiple/<%= userId %>" method="POST" enctype="multipart/form-data">
                     <!-- File upload fields -->
-                    <label for="profilephoto">Upload Profile Photo:</label>
-                    <input type="file" name="profilephoto" id="profilephoto" accept="image/*" required><br><br>
-                
-                    <label for="panphoto">Upload PAN Photo:</label>
-                    <input type="file" name="panphoto" id="panphoto" accept="image/*" required><br><br>
-                
-                    <label for="adharphoto">Upload Aadhaar Photo:</label>
-                    <input type="file" name="adharphoto" id="adharphoto" accept="image/*" required><br><br>
-                
-                    <button type="submit">Upload</button>
-        </div>
+                    <div style="flex-direction: column; display: flex;align-items: center;">
+                        <div>
+                            <label class="upload" for="profilephoto">Upload Profile Photo:</label>
+                            <input type="file" name="profilephoto" id="profilephoto" accept="image/*" required><br><br>
+                        </div>
+
+                        <div>
+                            <label class="upload" for="panphoto">Upload PAN Photo:</label>
+                            <input type="file" name="panphoto" id="panphoto" accept="image/*" required><br><br>
+                        </div>
+                        <div>
+                            <label class="upload" for="adharphoto">Upload Aadhaar Photo:</label>
+                            <input type="file" name="adharphoto" id="adharphoto" accept="image/*" required><br><br>
+                        </div>
+                        <button type="submit" class="submit d-block  mt-4">Upload</button>
+                    </div>
+
+            </div>
         </div>
 </main>

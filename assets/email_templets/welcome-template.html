@@ -21,9 +21,18 @@
 </head>
 <body>
     <div>
-        <h2>Welcome to Swaptography, {{name}}!</h2>
-        <p>We are excited to have you join our platform as a {{role}}. Your {{role}} code is: <strong>{{user_code}}</strong>.</p>
-        
+        <h2>Welcome to Swaptography, {{name}}!</h2>     
+        <p>Dear Sir / Ma'am,</p>
+        <p>We are excited to inform you that your registration as a consultant has been successfully completed. Welcome to the Swaptography Events & Films LLP family!</p>
+
+        <p>You are an important part of our company, and your role is key to both your success and ours. We trust you to represent our services with transparency and highlight their true value to your clients.</p>
+
+        <h3>Your Profile Details</h3>
+        <ul>
+            <li><strong>Consultant ID:</strong> {{user_code}}</li>
+            <li><strong>ID Valid Until:</strong> One Year From {{dateOfJoining}}</li>
+            <li><strong>Cycle Start Month:</strong> Seasonal - {{seasonal}} | Regular - {{regular}}</li>
+        </ul>
         <h3>Login Details</h3>
         <p>You can log in to your account using the following credentials:</p>
         <ul>
@@ -31,22 +40,11 @@
             <li><strong>Password:</strong> {{password}}</li>
             <li><strong>Login Link:</strong> <a href="https://swapto-photo.netlify.app" target="_blank">Login to Swaptography</a></li>
         </ul>
-        <!-- <p>Please make sure to change your password upon first login for security reasons.</p> -->
+        <p>Thank you for joining us, and we look forward to working with you!</p>
 
-        <h3>Your Role</h3>
-        <p>Your assigned role is: <strong>{{role}}</strong>.</p>
-        
-        <!-- <h3>Sales Assistant Details</h3>
-        <p>If you need any assistance regarding sales, feel free to reach out to your dedicated Sales Assistant:</p>
-        <ul>
-            <li><strong>Name:</strong> {{sales_assistan_name}}</li>
-            <li><strong>Mobile No:</strong> {{sales_assistan_mobile_no}}</li>
-        </ul> -->
-
-        <p>Thank you for joining Swaptography. We look forward to a fruitful collaboration.</p>
-        
-        <p>Best Regards,</p>
-        <p>The Swaptography Team</p>
+        <p>Best regards,</p>
+        <p>Swaptography Events & Films LLP</p>
+        <p>Contact - 8108842956 (Consultant Coordinator)</p>
     </div>
 </body>
 </html>
