@@ -3,8 +3,10 @@
 const { calculateLeadCycle } = require("../helpers/sample");
 const ConvertedLeadModel = require("../models/convertedLead.model");
 const LeadModel = require("../models/lead.models");
+const axios = require('axios');
+const Bitrixget = process.env.BITRIX_GET_DATA;
 
-const calculateCycleAndLeadNumber = async (data, consultantDetails, leadType) => {
+exports.calculateCycleAndLeadNumber = async (data, consultantDetails, leadType) => {
   const leadCycle = calculateLeadCycle(leadType, new Date());
   const currentYear = new Date().getFullYear();
   const cycleKey = `${currentYear}-${leadCycle.Label}`;
@@ -23,9 +25,8 @@ const calculateCycleAndLeadNumber = async (data, consultantDetails, leadType) =>
 
   return { cycleKey, leadNumber, totalLeadsConverted };
 };
-
 // Commission Calculation
-const calculateCommissionPercentage = (leadNumber, totalLeadsConverted, leadType) => {
+exports.calculateCommissionPercentage = (leadNumber, totalLeadsConverted, leadType) => {
   let commissionPercentage = 2; // Default 2% for all leads
 
   if (leadType === 'Seasonal') {
@@ -58,9 +59,8 @@ const calculateCommissionPercentage = (leadNumber, totalLeadsConverted, leadType
   }
   return commissionPercentage;
 };
-
 // Lead Conversion Process
-const processLeadConversion = async (data, consultantDetails, leadNumber, commissionPercentage, cycleKey, leadType) => {
+exports.processLeadConversion = async (data, consultantDetails, leadNumber, commissionPercentage, cycleKey, leadType) => {
   const { leadID } = data;
 
   // Check if the lead already exists in converted leads
@@ -172,6 +172,70 @@ const processLeadConversion = async (data, consultantDetails, leadNumber, commis
   return convertedLead;
 };
 
+exports.getLeadstage = async () => {
+    console.log("getLeadstage");
+    let ID="10"
+    try {
+      const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: `${Bitrixget}${ID}`,
+        headers: { 
+          'Cookie': 'qmb=0.'
+        }
+      };
+  
+      // Await the axios request
+      const response = await axios.request(config);
+      // Return successful response
+      return {
+        statusCode: 200,
+        status: true,
+        message: "success",
+        data: response.data
+      };
+  
+    } catch (err) {
+      // Log the error message for debugging
+      console.error('Error lead stage:', err.message);
+  
+      // Return error response
+      return {
+        status: false,
+        statusCode: 500,
+        error: err.message
+      };
+    }
+  };
+
+exports.getLeadquotation = async () => {
+    try { 
+        
+        const response = await axios.post(Bitrixget, null, {
+            params: requestBody,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }
+        });
+    return {
+        statusCode: 200,
+        status: true,
+        message: "success",
+        data: response.data
+    };
+      
+    } catch (err) {
+        console.error('Error lead stage', err.message);
+        return {
+            status: false,
+            statusCode: 500,
+            error: err.message
+        };
+    }
+}
+
+
+
 
 const calculateNextCycleStartDate = (leadCycle) => {
   const { startDate } = leadCycle; // Assuming the cycle object has a startDate
@@ -182,5 +246,3 @@ const calculateNextCycleStartDate = (leadCycle) => {
 
   return nextCycleStart;
 };
-
-  module.exports = { calculateCycleAndLeadNumber,calculateCommissionPercentage,processLeadConversion };

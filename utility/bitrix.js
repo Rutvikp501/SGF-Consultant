@@ -4,12 +4,12 @@ const ConvertedLeadModel = require('../models/convertedLead.model');
 const JunkLeadModel = require('../models/junkLead.model');
 const User = require('../models/user');
 const { calculateLeadCycle } = require('../helpers/sample');
-const { calculateCycleAndLeadNumber, calculateCommissionPercentage, processLeadConversion } = require('./querys');
+const { calculateCycleAndLeadNumber, calculateCommissionPercentage, processLeadConversion, getLeadstage } = require('./querys');
 
 exports.bitrixaddLead = async (LeadData) => {
     
     try {
-        const apiUrl = process.env.bitrixaddlead;
+        const apiUrl = process.env.BITRIX_ADD_LEAD;
         //console.log(apiUrl);
 
         // Mapping the LeadData to the requestBody
@@ -382,25 +382,43 @@ exports.getConvertedLead = async (req, res) => {
     }
 };
 
-exports.updateLeadstage = async () => {
+exports.updateLeadstage = async (req, res) => {
     try {
+        let data = req.body;
+        
+        return res.status(200).json({
+            status: true,
+            message: 'Converted lead updated successfully',
+            data: convertedLead,
+        });
 
-
-            return {
-                status: true,
-                statusCode: 200,
-                message: 'Updated lead stage',
-            };
-      
     } catch (err) {
-        console.error('Error lead stage', err.message);
-        return {
+        console.error('Error in getConvertedLead:', err.message);
+        return res.status(500).json({
             status: false,
-            statusCode: 500,
-            error: err.message
-        };
+            error: 'An internal server error occurred: ' + err.message,
+        });
     }
-}
+};
+exports.updateLeadquotation = async (req, res) => {
+    try {
+        let data = req.body;
+        
+        return res.status(200).json({
+            status: true,
+            message: 'Converted lead updated successfully',
+            data: convertedLead,
+        });
+
+    } catch (err) {
+        console.error('Error in getConvertedLead:', err.message);
+        return res.status(500).json({
+            status: false,
+            error: 'An internal server error occurred: ' + err.message,
+        });
+    }
+};
+
 
 exports.updateLeadquotation = async () => {
     try {
@@ -473,6 +491,28 @@ exports.getJunkLeadsLead = async () => {
     }
 }
 
+exports.getdata = async () => {
+    console.log("test getdata");
+    
+    try { 
+        const data = getLeadstage();
+        console.log(data);
+        
+        return res.status(200).json({
+            status: true,
+            message: 'success',
+            data: data.result
+        });
+      
+    } catch (err) {
+        console.error('Error lead stage', err.message);
+        return res.status(500).json({
+            status: false,
+            message: 'failed',
+            error: err.message
+        });
+    }
+}
 const cunvertedleaddata = {
     "consultant": "66ab659fdec07a2c29fd9609",
     "consultant_code": "001",

@@ -48,6 +48,125 @@
 //     }
 //   }
 
+const getdata={
+    "result": {
+        "ID": "82",
+        "TITLE": "Lead Testing",
+        "HONORIFIC": null,
+        "NAME": "Lead Testing",
+        "SECOND_NAME": null,
+        "LAST_NAME": null,
+        "COMPANY_TITLE": null,
+        "COMPANY_ID": null,
+        "CONTACT_ID": null,
+        "IS_RETURN_CUSTOMER": "N",
+        "BIRTHDATE": "",
+        "SOURCE_ID": null,
+        "SOURCE_DESCRIPTION": null,
+        "STATUS_ID": "JUNK",
+        "STATUS_DESCRIPTION": null,
+        "POST": null,
+        "COMMENTS": null,
+        "CURRENCY_ID": "INR",
+        "OPPORTUNITY": "0.00",
+        "IS_MANUAL_OPPORTUNITY": "N",
+        "HAS_PHONE": "Y",
+        "HAS_EMAIL": "Y",
+        "HAS_IMOL": "N",
+        "ASSIGNED_BY_ID": "8",
+        "CREATED_BY_ID": "8",
+        "MODIFY_BY_ID": "1",
+        "DATE_CREATE": "2024-09-10T19:33:39+03:00",
+        "DATE_MODIFY": "2024-09-12T19:57:07+03:00",
+        "DATE_CLOSED": "2024-09-12T00:00:00+03:00",
+        "STATUS_SEMANTIC_ID": "F",
+        "OPENED": "N",
+        "ORIGINATOR_ID": null,
+        "ORIGIN_ID": null,
+        "MOVED_BY_ID": "1",
+        "MOVED_TIME": "2024-09-12T19:57:07+03:00",
+        "ADDRESS": null,
+        "ADDRESS_2": null,
+        "ADDRESS_CITY": null,
+        "ADDRESS_POSTAL_CODE": null,
+        "ADDRESS_REGION": null,
+        "ADDRESS_PROVINCE": null,
+        "ADDRESS_COUNTRY": null,
+        "ADDRESS_COUNTRY_CODE": null,
+        "ADDRESS_LOC_ADDR_ID": null,
+        "UTM_SOURCE": null,
+        "UTM_MEDIUM": null,
+        "UTM_CAMPAIGN": null,
+        "UTM_CONTENT": null,
+        "UTM_TERM": null,
+        "LAST_ACTIVITY_BY": "8",
+        "LAST_ACTIVITY_TIME": "2024-09-10T19:33:39+03:00",
+        "UF_CRM_1722419358464": [],
+        "UF_CRM_1723870968846": "",
+        "UF_CRM_1723870992344": "",
+        "UF_CRM_1723871015696": "",
+        "UF_CRM_1723871043438": "",
+        "UF_CRM_1723871068885": "AMBIVALI",
+        "UF_CRM_1723871299165": "",
+        "UF_CRM_1723871321106": "",
+        "UF_CRM_1723871636157": "2024-09-10T03:00:00+03:00",
+        "UF_CRM_1723871684738": "",
+        "UF_CRM_1723871708430": "",
+        "UF_CRM_1723872311251": "",
+        "UF_CRM_INSTAGRAM_WZ": "",
+        "UF_CRM_VK_WZ": "",
+        "UF_CRM_AVITO_WZ": "",
+        "UF_CRM_TELEGRAMUSERNAME_WZ": "",
+        "UF_CRM_TELEGRAMID_WZ": "",
+        "UF_CRM_1724134367966": "",
+        "UF_CRM_1724134440238": "",
+        "UF_CRM_1724754601811": "",
+        "UF_CRM_1724912062877": "",
+        "UF_CRM_1724912903": false,
+        "UF_CRM_1724913090": [],
+        "UF_CRM_1724929500047": "Regular",
+        "UF_CRM_1725626932463": "1KLY05SWAPNILJOSHI",
+        "UF_CRM_1725627014795": "2024-09-10T03:00:00+03:00",
+        "UF_CRM_1725627051950": "Testing",
+        "UF_CRM_1725627132023": "123123",
+        "UF_CRM_1725957892961": "joshi.swap999@gmail.com",
+        "UF_CRM_1725958005830": "81088429546",
+        "UF_CRM_1725958658829": "1KLY05SWAPNILJOSHI-RE1L2Y24",
+        "UF_CRM_1725961934686": "123123",
+        "UF_CRM_1726161691803": false,
+        "UF_CRM_1726161815933": false,
+        "UF_CRM_1726162680849": "",
+        "UF_CRM_1726651078700": false,
+        "UF_CRM_1726651303165": "",
+        "UF_CRM_1726770095504": "",
+        "PHONE": [
+            {
+                "ID": "166",
+                "VALUE_TYPE": "WORK",
+                "VALUE": "8591575654",
+                "TYPE_ID": "PHONE"
+            }
+        ],
+        "EMAIL": [
+            {
+                "ID": "168",
+                "VALUE_TYPE": "WORK",
+                "VALUE": "rutvik72patil@gmail.com",
+                "TYPE_ID": "EMAIL"
+            }
+        ]
+    },
+    "time": {
+        "start": 1729681752.2603419,
+        "finish": 1729681752.3208289,
+        "duration": 0.060487031936645508,
+        "processing": 0.040335893630981445,
+        "date_start": "2024-10-23T14:09:12+03:00",
+        "date_finish": "2024-10-23T14:09:12+03:00",
+        "operating_reset_at": 1729682352,
+        "operating": 0
+    }
+}
 const LeadData ={
     consultant: new ObjectId("66ab659fdec07a2c29fd9609"),
     consultant_code: '001',
@@ -324,89 +443,19 @@ exports.getconvertedLeads = async (req, res) => {
     }
 };
 
-router.post("/admin/addUser", middleware.ensureAdminLoggedIn, upload, async (req, res) => {
-    const { email_id, password1, role, user_code, user_name, mobile_no, dateOfJoining, sales_assistan_name, sales_assistan_mobile_no, bank_name, account_number, ifsc_code, branch_name } = req.body;
-    let errors = [];
-	// console.log(req.body,req.files?.aadhaarFile,req.files?.panFile);
-    // // Check required fields
-    if (!email_id || !password1 || !user_code || !user_name || !mobile_no || !dateOfJoining) {
-        errors.push({ msg: "Please fill in all the fields" });
-    }
 
-    if (password1.length < 4) {
-        errors.push({ msg: "Password length should be at least 4 characters" });
-    }
-
-    if (!bank_name || !account_number || !ifsc_code || !branch_name) {
-        errors.push({ msg: "Please fill in all bank details" });
-    }
-
-    // If there are errors, re-render the form with error messages
-    if (errors.length > 0) {
-        return res.render("admin/addUser", {
-            title: "Add User",
-            errors, email_id, password1, user_code, user_name, mobile_no, dateOfJoining
-        });
-    }
-
-    try {
-        // Check for existing email and user code
-        const getExistingUser = await UserModel.findOne({ email_id: email_id });
-        const duplicateCode = await UserModel.findOne({ code: user_code });
-
-        if (getExistingUser) {
-            errors.push({ msg: "This Email is already registered. Please try another email." });
-            return res.render("admin/addUser", {
-                title: "Add User",
-                errors, email_id, password1, user_code, user_name, mobile_no, dateOfJoining
-            });
-        }
-
-        if (duplicateCode) {
-            return res.status(400).send({ success: "failed", message: "User code already exists." });
-        }
-
-        // Encrypt the password
-        const salt = bcrypt.genSaltSync(10);
-        const hash = bcrypt.hashSync(password1, salt);
-
-        // Calculate cycle
-        const date = new Date(dateOfJoining); // Parse date string
-        const { cycleLabel, cycleNumber } = calculateCycle(date);
-
-        // Create new user
-        const newUser = new UserModel({
-            code: user_code,
-            name: user_name,
-            email_id: email_id,
-            mobile_no: mobile_no,
-            role: role,
-            password: hash,
-            dateOfJoining: date,
-            sales_assistan: {
-                name: sales_assistan_name || null,
-                mobile_no: sales_assistan_mobile_no || null,
-            },
-            user_bank_details: {
-                bank_name: bank_name || null,
-                account_number: account_number || null,
-                ifsc_code: ifsc_code || null,
-                branch_name: branch_name || null,
-            },
-            currentcycle: { label: cycleLabel, number: cycleNumber },
-            profileFile: req.files.profileFile ? req.files.profileFile[0].filename : null, // Store the profile file
-            aadhaarFile: req.files.aadhaarFile ? req.files.aadhaarFile[0].filename : null, // Store the Aadhaar file
-            panFile: req.files.panFile ? req.files.panFile[0].filename : null // Store the PAN file
-        });
-
-        await newUser.save();
-        await Consultant_Wellcome(newUser, password1); // Send welcome email
-        req.flash("success", "User successfully added");
-        res.redirect("/admin/consultants");
-
-    } catch (err) {
-        console.log(err);
-        req.flash("error", "Some error occurred on the server.");
-        res.redirect("back");
-    }
-});
+{
+    "consultant": "string",
+    "leadID": "string",
+    "invoice": [
+      {
+        "number": "string",
+        "name": "string",
+        "paymentstatus": "string",
+        "totalamount": 0,
+        "percentage": 0,
+        "commission": 0,
+        "dateofconversion": "2024-09-27"
+      }
+    ]
+}

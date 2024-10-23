@@ -36,6 +36,7 @@ router.post('/adminapi/resetPassword',Admin.resetPassword)
 router.get('/exceluserdata',Admin.getuserexcel)
 
 router.post('/bitrix/convertedleads',bitrix.getConvertedLead)
+router.get('/bitrix/getdata:ID',bitrix.getdata)
 router.get('/packages', leadController.packages);
 
 module.exports = router;
