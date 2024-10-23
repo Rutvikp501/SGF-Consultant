@@ -1,5 +1,13 @@
 const mongoose = require('mongoose');
 
+const quotation = new mongoose.Schema({
+  number: { type: String,default: '' },
+  name: { type: String,default: '' },
+  stage: { type: String,default: ''},
+  amount:{ type: Number,default: 0},
+  commission:{ type: Number, default: null},
+}, { _id: false });
+
 const leadSchema = new mongoose.Schema(
     {
   consultant: { type: mongoose.Schema.Types.ObjectId, ref: 'users' },
@@ -34,12 +42,8 @@ const leadSchema = new mongoose.Schema(
     leadno: { type: String , default: ''},
     message: { type: String , default: ''},
   },  
-  booking :  {
-    status: { type: String , default: 'Pending'},
-    package:{ type: String , default: ''},
-    amount:{ type: Number , default: 0},
-    commission:{ type: Number , default: null},
-  },  
+  quotation :  [quotation],
+  stage:{ type: String ,default: ""},
   conversionDate: { type: Date ,default: null},
   status: { type: String, enum: ['Pending', 'Converted', 'Junk'], default: 'Pending' },  
 }, { timestamps: true });
