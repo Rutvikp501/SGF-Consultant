@@ -410,10 +410,10 @@ exports.resetPassword = async (req, res) => {
 
 exports.getuserexcel = async (req, res, next) => {
     try {
-        const { pincode, city } = req.query || ''; 
+        const { pincode, city } = req.query || '';
         const consultants = await UserModel.find({ role: "consultant" });
         const mobile_no = 8108842956; // mobile number to filter
-        
+
         const filteredConsultants = consultants.reduce((acc, consultant) => {
             if (
                 (!pincode || consultant.pincode === pincode) ||
@@ -425,9 +425,9 @@ exports.getuserexcel = async (req, res, next) => {
             return acc; // Return the accumulator for the next iteration
         }, []);
         // Log the filtered consultants
-        console.log('Filtered Consultants:', filteredConsultants);
-        
-        
+
+
+
 
         // Generate Excel file buffer using the searched users
         const excelBuffer = await getuserexcel(filteredConsultants);
