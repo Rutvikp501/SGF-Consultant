@@ -5,10 +5,10 @@ const UserModel = require('../models/user');
 const { calculateCycle, parseDate } = require('../helpers/sample');
 const Enc_Dec = require('../helpers/Enc_Dec');
 const validatePassword = require('../helpers/PassValidation');
-const { SendOTP } = require('../helpers/email');
+const { SendOTP } = require("../utility/email.util.js");
 const bcrypt = require("bcryptjs");
 const { getuserexcel } = require('../utility/excel.util');
-
+const { cloudinaryUpload } = require("../config/cloudinary.js");
 exports.GetAllUser = async (req, res) => {
     try {
         const User = await UserModel.find();
@@ -241,7 +241,6 @@ exports.Register = async (req, res) => {
     }
 };
 
-
 exports.Edit = async (req, res) => {
     const { id } = request.body;
     const authHeader = req.headers.authorization;
@@ -260,36 +259,72 @@ exports.Edit = async (req, res) => {
 };
 
 exports.Update = async (req, res) => {
-    const { Password, user_name, email_id } = req.body
-    const getExistingUser = await UserModel.find({ email_id: email_id });
-    // console.log(getExistingUser);
-    const valid = validatePassword(Password)
-    if (valid) {
-        return res.status(400).send({ message: valid[0] })
+    const authHeader = req.headers.authorization;
+    const authtoken = authHeader.split(" ")[1];
+    const decode = jwt.verify(authtoken, token)
+    const consultantId = decode.UserId|| "66ab659fdec07a2c29fd9609";
+    const { Password, user_name, email_id } = req.body;
+    const getExistingUser = await UserModel.findOne({ _id: consultantId });
+    
+    // const valid = validatePassword(Password);
+    // if (valid) {
+    //     return res.status(400).send({ message: valid[0] });
+    // }
+
+    if (getExistingUser) {
+        return  res.send({
+            success: true,
+            statusCode: 200,
+        });
     }
+
     try {
-        if (getExistingUser != "") {
-            return res.send({ success: "failed", message: "Email already exist." });
-        } else {
-            const salt = bcrypt.genSaltSync(10);
-            const hashPASS = bcrypt.hashSync(Password, salt);
+        const salt = bcrypt.genSaltSync(10);
+        const hashPASS = bcrypt.hashSync(Password, salt);
+        
+        const upload = cloudinaryUpload();
+        upload.fields([
+            { name: 'profilephoto', maxCount: 1 },
+            { name: 'panphoto', maxCount: 1 },
+            { name: 'adharphoto', maxCount: 1 }
+        ])(req, res, async (err) => {
+            if (err) {
+                return         res.send({
+                    success: false,
+                    statusCode: 500,
+                   message: 'Error uploading images.'
+                });
+                   }
+            
+            // Check and assign uploaded image paths
+            const profilePhotoUrl = req.files?.profilephoto ? req.files.profilephoto[0].path : null;
+            const panPhotoUrl = req.files?.panphoto ? req.files.panphoto[0].path : null;
+            const aadhaarPhotoUrl = req.files?.adharphoto ? req.files.adharphoto[0].path : null;
+
+            // Create new user document
             const User = new UserModel({
                 Password: hashPASS,
-                user_name: user_name,
-                email_id: email_id
-            })//the password from the body and hashed password is different
+                user_name,
+                email_id,
+                ...(profilePhotoUrl && { profilePhotoUrl }),
+                ...(panPhotoUrl && { panPhotoUrl }),
+                ...(aadhaarPhotoUrl && { aadhaarPhotoUrl })
+            });
+
             await User.save();
             res.send({
-                success: false,
-                statusCode: 500,
-                message: "User Updated Successfully"
+                success: true,
+                statusCode: 200,
+                message: "User updated successfully"
             });
-        }
-
-
+        });
     } catch (err) {
         console.log(err);
-        res.send("Error...");
+        res.status(500).send({
+            success: false,
+            statusCode: 500,
+            message: 'Error updating user.',
+        });
     }
 };
 
@@ -445,5 +480,72 @@ exports.getuserexcel = async (req, res, next) => {
     } catch (error) {
         console.log(error);
         next(error); // Pass the error to the error handling middleware
+    }
+};
+
+exports.Update = async (req, res) => {
+    const { Password, user_name, email_id } = req.body;
+    const getExistingUser = await UserModel.findOne({ email_id: email_id });
+    
+    const valid = validatePassword(Password);
+    if (valid) {
+        return res.status(400).send({ message: valid[0] });
+    }
+
+    if (getExistingUser) {
+        return  res.send({
+            success: true,
+            statusCode: 200,
+            leads: leadsData,
+        });
+    }
+
+    try {
+        const salt = bcrypt.genSaltSync(10);
+        const hashPASS = bcrypt.hashSync(Password, salt);
+        
+        const upload = cloudinaryUpload();
+        upload.fields([
+            { name: 'profilephoto', maxCount: 1 },
+            { name: 'panphoto', maxCount: 1 },
+            { name: 'adharphoto', maxCount: 1 }
+        ])(req, res, async (err) => {
+            if (err) {
+                return         res.send({
+                    success: false,
+                    statusCode: 500,
+                   message: 'Error uploading images.'
+                });
+                   }
+            
+            // Check and assign uploaded image paths
+            const profilePhotoUrl = req.files?.profilephoto ? req.files.profilephoto[0].path : null;
+            const panPhotoUrl = req.files?.panphoto ? req.files.panphoto[0].path : null;
+            const aadhaarPhotoUrl = req.files?.adharphoto ? req.files.adharphoto[0].path : null;
+
+            // Create new user document
+            const User = new UserModel({
+                Password: hashPASS,
+                user_name,
+                email_id,
+                ...(profilePhotoUrl && { profilePhotoUrl }),
+                ...(panPhotoUrl && { panPhotoUrl }),
+                ...(aadhaarPhotoUrl && { aadhaarPhotoUrl })
+            });
+
+            await User.save();
+            res.send({
+                success: true,
+                statusCode: 200,
+                message: "User updated successfully"
+            });
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({
+            success: false,
+            statusCode: 500,
+            message: 'Error updating user.',
+        });
     }
 };

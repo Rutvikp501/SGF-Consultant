@@ -10,7 +10,7 @@ exports.bitrixaddLead = async (LeadData) => {
 
     try {
         const apiUrl = process.env.BITRIX_ADD_LEAD;
-        //console.log(apiUrl);
+        console.log(apiUrl);
 
         // Mapping the LeadData to the requestBody
         const requestBody = {
@@ -332,7 +332,12 @@ exports.getConvertedLead = async (req, res) => {
 
         // Extract the leadID from the key "UF_CRM_1725958658829"
         const leadID = result.UF_CRM_1725958658829;
-
+        let invoice={
+            number : result.number,
+            name : result.name,
+            paymentstatus : result.paymentstatus,
+            totalamount : result.totalamount
+        }
         // Validate the request body
         if (!data || Object.keys(data).length === 0) {
             return res.status(400).json({
@@ -360,7 +365,7 @@ exports.getConvertedLead = async (req, res) => {
         const commissionPercentage = calculateCommissionPercentage(leadNumber, totalLeadsConverted, leadType);
 
         // Process lead conversion
-        const convertedLead = await processLeadConversion(data, consultantDetails, leadNumber, commissionPercentage, cycleKey, leadType);
+        const convertedLead = await processLeadConversion(data, consultantDetails, leadNumber, commissionPercentage, cycleKey, leadType,invoice);
 
         // Save last commission percentage based on lead type
         if (leadType === 'Seasonal') {

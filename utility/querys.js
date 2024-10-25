@@ -60,7 +60,7 @@ exports.calculateCommissionPercentage = (leadNumber, totalLeadsConverted, leadTy
     return commissionPercentage;
 };
 // Lead Conversion Process
-exports.processLeadConversion = async (data, consultantDetails, leadNumber, commissionPercentage, cycleKey, leadType) => {
+exports.processLeadConversion = async (data, consultantDetails, leadNumber, commissionPercentage, cycleKey, leadType,invoice) => {
     const { leadID } = data;
 
     // Check if the lead already exists in converted leads
@@ -116,13 +116,13 @@ exports.processLeadConversion = async (data, consultantDetails, leadNumber, comm
             specialCode: pendingLead.specialCode || '',
             leadType: pendingLead.leadType,
             packages: pendingLead.package || {},
-            invoice: data.invoice || [],
+            invoice: invoice || [],
             conversionDate: new Date(),
         };
 
         // Add commission calculation for invoices
-        if (data.invoice && data.invoice.length > 0) {
-            data.invoice.forEach((inv) => {
+        if (invoice && invoice.length > 0) {
+            invoice.forEach((inv) => {
                 const commission = (inv.totalamount * commissionPercentage) / 100;
                 inv.percentage = commissionPercentage + "%"; // Add the commission percentage
                 inv.commission = commission.toFixed(2);
