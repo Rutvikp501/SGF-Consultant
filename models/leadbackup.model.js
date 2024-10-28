@@ -8,7 +8,7 @@ const quotation = new mongoose.Schema({
   commission:{ type: Number, default: null},
 }, { _id: false });
 
-const leadSchema = new mongoose.Schema(
+const leadleadBackupSchema = new mongoose.Schema(
     {
   consultant: { type: mongoose.Schema.Types.ObjectId, ref: 'users' },
   consultant_code: {  type: String, required: true },
@@ -49,7 +49,7 @@ const leadSchema = new mongoose.Schema(
 }, { timestamps: true });
 
 
-leadSchema.pre('save', function(next) {
+leadleadBackupSchema.pre('save', function(next) {
   // Only set commission in each quotation if it's not already set
   this.quotation.forEach((quote) => {
     if (quote.commission === null) {
@@ -63,6 +63,6 @@ leadSchema.pre('save', function(next) {
   next();
 });
 
-const LeadModel = mongoose.model('lead', leadSchema);
+const LeadBackupModel = mongoose.model('leadbackup', leadleadBackupSchema);
 
-module.exports = LeadModel;
+module.exports = LeadBackupModel;
