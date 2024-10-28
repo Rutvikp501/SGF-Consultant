@@ -45,4 +45,5 @@ async function SendOTP( Email,otp) {
     return info;
 }
 
+
 module.exports = { SendOTP};

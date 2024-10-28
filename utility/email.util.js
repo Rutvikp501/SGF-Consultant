@@ -46,7 +46,6 @@ async function Consultant_Wellcome(EmailData, password1) {
 
     const mailOptions = {
         from: 'Swaptography Management',  
-        //to: 'patilrutvik501@gmail.com',
         to: EmailData.email_id,
         subject: `CONSULTANT REGISTRATION SUCCESSFUL!`,
         html: welcomehtmlTemplate,

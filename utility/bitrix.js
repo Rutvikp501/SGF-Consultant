@@ -85,9 +85,6 @@ exports.bitrixaddLead = async (LeadData) => {
     }
 };
 
-
-
-
 exports.getAllLead = async (LeadData) => {
     // console.log("bitrixlog",LeadData.consultant_email_id);
     try {
@@ -96,12 +93,12 @@ exports.getAllLead = async (LeadData) => {
             consultant_email_id: "",
             leadID: "",
         }
-        // const response = await axios.post(`https://swaptography.bitrix24.in/rest/8/t6107s6fsf94wfo9/crm.lead.add.json?fields[NAME]=Rutvik&fields[SECOND_NAME]=&fields[LAST_NAME]=Patil&fields[PHONE][0][VALUE]=8591575854&fields[PHONE][0][VALUE_TYPE]=WORK&fields[EMAIL][0][VALUE]=test@goo.com&fields[EMAIL][0][VALUE_TYPE]=WORK `, {
-        //     headers: {
-        //       'Content-Type': 'application/json',
-        //     }
-        //   });
-        let response = { status: true, statusCode: 200, data: data }
+        const response = await axios.post(`https://swaptography.bitrix24.in/rest/8/t6107s6fsf94wfo9/crm.lead.add.json?fields[NAME]=Rutvik&fields[SECOND_NAME]=&fields[LAST_NAME]=Patil&fields[PHONE][0][VALUE]=8591575854&fields[PHONE][0][VALUE_TYPE]=WORK&fields[EMAIL][0][VALUE]=test@goo.com&fields[EMAIL][0][VALUE_TYPE]=WORK `, {
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          });
+
         if (response.status) {
             console.log(response.data);
             return {
@@ -398,8 +395,9 @@ exports.moveTojunk = async (req, res) => {
 
     try {
         // Await the asynchronous getLeadstage function
+        
         const data = await getLeadstage();
-
+        console.log(data);
         // Extract the result object and STATUS_ID
         const result = data.result;
         const statusID = result.STATUS_ID;
@@ -470,12 +468,18 @@ exports.moveTojunk = async (req, res) => {
     }
 };
 
-
 exports.updateLeadstage = async (req, res) => {
+    let data ={}
     try {
         // Extract data from request body
-        const data = await getLeadstage();
-
+        console.log("updateLeadstage====",req.body);
+        
+        if (req.body==null || req.body==""){
+            data = getLeadstage();
+            console.log('test1',data);
+            }else{
+                data=req.body
+            }
         // Extract the result object and STATUS_ID
         const result = data.result;
         const statusID = result.STATUS_ID;
@@ -612,20 +616,23 @@ exports.updateLeadquotation = async (req, res) => {
     }
 };
 
-
-
-
-exports.getdata = async () => {
+exports.getgetleaddatadata = async (req, res) => {
     console.log("test getdata");
-
+console.log(req.body);
+let data = {}
     try {
-        const data = getLeadstage();
+        if (req.body==null || req.body==""){
+        data = getLeadstage();
+        }else{
+            data=req.body
+        }
+         
         console.log(data);
 
         return res.status(200).json({
             status: true,
             message: 'success',
-            data: data.result
+            data: data
         });
 
     } catch (err) {
@@ -637,6 +644,7 @@ exports.getdata = async () => {
         });
     }
 }
+
 const cunvertedleaddata = {
     "consultant": "66ab659fdec07a2c29fd9609",
     "consultant_code": "001",
