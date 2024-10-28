@@ -10,7 +10,6 @@ exports.bitrixaddLead = async (LeadData) => {
 
     try {
         const apiUrl = process.env.BITRIX_ADD_LEAD;
-        console.log(apiUrl);
 
         // Mapping the LeadData to the requestBody
         const requestBody = {

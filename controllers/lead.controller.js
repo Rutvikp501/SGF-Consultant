@@ -7,14 +7,13 @@ const JunkLeadModel = require('../models/junkLead.model');
 const { bitrixaddLead } = require('../utility/bitrix');
 const {getCommissionexcel} = require('../utility/excel.util');
 const packagesModel = require('../models/packages.model');
+const LeadBackupModel = require('../models/leadbackup.model');
 const token = process.env.token
 
 
 exports.addLead = async (req, res) => {
 
     let params = req.body;
-   console.log(params);
-    
     
     try {
         const currentDate = new Date();
@@ -110,6 +109,14 @@ exports.addLead = async (req, res) => {
             });
 
         } else {
+            const leadBackup = new LeadBackupModel({
+                ...LeadData,
+                bitrixres: {
+                    leadno: bitrixres.leadno || '',
+                    message: bitrixres.message || ''
+                }
+            });
+            await leadBackup.save();
             console.error(bitrixres.error);
             return res.send({
                 success: false,
