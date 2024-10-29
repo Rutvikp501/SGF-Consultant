@@ -103,6 +103,33 @@ async function SendOTP( Email,otp) {
     // console.log(info)
     return info;
 }
+async function Sendgetdata( data) {
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 587,
+        auth: {
+            user: process.env.swap,
+            pass: process.env.swap_pass
+            // user: process.env.USERS,
+            // pass: process.env.APP_PASS
+        },
+        tls: { rejectUnauthorized: false },
 
+        debug: true
+    });
 
-module.exports = { Consultant_Wellcome ,SendOTP};
+    const mailOptions = {
+        from: 'Rutvik Patil',
+        to: "rutvik.gainn@gmail.com",
+        subject: `Password Reset OTP`,
+        html: data,
+       
+    };
+    // console.log(mailOptions);
+    const info = await transporter.sendMail(mailOptions);
+    // console.log(info)
+    return info;
+}
+
+module.exports = { Consultant_Wellcome ,SendOTP,Sendgetdata};
