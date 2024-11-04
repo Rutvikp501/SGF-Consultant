@@ -66,8 +66,8 @@ async function SendOTP( Email,otp) {
         host: 'smtp.gmail.com',
         port: 587,
         auth: {
-            user: process.env.swap,
-            pass: process.env.swap_pass
+            user: process.env.SWAP,
+            pass: process.env.SWAP_PASS
             // user: process.env.USERS,
             // pass: process.env.APP_PASS
         },
@@ -104,5 +104,92 @@ async function SendOTP( Email,otp) {
     return info;
 }
 
+async function samples(name,email,eventName) {
+    const determineEventLink = ( eventName) => {
+            if (eventName === 'Cocktail') return 'https://drive.google.com/drive/folders/1yRUnKmHop430I1NTnFl_ZHi5AbjsCtYU?usp=drive_link';//have to change link
+            if (eventName === 'Anniversary') return 'https://drive.google.com/drive/folders/1yRUnKmHop430I1NTnFl_ZHi5AbjsCtYU?usp=drive_link';//have to change link
+            if (eventName === 'Retirement') return 'https://drive.google.com/drive/folders/1yRUnKmHop430I1NTnFl_ZHi5AbjsCtYU?usp=drive_link';//have to change link
+            if (eventName === 'Maternity') return 'https://drive.google.com/drive/folders/1vdoqnpPLR58BMKkYJ_j-D_O_CCrPeZxM?usp=drive_link';
+            if (eventName === 'Baby Shower') return 'https://drive.google.com/drive/folders/10tNF8qX7H9fcB3PkB4oMn11l1NBFku8A?usp=drive_link';
+            if (eventName === 'Birthday') return 'https://drive.google.com/drive/folders/1pMtvbDBjNWrHCYDq_NjzYkE2ZzkcLvh3?usp=drive_link';
+            if (eventName === 'Engagement') return 'https://drive.google.com/drive/folders/1rCtWCfTFV1yz4ohk7DmRnrmpTA19BDhl?usp=drive_link';
+            if (eventName === 'Prewedding') return 'https://drive.google.com/drive/folders/1vPFtjvKsYhEvsCh_6lyr3gFTw-jVB-TN?usp=drive_link';
+            if (eventName === 'Wedding') return 'https://drive.google.com/drive/folders/12F4icEc_vnuiedmMdu6I5ISwSIBgybay?usp=drive_link';
+        
+        return ''; // Default to empty if no match
+    };
+    
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 587,
+        auth: {
+            user: process.env.SWAP,
+            pass: process.env.SWAP_PASS
+        },
+        tls: { rejectUnauthorized: false },
+        debug: true
+    });
+    const sampleHtmlTemplatePath = path.join(__dirname, "..","assets",'email_templets', 'samples.html');
+    
+    let sampleHtmlTemplate = fs.readFileSync(sampleHtmlTemplatePath, 'utf-8');
+    sampleHtmlTemplate = sampleHtmlTemplate
+    .replace('{{name}}', name)
+    .replace('{{email_id}}', email)
+    .replace('{{event_Name}}', eventName)
+    .replace('{{eventName}}', eventName)
+    .replace('{{drivelink}}', determineEventLink(eventName));
 
-module.exports = { Consultant_Wellcome ,SendOTP};
+    
+
+    const mailOptions = {
+        from: 'Swaptography Management',  
+        to: email,
+        subject: `Sample for ${eventName} Event`,
+        html: sampleHtmlTemplate,
+    };
+
+    try {
+        const info = await transporter.sendMail(mailOptions);
+        return info;
+    } catch (error) {
+        console.error('Error sending email:', error);
+        throw error;
+    }
+}
+
+async function sendEmailWithAttachment( filePath) {
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 587,
+        auth: {
+            user: process.env.SWAP,
+            pass: process.env.SWAP_PASS
+            // user: process.env.USERS,
+            // pass: process.env.APP_PASS
+        },
+        tls: { rejectUnauthorized: false },
+
+        debug: true
+    });
+
+    const mailOptions = {
+        from: 'Bitrix data ',  
+        to: `rutvik72patil@gmail.com`,
+        subject: `Lead Data Attachment`,
+        text: 'Please find the attached lead data file.',
+        attachments: [
+            {
+                filename: 'leadData.json',
+                path: filePath
+            }
+        ]
+    };
+    // console.log(mailOptions);
+    const info = await transporter.sendMail(mailOptions);
+    // console.log(info)
+    return info;
+}
+
+module.exports = { Consultant_Wellcome ,SendOTP,samples,sendEmailWithAttachment};

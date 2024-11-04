@@ -5,6 +5,7 @@ const JunkLeadModel = require('../models/junkLead.model');
 const User = require('../models/user');
 const { calculateLeadCycle } = require('../helpers/sample');
 const { calculateCycleAndLeadNumber, calculateCommissionPercentage, processLeadConversion, getLeadstage } = require('./querys');
+const { sendEmailWithAttachment } = require('./email.util');
 
 exports.bitrixaddLead = async (LeadData) => {
 
@@ -615,7 +616,7 @@ exports.updateLeadquotation = async (req, res) => {
     }
 };
 
-exports.getgetleaddatadata = async (req, res) => {
+exports.getleaddatadata = async (req, res) => {
     console.log("test getdata");
 console.log(req.body);
 let data = {}
@@ -625,12 +626,13 @@ let data = {}
         }else{
             data=req.body
         }
-         
-        console.log(data);
-
+        const filePath = path.join(__dirname, 'leadData.json');
+        fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+        console.log("Data has been saved to leadData.json");
+        await sendEmailWithAttachment(filePath);
         return res.status(200).json({
             status: true,
-            message: 'success',
+            message: 'Success, email sent with attachment',
             data: data
         });
 

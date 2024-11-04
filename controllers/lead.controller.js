@@ -6,6 +6,7 @@ const ConvertedLeadModel = require('../models/convertedLead.model');
 const JunkLeadModel = require('../models/junkLead.model');
 const { bitrixaddLead } = require('../utility/bitrix');
 const {getCommissionexcel} = require('../utility/excel.util');
+const { samples } = require("../utility/email.util.js");
 const packagesModel = require('../models/packages.model');
 const LeadBackupModel = require('../models/leadbackup.model');
 const token = process.env.token
@@ -14,7 +15,10 @@ const token = process.env.token
 exports.addLead = async (req, res) => {
 
     let params = req.body;
-    
+    const formattedEvents = params.events.map(event => ({
+        name: event.name || 'Unnamed Event',
+    }));
+   return await samples(params.name,params.email,formattedEvents[0].name); 
     try {
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear();
@@ -117,6 +121,7 @@ exports.addLead = async (req, res) => {
                 }
             });
             await leadBackup.save();
+            await samples(params.name,params.email,formattedEvents[0].name); 
             console.error(bitrixres.error);
             return res.send({
                 success: false,

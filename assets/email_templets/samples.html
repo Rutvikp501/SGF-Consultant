@@ -1,0 +1,40 @@
+<!-- templates/sample-template.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Event Sample from Swaptography</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            line-height: 1.6;
+        }
+        h2 {
+            color: #4CAF50;
+        }
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h2>Explore Your Event Sample.</h2>     
+        <p>Dear {{name}},</p>
+        <p>We are thrilled to share a preview of our work for your upcoming {{event_Name}} event. Please find the link below to view the sample document, which showcases our approach and attention to detail in capturing special moments.</p>
+
+        <h3>Sample Link</h3>
+        <ul>
+            <li><strong>Event Name:</strong> {{eventName}}</li>
+            <li><strong>Sample Document:</strong> <a href="{{drivelink}}!" target="_blank">View Sample</a></li>
+        </ul>
+        
+        <p>We hope you enjoy this preview, and we look forward to creating beautiful memories together!</p>
+
+        <p>Warm regards,</p>
+        <p>Swaptography Events & Films LLP</p>
+    </div>
+</body>
+</html>
