@@ -263,7 +263,7 @@ exports.Update = async (req, res) => {
     const authtoken = authHeader.split(" ")[1];
     const decode = jwt.verify(authtoken, token)
     const consultantId = decode.UserId|| "66ab659fdec07a2c29fd9609";
-    const { Password, user_name, email_id } = req.body;
+    const { Password, user_name, email_id,mobile_no } = req.body;
     const getExistingUser = await UserModel.findOne({ _id: consultantId });
     
     // const valid = validatePassword(Password);
@@ -305,6 +305,7 @@ exports.Update = async (req, res) => {
             const User = new UserModel({
                 Password: hashPASS,
                 user_name,
+                mobile_no,
                 email_id,
                 ...(profilePhotoUrl && { profilePhotoUrl }),
                 ...(panPhotoUrl && { panPhotoUrl }),

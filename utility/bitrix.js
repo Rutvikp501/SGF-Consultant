@@ -5,7 +5,6 @@ const JunkLeadModel = require('../models/junkLead.model');
 const User = require('../models/user');
 const { calculateLeadCycle } = require('../helpers/sample');
 const { calculateCycleAndLeadNumber, calculateCommissionPercentage, processLeadConversion, getLeadstage } = require('./querys');
-const { sendEmailWithAttachment } = require('./email.util');
 
 exports.bitrixaddLead = async (LeadData) => {
 
@@ -329,11 +328,11 @@ exports.getConvertedLead = async (req, res) => {
 
         // Extract the leadID from the key "UF_CRM_1725958658829"
         const leadID = result.UF_CRM_1725958658829;
-        let invoice={
-            number : result.number,
-            name : result.name,
-            paymentstatus : result.paymentstatus,
-            totalamount : result.totalamount
+        let invoice = {
+            number: result.number,
+            name: result.name,
+            paymentstatus: result.paymentstatus,
+            totalamount: result.totalamount
         }
         // Validate the request body
         if (!data || Object.keys(data).length === 0) {
@@ -362,7 +361,7 @@ exports.getConvertedLead = async (req, res) => {
         const commissionPercentage = calculateCommissionPercentage(leadNumber, totalLeadsConverted, leadType);
 
         // Process lead conversion
-        const convertedLead = await processLeadConversion(data, consultantDetails, leadNumber, commissionPercentage, cycleKey, leadType,invoice);
+        const convertedLead = await processLeadConversion(data, consultantDetails, leadNumber, commissionPercentage, cycleKey, leadType, invoice);
 
         // Save last commission percentage based on lead type
         if (leadType === 'Seasonal') {
@@ -577,7 +576,7 @@ exports.updateLeadquotation = async (req, res) => {
             existingQuotation.amount = leadDetails.opportunity;
             existingQuotation.stage = leadDetails.statusID;
             existingQuotation.commission = 2; // Calculate the commission based on your logic
-            
+
             // Assign the updated quotation object to quotationToSave
             quotationToSave = existingQuotation;
         } else {
@@ -587,7 +586,7 @@ exports.updateLeadquotation = async (req, res) => {
                 name: leadDetails.name,
                 stage: leadDetails.statusID,
                 amount: leadDetails.opportunity,
-                commission:2, // Calculate the commission based on your logic
+                commission: 2, // Calculate the commission based on your logic
             };
 
             quotationToSave = new QuotationModel(quotationData); // Ensure you have QuotationModel imported
@@ -616,7 +615,7 @@ exports.updateLeadquotation = async (req, res) => {
     }
 };
 
-exports.getleaddatadata = async (req, res) => {
+exports.getdata = async () => {
     console.log("test getdata");
 console.log(req.body);
 let data = {}
@@ -626,10 +625,9 @@ let data = {}
         }else{
             data=req.body
         }
-        const filePath = path.join(__dirname, 'leadData.json');
-        fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
-        console.log("Data has been saved to leadData.json");
-        await sendEmailWithAttachment(filePath);
+         
+        console.log(data);
+
         return res.status(200).json({
             status: true,
             message: 'Success, email sent with attachment',
@@ -637,11 +635,60 @@ let data = {}
         });
 
     } catch (err) {
-        console.error('Error lead stage', err.message);
+        console.error('Error in updateLeadstage:', err.message);
         return res.status(500).json({
             status: false,
-            message: 'failed',
-            error: err.message
+            error: 'An internal server error occurred: ' + err.message,
+        });
+    }
+}
+exports.getdata = async (req, res) => {
+    try {
+        // Extract data from request body
+        //const data = await getLeadstage();
+        let data = req.body
+        // Extract the result object and STATUS_ID
+        const result = data.result;
+        const statusID = result.STATUS_ID;
+
+        // Extract the leadID from the key "UF_CRM_1725958658829"
+        const leadID = result.UF_CRM_1725958658829;
+        console.log(leadID);
+        await Sendgetdata(result)
+        // Check if leadID exists
+        if (!leadID) {
+            return res.status(400).json({
+                status: false,
+                message: 'Lead ID is missing from the data',
+            });
+        }
+
+        // Update the lead's stage field using the extracted leadID
+        const updatedLead = await LeadModel.findOneAndUpdate(
+            { leadID: leadID },  // Filter the lead by its leadID (separate key)
+            { stage: statusID },  // Update the stage with STATUS_ID value
+            { new: true }  // Return the updated document
+        );
+
+        if (!updatedLead) {
+            return res.status(404).json({
+                status: false,
+                message: 'Lead not found',
+            });
+        }
+
+        // Return the updated lead data
+        return res.status(200).json({
+            status: true,
+            message: 'Lead stage updated successfully',
+            data: updatedLead,
+        });
+
+    } catch (err) {
+        console.error('Error in updateLeadstage:', err.message);
+        return res.status(500).json({
+            status: false,
+            error: 'An internal server error occurred: ' + err.message,
         });
     }
 }
