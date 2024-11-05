@@ -642,7 +642,7 @@ let data = {}
         });
     }
 }
-exports.getdata = async (req, res) => {
+exports.getstagedata = async (req, res) => {
     try {
         // Extract data from request body
         //const data = await getLeadstage();

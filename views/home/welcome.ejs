@@ -10,9 +10,10 @@
 
             <div class="input-box">
                 <input type="password" name="password" id="password" required>
-                <label>Password</label>
-                <!-- <input type="password" name="password" class="form-control" id="password" placeholder="Enter password.." required> -->
+                <label>New Password</label>
+                <!--<input type="checkbox" onclick="togglePasswordVisibility()"> -->
             </div>
+            
             <button type="submit" class="buttonlogin">Login</button>
             <div class="signup-link">
                 <p>Have no account yet? <a href="/auth/signup">Signup</a></p>
@@ -72,3 +73,9 @@
     <span style="--i:49;"></span> -->
 
 </div>
+<script>
+    function togglePasswordVisibility() {
+    const passwordField = document.getElementById('password');
+    passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+}
+</script>

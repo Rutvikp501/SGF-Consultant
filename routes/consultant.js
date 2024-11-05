@@ -116,6 +116,7 @@ router.put("/consultant/profile", middleware.ensureconsultantLoggedIn, async (re
 	}
 	
 });
+
 router.get("/consultant/profile/google-maps", middleware.ensureconsultantLoggedIn, (req, res) => {
     res.render("consultant/googleMaps", { title: "Google Maps" });
 });
@@ -135,6 +136,7 @@ router.get("/consultant/addLeads", middleware.ensureconsultantLoggedIn, async (r
 	
 	
 });
+
 router.post("/consultant/addLeads", middleware.ensureconsultantLoggedIn, async (req,res) => { //middleware.ensureAdminLoggedIn,
 	
 	let params = req.body;

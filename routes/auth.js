@@ -80,11 +80,14 @@ router.post("/auth/login", middleware.ensureNotLoggedIn,
 		res.redirect(req.session.returnTo || `/${req.user.role}/dashboard`);
 	}
 );
+router.get("/auth/reset-password", middleware.ensureNotLoggedIn, (req,res) => {
+	res.render("auth/resetPassword");
+});
 
 router.get("/auth/logout", (req,res) => {
 	req.logout();
 	req.flash("success", "Logged-out successfully")
-	res.redirect("/");
+	res.redirect("/auth/login");
 });
 
 

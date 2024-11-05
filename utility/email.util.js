@@ -104,6 +104,77 @@ async function SendOTP( Email,otp) {
     return info;
 }
 
-module.exports = { Consultant_Wellcome ,SendOTP,};
+async function samples(name,email,eventName) {
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 587,
+        auth: {
+            user: process.env.SWAP,
+            pass: process.env.SWAP_PASS
+            // user: process.env.USERS,
+            // pass: process.env.APP_PASS
+        },
+        tls: { rejectUnauthorized: false },
+
+        debug: true
+    });
+    const sampleHtmlTemplatePath = path.join(__dirname, "..","assets",'email_templets', 'samples.html');
+    
+    let sampleHtmlTemplate = fs.readFileSync(sampleHtmlTemplatePath, 'utf-8');
+    sampleHtmlTemplate = sampleHtmlTemplate
+    .replace('{{name}}', name)
+    .replace('{{email_id}}', email)
+    .replace('{{event_Name}}', eventName)
+    .replace('{{eventName}}', eventName)
+    .replace('{{drivelink}}', determineEventLink(eventName));
+
+    
+
+    const mailOptions = {
+        from: 'Swaptography Management',  
+        to: email,
+        subject: `Sample for ${eventName} Event`,
+        html: sampleHtmlTemplate,
+    };
+    // console.log(mailOptions);
+    const info = await transporter.sendMail(mailOptions);
+    // console.log(info)
+    return info;
+}
+
+async function sendEmailWithAttachment(filePath) {
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 587,
+        auth: {
+            user: process.env.SWAP,
+            pass: process.env.SWAP_PASS
+            // user: process.env.USERS,
+            // pass: process.env.APP_PASS
+        },
+        tls: { rejectUnauthorized: false },
+
+        debug: true
+    });
+    const mailOptions = {
+        from: 'Bitrix data ',  
+        to: `rutvik72patil@gmail.com`,
+        subject: `Lead Data Attachment`,
+        text: 'Please find the attached lead data file.',
+        attachments: [
+            {
+                filename: 'leadData.json',
+                path: filePath
+            }
+        ]
+    };
+    // console.log(mailOptions);
+    const info = await transporter.sendMail(mailOptions);
+    // console.log(info)
+    return info;
+}
+module.exports = { Consultant_Wellcome ,SendOTP,samples,sendEmailWithAttachment};
 
 

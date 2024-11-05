@@ -496,7 +496,7 @@ router.get("/admin/addpackages", middleware.ensureAdminLoggedIn, async (req, res
 
 router.post('/admin/addLeads', middleware.ensureAdminLoggedIn, async (req, res) => {
 	let params = req.body;
-	console.log(params);
+	//console.log(params);
 
 	try {
 
@@ -505,6 +505,7 @@ router.post('/admin/addLeads', middleware.ensureAdminLoggedIn, async (req, res) 
 		res.status(500).send({ message: 'Internal server error' });
 	}
 });
+
 
 
 module.exports = router;

@@ -335,7 +335,6 @@ exports.Delete = async (req, res) => {
     const decode = jwt.verify(authtoken, token)
     try {
         let User = await UserModel.findById(decode.UserId);
-        console.log(User); // Check what User object is returned
         if (!User) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -364,6 +363,7 @@ exports.Logout = async (req, res) => {
 }
 
 exports.forgotPassword = async (req, res) => {
+    
     const { email_id } = req.body;
     try {
         const user = await UserModel.findOne({ email_id });

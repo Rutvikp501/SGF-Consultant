@@ -15,10 +15,7 @@ const token = process.env.token
 exports.addLead = async (req, res) => {
 
     let params = req.body;
-    const formattedEvents = params.events.map(event => ({
-        name: event.name || 'Unnamed Event',
-    }));
-   return await samples(params.name,params.email,formattedEvents[0].name); 
+    
     try {
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear();
@@ -121,7 +118,7 @@ exports.addLead = async (req, res) => {
                 }
             });
             await leadBackup.save();
-            await samples(params.name,params.email,formattedEvents[0].name); 
+            //await samples(params.name,params.email,formattedEvents[0].name); 
             console.error(bitrixres.error);
             return res.send({
                 success: false,
