@@ -80,5 +80,14 @@ const generateLeadID = (consultantNumber, leadType, cycleMonth, consultantLifeti
     return `${consultantNumber}-${leadTypeCode}${cycleMonth}${consultantLifetimeCycleNumber}L${leadNumber}${leadYearCode}`;
   }
 };
-
-module.exports = { convertToIST, parseDate, generateLeadID, calculateCycle, calculateLeadCycle };
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  
+  // Extract day, month, and year
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() is 0-indexed
+  const year = date.getFullYear();
+  
+  return `${day}-${month}-${year}`;
+}
+module.exports = { convertToIST, parseDate, generateLeadID, calculateCycle, calculateLeadCycle,formatDate };

@@ -286,7 +286,7 @@ router.post("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) =
 	  });
   
 	  // Save the new user to the database
-	  await newUser.save();
+	  //await newUser.save();
 	  await Consultant_Wellcome(newUser, password1); 
 	  // Redirect to the upload photos route with the user's ID
 	  req.flash("success", "User successfully added. Please upload photos.");
