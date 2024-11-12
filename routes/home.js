@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 router.get("/", (req,res) => {
-	res.render("home/welcome");
+	res.render("auth/login");
 });
 
 router.get("/home/about-us", (req,res) => {
