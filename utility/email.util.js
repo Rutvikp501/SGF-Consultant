@@ -17,7 +17,7 @@ async function Consultant_Wellcome(EmailData, password1) {
         debug: true
     });
     const welcometemplatePath = path.join(__dirname, "..", "assets", 'email_templets', 'welcome-template.html');
-    const cardtemplatePath = path.join(__dirname, "..", "assets", 'email_templets', 'welcomeCard.html');
+    //const cardtemplatePath = path.join(__dirname, "..", "assets", 'email_templets', 'welcomeCard.html');
 
     const dateOfJoining = new Date(EmailData.dateOfJoining);
     const formattedDate = `${dateOfJoining.getDate().toString().padStart(2, '0')}-${(dateOfJoining.getMonth() + 1).toString().padStart(2, '0')}-${dateOfJoining.getFullYear()}`;
@@ -35,18 +35,18 @@ async function Consultant_Wellcome(EmailData, password1) {
         .replace('{{sales_assistan_name}}', EmailData.sales_assistan.name || 'N/A')
         .replace('{{sales_assistan_mobile_no}}', EmailData.sales_assistan.mobile_no || 'N/A');
 
-    let cardhtmlTemplate = fs.readFileSync(cardtemplatePath, 'utf-8');
-    cardhtmlTemplate = cardhtmlTemplate
-        .replace('{{name}}', EmailData.name)
-        .replace('{{user_code}}', EmailData.code)
-        .replace('{{email_id}}', EmailData.email_id)
-        .replace('{{password}}', password1)
-        .replace('{{role}}', EmailData.role)
-        .replace('{{regular}}', EmailData.currentcycle.regular.cycleLabel)
-        .replace('{{seasonal}}', EmailData.currentcycle.seasonal.cycleLabel)
-        .replace('{{dateOfJoining}}', formattedDate)
-        .replace('{{sales_assistan_name}}', EmailData.sales_assistan.name || 'N/A')
-        .replace('{{sales_assistan_mobile_no}}', EmailData.sales_assistan.mobile_no || 'N/A');
+    // let cardhtmlTemplate = fs.readFileSync(cardtemplatePath, 'utf-8');
+    // cardhtmlTemplate = cardhtmlTemplate
+    //     .replace('{{name}}', EmailData.name)
+    //     .replace('{{user_code}}', EmailData.code)
+    //     .replace('{{email_id}}', EmailData.email_id)
+    //     .replace('{{password}}', password1)
+    //     .replace('{{role}}', EmailData.role)
+    //     .replace('{{regular}}', EmailData.currentcycle.regular.cycleLabel)
+    //     .replace('{{seasonal}}', EmailData.currentcycle.seasonal.cycleLabel)
+    //     .replace('{{dateOfJoining}}', formattedDate)
+    //     .replace('{{sales_assistan_name}}', EmailData.sales_assistan.name || 'N/A')
+    //     .replace('{{sales_assistan_mobile_no}}', EmailData.sales_assistan.mobile_no || 'N/A');
 
     const mailOptions = {
         from: 'Swaptography Management',

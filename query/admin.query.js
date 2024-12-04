@@ -58,7 +58,7 @@ exports.consultantregistationquery = async (params) => {
         if (existingUser) {
             return {
                 success: false,
-                statusCode: 409,
+                statusCode: 401,
                 message: "This Email is already registered. Please try another email.",
             };
         }
@@ -193,14 +193,14 @@ exports.updateAdminQuery = async (params) => {
         city: params.user_city || existingConsultant.city,
         pincode: params.user_pincode || existingConsultant.pincode,
         sales_assistan: {
-          name: params.sales_assistan_name || existingConsultant.sales_assistan.name,
-          mobile_no: params.sales_assistan_mobile_no || existingConsultant.sales_assistan.mobile_no,
+          name: params.sales_assistan_name || existingConsultant.sales_assistan.name||null,
+          mobile_no: params.sales_assistan_mobile_no || existingConsultant.sales_assistan.mobile_no||null,
         },
         user_bank_details: {
-          bank_name: params.bank_name || existingConsultant.user_bank_details.bank_name,
-          account_number: params.account_number || existingConsultant.user_bank_details.account_number,
-          ifsc_code: params.ifsc_code || existingConsultant.user_bank_details.ifsc_code,
-          branch_name: params.branch_name || existingConsultant.user_bank_details.branch_name,
+          bank_name: params.bank_name || existingConsultant.user_bank_details.bank_name||null,
+          account_number: params.account_number || existingConsultant.user_bank_details.account_number||null,
+          ifsc_code: params.ifsc_code || existingConsultant.user_bank_details.ifsc_code||null,
+          branch_name: params.branch_name || existingConsultant.user_bank_details.branch_name||null,
         },
       };
   
