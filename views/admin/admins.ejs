@@ -1,5 +1,5 @@
-<main></main>
-	<%- include('../partials/adminSidebar') %>
+<main>
+	<%- include('../partials/managementSidebar') %>
 	
 	<div id="main-wrapper">
 		
@@ -12,11 +12,11 @@
 			<table  cellpadding="0" cellspacing="0"  border="0">
 				<thead>
 					<tr>
-						<th scope="col">#</th>
-						<th scope="col">code</th>
-						<th scope="col">name</th>
-						<th scope="col">Email</th>
-						<th scope="col">Phone</th>
+						<th scope="col"  style="width: 5%;">#</th>
+						<th scope="col"  style="width: 7%;">Department</th>
+						<th scope="col"  style="width: 8%;">name</th>
+						<th scope="col"  style="width: 15%;">Email</th>
+						<th scope="col"  style="width: 10%;">Phone</th>
 					</tr>
 				</thead>
 			</table>
@@ -24,13 +24,13 @@
 		<div class="tbl-content">
 			<table cellpadding="0" cellspacing="0" border="0">
 				<tbody>
-					<% for(let i=0; i<admin.length; i++) { %>
+					<% for(let i=0; i<admins.length; i++) { %>
 						<tr>
-							<th scope="row"> <%= i+1 %> </th>
-							<td> <%= admin[i].code  %> </td>
-							<td> <%= admin[i].name %> </td>
-							<td> <%= admin[i].email_id %> </td>
-							<td> <%= admin[i].mobile_no %> </td>
+							<th scope="row" style="width: 5%;"> <%= i+1 %> </th>
+							<td  style="width: 7%;"> <%= admins[i].department  %> </td>
+							<td  style="width: 8%;"> <%= admins[i].name %> </td>
+							<td  style="width: 15%;"> <%= admins[i].email_id %> </td>
+							<td  style="width: 10%;"> <%= admins[i].mobile_no %> </td>
 					<% } %>
 				</tbody>
 			</table>

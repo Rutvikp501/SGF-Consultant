@@ -84,16 +84,18 @@ const getuserexcel = async (filteredConsultants) => {
                 { header: 'Pincode', key: 'pincode', width: 10 },
                 { header: 'City', key: 'city', width: 15 }
             ];
-        
+          
             // Add data to the worksheet
             filteredConsultants.forEach((consultant, index) => {
+                const dateOfJoining = new Date(consultant.dateOfJoining);
+                const formattedDate = `${dateOfJoining.getDate().toString().padStart(2, '0')}-${(dateOfJoining.getMonth() + 1).toString().padStart(2, '0')}-${dateOfJoining.getFullYear()}`;
                 worksheet.addRow({
                     index: index + 1,
                     code: consultant.code,
                     name: consultant.name,
                     email_id: consultant.email_id,
                     mobile_no: consultant.mobile_no,
-                    dateOfJoining: consultant.dateOfJoining,
+                    dateOfJoining: formattedDate,
                     consultantLifetimeCycleNumber: consultant.consultantLifetimeCycleNumber,
                     pincode: consultant.pincode||"",
                     city: consultant.city||""

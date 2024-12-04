@@ -1,10 +1,10 @@
 <main>
-	<%- include('../partials/adminSidebar') %>
+	<%- include('../partials/managementSidebar') %>
 	
 	<div id="main-wrapper">
-		<p class="title">Download User Data</p>
+		<p class="title">Manage Users</p>
 
-		<!-- Filter Form for Download -->
+		<!-- Filter Form for User Search -->
 		<form id="filterForm" class="form-inline">
 			<div class="gridf" style="display: flex; align-items: center; gap: 10px;">
 				<label style="flex-grow: 1;">
@@ -17,22 +17,21 @@
 				</label>
 				<button type="button" id="download-btn" class="submit" style="margin-bottom: 23px;">Download Excel</button>
 			</div>
-			
 		</form>
 
-		<!-- Table Section as before -->
+		<!-- Table Section for Users -->
 		<div class="tbl-header" style="max-height: 75%; overflow: auto;">
-			<table  cellpadding="0" cellspacing="0"  border="0">
+			<table cellpadding="0" cellspacing="0" border="0">
+				
 				<thead>
 					<tr>
-						<th scope="col">#</th>
-						<th scope="col">Code</th>
-						<th scope="col">Name</th>
-						<th scope="col">Email</th>
-						<th scope="col">Phone</th>
-						<th scope="col">Join date</th>
-						<th scope="col">Lifetime Cycle</th>
-						<th scope="col">Action</th> <!-- New column for Add/Update Photo -->
+						<th scope="col" style="width: 5%;">#</th>
+						<th scope="col" style="width: 5%;">Code</th>
+						<th scope="col" style="width: 10%;">Name</th>
+						<th scope="col" style="width: 15%;">Email</th>
+						<th scope="col" style="width: 7%;">Phone</th>
+						<th scope="col" style="width: 8%;">DOJ</th>
+						<th scope="col" style="width: 15%;">Action</th> <!-- Action Column for Edit/Photo -->
 					</tr>
 				</thead>
 			</table>
@@ -42,15 +41,21 @@
 				<tbody>
 					<% for(let i=0; i<consultant.length; i++) { %>
 						<tr>
-							<th scope="row"> <%= i+1 %> </th>
-							<td> <%= consultant[i].code  %> </td>
-							<td> <%= consultant[i].name %> </td>
-							<td> <%= consultant[i].email_id %> </td>
-							<td> <%= consultant[i].mobile_no %> </td>
-							<td> <%= consultant[i].dateOfJoining.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short"}) %> </td>
-							<td> <%= consultant[i].consultantLifetimeCycleNumber %> </td>
-							<td>
-								<!-- Add/Update Photo button -->
+							<th scope="row" style="width: 5%;"> <%= i+1 %> </th>
+							<td style="width: 5%;" > <%= consultant[i].code  %> </td>
+							<td style="width: 10%;"> <%= consultant[i].name %> </td>
+							<td style="width: 15%;"> <%= consultant[i].email_id %> </td>
+							<td style="width: 7%;"> <%= consultant[i].mobile_no %> </td>
+							<% 
+							const dateOfJoining = new Date(consultant[i].dateOfJoining);
+							const formattedDate = `${dateOfJoining.getDate().toString().padStart(2, '0')}-${(dateOfJoining.getMonth() + 1).toString().padStart(2, '0')}-${dateOfJoining.getFullYear()}`;
+						  %>
+							<td style="width: 8%;"> <%= formattedDate %> </td>
+							<td style="width: 15%;" >
+								<!-- Edit User Button -->
+								<a href="/admin/updateconsultant/<%= consultant[i]._id %>" class="submit" > Edit </a>
+								
+								<!-- Photo Button (remains the same) -->
 								<a href="/admin/upload-multiple/<%= consultant[i]._id %>" class="submit"> Photo</a>
 							</td>
 						</tr>

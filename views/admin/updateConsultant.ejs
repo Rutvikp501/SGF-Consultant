@@ -1,0 +1,159 @@
+<main>
+    <%- include('../partials/managementSidebar') %>
+
+    <div id="main-wrapper">
+        <p class="title">Update User</p>
+        <form action="/admin/updateconsultant/<%= consultant._id %>" method="POST" class="form">
+
+            <% if (typeof errors != 'undefined') { %>
+                <% errors.forEach(function (error) { %>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <%= error.msg %>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <% }); %>
+            <% } %>
+
+            <div class="section">
+                <h3>Consultant Information</h3>
+                <div class="gridf">
+                    <label>
+                        <input type="text" name="Role" class="input" id="Role" value="<%= consultant.role %>" disabled>
+                        <span>Role</span>
+                    </label>
+
+                    <!-- Disable department and name inputs for Admin -->
+                    <label>
+                        <input type="text" name="department" class="input" id="department" value="<%= consultant.department %>" disabled>
+                        <span>Department</span>
+                    </label>
+
+                    <label>
+                        <input type="text" name="user_code" class="input" id="user-code" value="<%= consultant.code %>"  disabled   >
+                        <span>User Code</span>
+                    </label>
+
+                    <label>
+                        <input type="text" name="user_name" class="input" id="user-name" value="<%= consultant.name %>" >
+                        <span>Name</span>
+                    </label>
+
+                    <!-- Admin cannot edit email -->
+                    <label>
+                        <input type="text" name="email_id" class="input" id="email" value="<%= consultant.email_id %>"  disabled   >
+                        <span>Email Address</span>
+                    </label>
+
+                    <label>
+                        <% 
+                        const dateOfJoining = new Date(consultant.dateOfJoining);
+                        const formattedDate = `${dateOfJoining.getDate().toString().padStart(2, '0')}-${(dateOfJoining.getMonth() + 1).toString().padStart(2, '0')}-${dateOfJoining.getFullYear()}`;
+                      %>
+                      
+                      <input type="text" name="dateOfJoining" class="input" id="date-of-joining" value="<%= formattedDate %>" disabled>
+                        <span>Date of Joining</span>
+                    </label>
+
+                    <label>
+                        <input type="text" name="mobile_no" class="input" id="mobile-no" value="<%= consultant.mobile_no %>"     >
+                        <span>Mobile Number</span>
+                    </label>
+
+                    <label>
+                        <input type="text" name="user_city" class="input" id="user-city" value="<%= consultant.city %>"   >
+                        <span>City</span>
+                    </label>
+
+                    <label>
+                        <input type="text" name="user_pincode" class="input" id="user-pincode" value="<%= consultant.pincode %>"   >
+                        <span>Pincode</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Sales Assistant Section (Only editable if not Admin) -->
+            <% if (consultant.role !== 'admin') { %>
+                <div class="section" id="sales-assistant-section">
+                    <h3>Sales Assistant Information</h3>
+                    <div class="gridf">
+                        <label>
+                            <input type="text" name="sales_assistan_name" class="input" id="sales-assistan-name"
+                                value="<%= consultant.sales_assistan.name || '' %>">
+                            <span>Sales Assistant Name</span>
+                        </label>
+
+                        <label>
+                            <input type="text" name="sales_assistan_mobile_no" class="input" id="sales-assistan-mobile-no"
+                                value="<%= consultant.sales_assistan.mobile_no || '' %>">
+                            <span>Sales Assistant Mobile No.</span>
+                        </label>
+                    </div>
+                </div>
+            <% } %>
+
+            <!-- Bank Details Section (Only editable if not Admin) -->
+            <% if (consultant.role !== 'admin') { %>
+                <div class="section" id="bank-details-section">
+                    <h3>Bank Details</h3>
+                    <div class="gridf">
+                        <label>
+                            <input type="text" name="bank_name" class="input" id="bank-name" value="<%= consultant.consultant_bank_details ? consultant.consultant_bank_details.bank_name : '' %>">
+                            <span>Bank Name</span>
+                        </label>
+                        
+                        <label>
+                            <input type="text" name="account_number" class="input" id="account-number" value="<%= consultant.consultant_bank_details ? consultant.consultant_bank_details.account_number : '' %>">
+                            <span>Account Number</span>
+                        </label>
+                        
+                        <label>
+                            <input type="text" name="ifsc_code" class="input" id="ifsc-code" value="<%= consultant.consultant_bank_details ? consultant.consultant_bank_details.ifsc_code : '' %>">
+                            <span>IFSC Code</span>
+                        </label>
+                        
+                        <label>
+                            <input type="text" name="branch_name" class="input" id="branch-name" value="<%= consultant.consultant_bank_details ? consultant.consultant_bank_details.branch_name : '' %>">
+                            <span>Branch Name</span>
+                        </label>
+                        
+                    </div>
+                </div>
+            <% } %>
+
+            <button type="submit" class="submit d-block m-auto mt-4">Update</button>
+        </form>
+    </div>
+</main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const roleSelect = document.getElementById('role');
+        const salesAssistantSection = document.getElementById('sales-assistant-section');
+        const bankDetailsSection = document.getElementById('bank-details-section');
+
+        function toggleEditableFields() {
+            const isAdmin = roleSelect.value === 'admin';
+            const fields = document.querySelectorAll('.input');
+            fields.forEach(field => {
+                // Disable fields that should not be edited by admin
+                if (isAdmin && ['user_name', 'department', 'email_id', 'dateOfJoining'].includes(field.name)) {
+                    field.disabled = true;
+                } else if (!isAdmin) {
+                    field.disabled = false;
+                }
+            });
+
+            // Hide sections based on role
+            if (isAdmin) {
+                salesAssistantSection.style.display = 'none';
+                bankDetailsSection.style.display = 'none';
+            } else {
+                salesAssistantSection.style.display = 'block';
+                bankDetailsSection.style.display = 'block';
+            }
+        }
+
+        toggleEditableFields();
+        roleSelect.addEventListener('change', toggleEditableFields);
+    });
+</script>

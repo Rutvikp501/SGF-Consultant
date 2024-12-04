@@ -15,9 +15,12 @@ async function Consultant_Wellcome(EmailData, password1) {
         tls: { rejectUnauthorized: false },
         debug: true
     });
-    const welcometemplatePath = path.join(__dirname, "..","assets",'email_templets', 'welcome-template.html');
-    const cardtemplatePath = path.join(__dirname, "..","assets",'email_templets', 'welcomeCard.html');
-    
+    const welcometemplatePath = path.join(__dirname, "..", "assets", 'email_templets', 'welcome-template.html');
+    const cardtemplatePath = path.join(__dirname, "..", "assets", 'email_templets', 'welcomeCard.html');
+
+    const dateOfJoining = new Date(EmailData.dateOfJoining);
+    const formattedDate = `${dateOfJoining.getDate().toString().padStart(2, '0')}-${(dateOfJoining.getMonth() + 1).toString().padStart(2, '0')}-${dateOfJoining.getFullYear()}`;
+
     let welcomehtmlTemplate = fs.readFileSync(welcometemplatePath, 'utf-8');
     welcomehtmlTemplate = welcomehtmlTemplate
         .replace('{{name}}', EmailData.name)
@@ -27,7 +30,7 @@ async function Consultant_Wellcome(EmailData, password1) {
         .replace('{{role}}', EmailData.role)
         .replace('{{regular}}', EmailData.currentcycle.regular.cycleLabel)
         .replace('{{seasonal}}', EmailData.currentcycle.seasonal.cycleLabel)
-        .replace('{{dateOfJoining}}', EmailData.dateOfJoining)
+        .replace('{{dateOfJoining}}', formattedDate)
         .replace('{{sales_assistan_name}}', EmailData.sales_assistan.name || 'N/A')
         .replace('{{sales_assistan_mobile_no}}', EmailData.sales_assistan.mobile_no || 'N/A');
 
@@ -40,12 +43,12 @@ async function Consultant_Wellcome(EmailData, password1) {
         .replace('{{role}}', EmailData.role)
         .replace('{{regular}}', EmailData.currentcycle.regular.cycleLabel)
         .replace('{{seasonal}}', EmailData.currentcycle.seasonal.cycleLabel)
-        .replace('{{dateOfJoining}}', EmailData.dateOfJoining)
+        .replace('{{dateOfJoining}}', formattedDate)
         .replace('{{sales_assistan_name}}', EmailData.sales_assistan.name || 'N/A')
         .replace('{{sales_assistan_mobile_no}}', EmailData.sales_assistan.mobile_no || 'N/A');
 
     const mailOptions = {
-        from: 'Swaptography Management',  
+        from: 'Swaptography Management',
         to: EmailData.email_id,
         subject: `CONSULTANT REGISTRATION SUCCESSFUL!`,
         html: welcomehtmlTemplate,
@@ -60,7 +63,7 @@ async function Consultant_Wellcome(EmailData, password1) {
     }
 }
 
-async function SendOTP( Email,otp) {
+async function SendOTP(Email, otp) {
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         host: 'smtp.gmail.com',
@@ -96,7 +99,7 @@ async function SendOTP( Email,otp) {
   </div>
 </div>
         `,
-       
+
     };
     // console.log(mailOptions);
     const info = await transporter.sendMail(mailOptions);
@@ -104,7 +107,7 @@ async function SendOTP( Email,otp) {
     return info;
 }
 
-async function samples(name,email,eventName) {
+async function samples(name, email, eventName) {
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         host: 'smtp.gmail.com',
@@ -119,20 +122,20 @@ async function samples(name,email,eventName) {
 
         debug: true
     });
-    const sampleHtmlTemplatePath = path.join(__dirname, "..","assets",'email_templets', 'samples.html');
-    
+    const sampleHtmlTemplatePath = path.join(__dirname, "..", "assets", 'email_templets', 'samples.html');
+
     let sampleHtmlTemplate = fs.readFileSync(sampleHtmlTemplatePath, 'utf-8');
     sampleHtmlTemplate = sampleHtmlTemplate
-    .replace('{{name}}', name)
-    .replace('{{email_id}}', email)
-    .replace('{{event_Name}}', eventName)
-    .replace('{{eventName}}', eventName)
-    .replace('{{drivelink}}', determineEventLink(eventName));
+        .replace('{{name}}', name)
+        .replace('{{email_id}}', email)
+        .replace('{{event_Name}}', eventName)
+        .replace('{{eventName}}', eventName)
+        .replace('{{drivelink}}', determineEventLink(eventName));
 
-    
+
 
     const mailOptions = {
-        from: 'Swaptography Management',  
+        from: 'Swaptography Management',
         to: email,
         subject: `Sample for ${eventName} Event`,
         html: sampleHtmlTemplate,
@@ -159,7 +162,7 @@ async function sendEmailWithAttachment(filePath) {
         debug: true
     });
     const mailOptions = {
-        from: 'Bitrix data ',  
+        from: 'Bitrix data ',
         to: `rutvik72patil@gmail.com`,
         subject: `Lead Data Attachment`,
         text: 'Please find the attached lead data file.',
@@ -175,6 +178,8 @@ async function sendEmailWithAttachment(filePath) {
     // console.log(info)
     return info;
 }
-module.exports = { Consultant_Wellcome ,SendOTP,samples,sendEmailWithAttachment};
+
+
+module.exports = { Consultant_Wellcome, SendOTP, samples, sendEmailWithAttachment };
 
 

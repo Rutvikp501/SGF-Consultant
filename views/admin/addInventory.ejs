@@ -1,0 +1,57 @@
+<main>
+    <%- include('../partials/managementSidebar') %>
+
+    <div id="main-wrapper">
+
+        <p class="title">Add inventory</p>
+        <form action="/admin/addinventory" method="POST" class="form">
+
+            <% if (typeof errors != 'undefined') { %>
+                <% errors.forEach(function(error) { %>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <%= error.msg %>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <% }); %>
+            <% } %>
+
+            <div class="gridf">
+                <label>
+                    <select class="input" name="inventory_type" id="inventory-type">
+                        <option value="" disabled selected>SelectType</option>
+                        <option value="service">service</option>
+                        <option value="product">Product</option>
+                    </select>
+                   <span>Inventory Type</span>
+                </label>
+                
+                <label>
+                    <input type="text" name="inventory_name" class="input" id="inventory-name" value="<%= typeof inventory_name != 'undefined' ? inventory_name : '' %>" required>
+                    <span>Name</span>
+                </label>
+
+                <label>
+                    <input type="text" name="subname" class="input" id="subname" value="<%= typeof subname != 'undefined' ? subname : '' %>" >
+                    <span>Sub Name</span>
+                </label>
+
+                <label>
+                    <input type="number" name="retail_price" class="input" id="retail_price" value="<%= typeof retail_price != 'undefined' ? retail_price : '' %>" required>
+                    <span>Retail Price</span>
+                </label>
+
+                <label>
+                    <input type="text" name="detailed_description" class="input" id="detailed_description" value="<%= typeof detailed_description != 'undefined' ? detailed_description : '' %>" >
+                    <span>Detailed Description</span>
+                </label>
+
+
+
+
+            </div>
+            <button type="submit" class="submit d-block m-auto mt-4">Submit</button>
+
+        </form>
+
+    </div>
+</main>

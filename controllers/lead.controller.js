@@ -1,7 +1,6 @@
 const { calculateCycle, calculateLeadCycle, generateLeadID } = require('../helpers/sample');
 const LeadModel = require('../models/lead.models');
 const UserModel = require('../models/user');
-const jwt = require('jsonwebtoken');
 const ConvertedLeadModel = require('../models/convertedLead.model');
 const JunkLeadModel = require('../models/junkLead.model');
 const { bitrixaddLead } = require('../utility/bitrix');
@@ -9,6 +8,8 @@ const {getCommissionexcel} = require('../utility/excel.util');
 const { samples } = require("../utility/email.util.js");
 const packagesModel = require('../models/packages.model');
 const LeadBackupModel = require('../models/leadbackup.model');
+const consultantModel = require('../models/consultant.model.js');
+const jwt = require('jsonwebtoken');
 const token = process.env.token
 
 
@@ -20,7 +21,7 @@ exports.addLead = async (req, res) => {
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear();
 
-        let consultantDetails = await UserModel.findById(params.consultant);
+        let consultantDetails = await consultantModel.findById(params.consultant);
         if (!consultantDetails) {
             return res.send({
                 success: false,

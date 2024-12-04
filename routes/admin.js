@@ -3,6 +3,9 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const middleware = require("../middleware/index.js");
 const UserModel = require("../models/user.js");
+
+const adminModel = require("../models/admin.model");
+const consultantModel = require("../models/consultant.model.js");
 const LeadModel = require("../models/lead.models.js");
 const ConvertedLeadModel = require("../models/convertedLead.model.js");
 const JunkLeadModel = require("../models/junkLead.model.js");
@@ -11,20 +14,25 @@ const { Consultant_Wellcome } = require("../utility/email.util.js");
 const { addLead } = require("../controllers/lead.controller.js");
 const packagesModel = require("../models/packages.model.js");
 const { cloudinaryUpload } = require("../config/cloudinary.js");
+const { adminregistationquery, consultantregistationquery, updateUserPhotos, addinventoryquery, updateConsultantQuery, transformedData } = require("../query/admin.query.js");
+const inventorysModel = require("../models/inventory.model.js");
+const { create_proforma } = require("../utility/pdf.js");
 
 router.get("/admin/dashboard", middleware.ensureAdminLoggedIn, async (req, res) => {
-	const numAdmins = await UserModel.countDocuments({ role: "admin" });
-	const numconsultant = await UserModel.countDocuments({ role: "consultant" });
+	const { department } = req.user;
+	const numAdmins = await adminModel.countDocuments();
+	const numconsultant = await consultantModel.countDocuments();
 	const numPendingLeads = await LeadModel.countDocuments({ status: "Pending" });
 	const numConvertedLeads = await LeadModel.countDocuments({ status: "Converted" });
 	const numJunkLeads = await LeadModel.countDocuments({ status: "Junk" });
 	res.render("admin/dashboard", {
 		title: "Dashboard",
-		numAdmins, numconsultant, numPendingLeads, numConvertedLeads, numJunkLeads,
+		numAdmins, numconsultant, numPendingLeads, numConvertedLeads, numJunkLeads, department
 	});
 });
 
 router.get("/admin/Leads/all", middleware.ensureAdminLoggedIn, async (req, res) => {
+	const { department } = req.user;
 	try {
 		const { search, sortBy, order = 'asc' } = req.query; // Get query parameters
 
@@ -46,7 +54,7 @@ router.get("/admin/Leads/all", middleware.ensureAdminLoggedIn, async (req, res) 
 			.populate("consultant")
 			.sort({ [sortBy]: order === 'asc' ? 1 : -1 });
 
-		res.render("admin/allLeads", { title: "Pending Leads", allLeads, search, sortBy, order });
+		res.render("admin/allLeads", { title: "Pending Leads", allLeads, search, sortBy, order, department });
 	} catch (err) {
 		console.log(err);
 		req.flash("error", "Some error occurred on the server.");
@@ -58,7 +66,7 @@ router.get("/admin/Leads/converted", middleware.ensureAdminLoggedIn, async (req,
 	try {
 		const ConvertedLeads = await LeadModel.find({ status: "Converted" }).populate("consultant");
 
-		res.render("admin/convertedLeads", { title: "Converted Leads ", ConvertedLeads });
+		res.render("admin/convertedLeads", { title: "Converted Leads ", ConvertedLeads, department });
 	}
 	catch (err) {
 		console.log(err);
@@ -73,7 +81,7 @@ router.get("/admin/Leads/view/:LeadsId", middleware.ensureAdminLoggedIn, async (
 		const Leads = await LeadModel.findById(LeadsId).populate("consultant");
 		const ConvertedLeads = await ConvertedLeadModel.find({ leadID: Leads.leadID });
 
-		res.render("admin/leads", { title: "Leads details", Leads: Leads, ConvertedLeads: ConvertedLeads });
+		res.render("admin/leads", { title: "Leads details", Leads: Leads, ConvertedLeads: ConvertedLeads, department });
 	}
 	catch (err) {
 		console.log(err);
@@ -167,12 +175,12 @@ router.post("/admin/Leads/reject/:LeadsId", middleware.ensureAdminLoggedIn, asyn
 });
 
 router.get("/admin/consultants", middleware.ensureAdminLoggedIn, async (req, res) => {
+	const { department } = req.user;
 	try {
-		const consultant = await UserModel.find({ role: "consultant" });
-		const admin = await UserModel.find({ role: "admin" });
+		const consultant = await consultantModel.find();
 		// console.log(consultant);
 
-		res.render("admin/Consultants", { title: "List of consultant", consultant });
+		res.render("admin/Consultants", { title: "List of consultant", consultant, department });
 	}
 	catch (err) {
 		console.log(err);
@@ -182,11 +190,12 @@ router.get("/admin/consultants", middleware.ensureAdminLoggedIn, async (req, res
 });
 
 router.get("/admin/admins", middleware.ensureAdminLoggedIn, async (req, res) => {
+	const { department } = req.user;
 	try {
-		const admin = await UserModel.find({ role: "admin" });
-		//console.log(admin);
+		const admins = await adminModel.find();
+		console.log(admins);
 
-		res.render("admin/admins", { title: "List of Admin", admin });
+		res.render("admin/admins", { title: "List of Admin", admins, department });
 	}
 	catch (err) {
 		console.log(err);
@@ -196,9 +205,10 @@ router.get("/admin/admins", middleware.ensureAdminLoggedIn, async (req, res) => 
 });
 
 router.get("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) => {
+	const { department } = req.user;
 	try {
-		const users = await UserModel.find();
-		res.render("admin/addUser", { title: "List of users",  users});
+		const consultants = await consultantModel.find();
+		res.render("admin/addUser", { title: "List of users", consultants, department });
 	}
 	catch (err) {
 		console.log(err);
@@ -209,165 +219,157 @@ router.get("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) =>
 
 });
 
-
-// Add User Route
 router.post("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) => {
-  
-	const {
-	  email_id, password1, role, user_code, user_name, mobile_no, dateOfJoining,
-	  user_city, user_pincode, sales_assistan_name, sales_assistan_mobile_no, bank_name,
-	  account_number, ifsc_code, branch_name
-	} = req.body;
-	let errors = [];
-  
-	if (!email_id || !password1 || !user_code || !user_name || !mobile_no || !dateOfJoining) {
-	  errors.push({ msg: "Please fill in all the fields" });
-	}
-  
-	if (errors.length > 0) {
-	  return res.render("admin/addUser", {
-		title: "Add User",
-		errors, email_id, password1, role, user_code, user_name, mobile_no, dateOfJoining,
-		user_city, user_pincode, sales_assistan_name, sales_assistan_mobile_no, bank_name,
-		account_number, ifsc_code, branch_name
-	  });
-	}
-  
 	try {
-	  const getExistingUser = await UserModel.findOne({ email_id });
-	  const duplicateCode = await UserModel.findOne({ code: user_code });
-  
-	  if (getExistingUser) {
-		errors.push({ msg: "This Email is already registered. Please try another email." });
-		return res.render("admin/addUser", {
-		  title: "Add User",
-		  errors, email_id, password1, role, user_code, user_name, mobile_no, dateOfJoining,
-		  user_city, user_pincode, sales_assistan_name, sales_assistan_mobile_no, bank_name,
-		  account_number, ifsc_code, branch_name
-		});
-	  }
-  
-	  if (duplicateCode) {
-		return res.status(400).send({ success: "failed", message: "User code already exists." });
-	  }
-  
-	  // Encrypt the password
-	  const salt = bcrypt.genSaltSync(10);
-	  const hash = bcrypt.hashSync(password1, salt);
-  		// Calculate cycle
-		  const date = new Date(dateOfJoining); // Parse date string
-		  const { regular, seasonal } = calculateCycle(date);
-  
-	  // Create new user
-	  const newUser = new UserModel({
-		code: user_code,
-		name: user_name,
-		email_id: email_id,
-		mobile_no: mobile_no,
-		role: role,
-		password: hash,
-		dateOfJoining: new Date(dateOfJoining),
-		city: user_city,
-		pincode: user_pincode,
-		sales_assistan: {
-		  name: sales_assistan_name || null,
-		  mobile_no: sales_assistan_mobile_no || null,
-		},
-		user_bank_details: {
-		  bank_name: bank_name || null,
-		  account_number: account_number || null,
-		  ifsc_code: ifsc_code || null,
-		  branch_name: branch_name || null,
-		},
-		currentcycle: {  
-		  regular: { cycleLabel: regular.cycleLabel, cycleNumber: regular.cycleNumber },
-		  seasonal: { cycleLabel: seasonal.cycleLabel, cycleNumber: seasonal.cycleNumber }
-		},
-	  });
-  
-	  // Save the new user to the database
-	  await newUser.save();
-	  await Consultant_Wellcome(newUser, password1); 
-	  // Redirect to the upload photos route with the user's ID
-	  req.flash("success", "User successfully added. Please upload photos.");
-	  res.redirect("/admin/consultants");
-	 // res.redirect(`/admin/upload-multiple/${newUser._id}`); // pass the user ID as a query parameter
-	 
+		const params = req.body;
+
+		if (!params.role) {
+			req.flash("error", "Role is required.");
+			return res.redirect("back");
+		}
+
+		let result;
+		if (params.role === "admin") {
+			result = await adminregistationquery(params);
+		} else if (params.role === "consultant") {
+			result = await consultantregistationquery(params);
+		} else {
+			req.flash("error", "Invalid role specified.");
+			return res.redirect("back");
+		}
+
+		if (result.success) {
+			req.flash("success", result.message);
+			res.redirect("/admin/consultants");
+		} else {
+			req.flash("error", result.message);
+			res.redirect("back");
+		}
 	} catch (err) {
-	  console.error(err);
-	  req.flash("error", "Some error occurred on the server.");
-	  res.redirect("back");
+		console.error(err);
+		req.flash("error", "Some error occurred on the server.");
+		res.redirect("back");
 	}
 });
+router.get("/admin/updateconsultant/:id", middleware.ensureAdminLoggedIn, async (req, res) => {
+    const { department } = req.user;
+    const { id } = req.params;
+    
+    try {
+        const consultant = await consultantModel.findById(id);
+        const consultants = await consultantModel.find();
+		
+        if (!consultant) {
+            req.flash("error", "consultant not found.");
+            return res.redirect("back");
+        }
+        
+        res.render("admin/updateConsultant", { title: "Update User", consultant , consultants, department });
+    } catch (err) {
+        console.log(err);
+        req.flash("error", "Some error occurred on the server.");
+        res.redirect("back");
+    }
+});
 
-  
-// Updated route to capture the user ID as a route parameter
+router.post("/admin/updateconsultant/:id", middleware.ensureAdminLoggedIn, async (req, res) => {
+    const { id } = req.params;
+    const params = req.body;
+	
+    try {
+        
+        // Find user by ID and update
+        let updatedUser = await updateConsultantQuery(params, id); // Assuming this function handles updates for consultant
+    
+        
+        if (updatedUser.success) {
+            req.flash("success", updatedUser.message);
+            res.redirect("/admin/consultants");
+        } else {
+            req.flash("error", updatedUser.message);
+            res.redirect("back");
+        }
+    } catch (err) {
+        console.error(err);
+        req.flash("error", "Some error occurred on the server.");
+        res.redirect("back");
+    }
+});
+
+
 router.get("/admin/upload-multiple/:id", middleware.ensureAdminLoggedIn, async (req, res) => {
+	const { department } = req.user;
 	const userId = req.params.id; // Get the user ID from route params
 	if (!userId) {
-	  req.flash("error", "Invalid user ID.");
-	  return res.redirect("/admin/addUser");
+		req.flash("error", "Invalid user ID.");
+		return res.redirect("/admin/addUser");
 	}
 
 	res.render("admin/addPhoto", {
-	  title: "Upload User Photos",
-	  userId, // Pass the userId to the view
+		title: "Upload User Photos",
+		userId, // Pass the userId to the view
+		department
 	});
 });
 
-  
-// POST route to handle file upload with userId in URL
 router.post('/admin/upload-multiple/:id', async (req, res) => {
-	const userId = req.params.id; // Get the userId from the URL params
-	
+	const userId = req.params.id;
+
 	if (!userId) {
-	  req.flash("error", "No user ID found.");
-	  return res.redirect("back");
+		req.flash("error", "No user ID found.");
+		return res.redirect("back");
 	}
-  
+
 	try {
-	  const upload = await cloudinaryUpload();
-  
-	  upload.fields([
-		{ name: 'profilephoto', maxCount: 1 },
-		{ name: 'panphoto', maxCount: 1 },
-		{ name: 'adharphoto', maxCount: 1 }
-	  ])(req, res, async (err) => {
-		if (err) {
-		  return res.status(500).send('Error uploading images.');
-		}
-  
-		const profilePhotoUrl = req.files.profilephoto ? req.files.profilephoto[0].path : null;
-		const panPhotoUrl = req.files.panphoto ? req.files.panphoto[0].path : null;
-		const adharPhotoUrl = req.files.adharphoto ? req.files.adharphoto[0].path : null;
-  
-		// Update the user document with the photo URLs
-		await UserModel.findByIdAndUpdate(userId, {
-			profilePhotoUrl: profilePhotoUrl,
-			panPhotoUrl: panPhotoUrl,
-			aadhaarPhotoUrl: adharPhotoUrl
+		// Setup for uploading images
+		const upload = await cloudinaryUpload();
+		upload.fields([
+			{ name: 'profilephoto', maxCount: 1 },
+			{ name: 'panphoto', maxCount: 1 },
+			{ name: 'adharphoto', maxCount: 1 },
+		])(req, res, async (err) => {
+			if (err) {
+				console.error(err);
+				req.flash("error", "Error uploading images.");
+				return res.redirect("back");
+			}
+
+			const profilePhotoUrl = req.files.profilephoto?.[0]?.path || null;
+			const panPhotoUrl = req.files.panphoto?.[0]?.path || null;
+			const adharPhotoUrl = req.files.adharphoto?.[0]?.path || null;
+
+			// Update the user with photo URLs
+			const updateResult = await updateUserPhotos(userId, {
+				profilePhotoUrl,
+				panPhotoUrl,
+				adharPhotoUrl,
+			});
+
+			if (!updateResult.success) {
+				req.flash("error", updateResult.message);
+				return res.redirect("back");
+			}
+
+			req.flash("success", "User photos uploaded successfully!");
+			res.redirect("/admin/consultants");
 		});
-  
-		req.flash("success", "User photos uploaded successfully!");
-		res.redirect("/admin/consultants");
-	  });
 	} catch (err) {
-	  console.error(err);
-	  res.status(500).send('Failed to upload images.');
+		console.error(err);
+		req.flash("error", "Failed to upload images.");
+		res.redirect("back");
 	}
-  });
-  
-  
+});
 
 router.get("/admin/profile", middleware.ensureAdminLoggedIn, (req, res) => {
-	res.render("admin/profile", { title: "My profile" });
+	const { department } = req.user;
+	res.render("admin/profile", { title: "My profile", department });
 });
 
 router.put("/admin/profile", middleware.ensureAdminLoggedIn, async (req, res) => {
 	try {
 		const id = req.user._id;
 		const updateObj = req.body.admin;	// updateObj: {name, lastName, gender, address, phone}
-		await UserModel.findByIdAndUpdate(id, updateObj);
+		await adminModel.findByIdAndUpdate(id, updateObj);
 
 		req.flash("success", "Profile updated successfully");
 		res.redirect("/admin/profile");
@@ -381,9 +383,10 @@ router.put("/admin/profile", middleware.ensureAdminLoggedIn, async (req, res) =>
 });
 
 router.get("/admin/addLeads", middleware.ensureAdminLoggedIn, async (req, res) => {
+	const { department } = req.user;
 	try {
 		const Leads = await LeadModel.find();
-		res.render("admin/addLeads", { title: "List of Leads", Leads });
+		res.render("admin/addLeads", { title: "List of Leads", Leads, department });
 	}
 	catch (err) {
 		console.log(err);
@@ -480,32 +483,110 @@ router.post('/admin/addLeads', middleware.ensureAdminLoggedIn, async (req, res) 
 	}
 });
 
-router.get("/admin/addpackages", middleware.ensureAdminLoggedIn, async (req, res) => {
+router.get("/admin/addinventory", middleware.ensureAdminLoggedIn, async (req, res) => {
+	const { department } = req.user;
 	try {
-		const packages = await packagesModel.find();
-		res.render("admin/addPackage", { title: "List of Packages", Leads });
+		const inventorys = await inventorysModel.find();
+		res.render("admin/addinventory", { title: "List of inventory", inventorys, department });
 	}
 	catch (err) {
 		console.log(err);
 		req.flash("error", "Some error occurred on the server.")
 		res.redirect("back");
 	}
-
-
 });
 
-router.post('/admin/addLeads', middleware.ensureAdminLoggedIn, async (req, res) => {
-	let params = req.body;
-	//console.log(params);
+router.post('/admin/addinventory', middleware.ensureAdminLoggedIn, async (req, res) => {
+
 
 	try {
+		const params = req.body;
+		console.log(params);
 
+		let result;
+
+		result = await addinventoryquery(params);
+
+
+		if (result.success) {
+			req.flash("success", result.message);
+			res.redirect("/admin/showinventorys");
+		} else {
+			req.flash("error", result.message);
+			res.redirect("back");
+		}
 	} catch (error) {
 		console.error(error);
 		res.status(500).send({ message: 'Internal server error' });
 	}
 });
 
+router.get("/admin/showinventorys", middleware.ensureAdminLoggedIn, async (req, res) => {
+	const { department } = req.user;
+	try {
+		const inventorys = await inventorysModel.find();
+		console.log(inventorys);
 
+		res.render("admin/showinventorys", { title: "List of inventorys", inventorys, department });
+	}
+	catch (err) {
+		console.log(err);
+		req.flash("error", "Some error occurred on the server.")
+		res.redirect("back");
+	}
+});
 
+router.get("/admin/createproforma", middleware.ensureAdminLoggedIn, async (req, res) => {
+	const { department } = req.user;
+	try {
+		const inventorys = await inventorysModel.find();
+		// console.log(inventorys);
+
+		res.render("admin/createproforma", { title: "List of inventorys", inventorys, department });
+	}
+	catch (err) {
+		console.log(err);
+		req.flash("error", "Some error occurred on the server.")
+		res.redirect("back");
+	}
+});
+
+router.post("/admin/createproforma", middleware.ensureAdminLoggedIn, async (req, res) => {
+	const { items, discount, gst, subtotal, finalTotal, leaddata, qdata,paymentstatus } = req.body;
+	const result = await transformedData({ items });
+    const serviceitems = result.serviceitems;
+	const pdfdata = {
+		qdata,
+		leaddata,
+		serviceitems,
+		discount,
+		gst,
+		finalTotal,
+		subtotal,
+		discountamnt:(subtotal-finalTotal),
+		paymentstatus
+	  };
+	try {
+		//console.log(params);
+		
+		const pdfBuffer = await create_proforma(pdfdata);
+
+		// Send the PDF in the response
+		res.setHeader('Content-Disposition', 'attachment; filename=Proforma_with_Terms.pdf');
+		res.setHeader('Content-Type', 'application/pdf');
+		res.end(pdfBuffer);
+		// if (result.success) {
+		// 	req.flash("success", result.message);
+		// 	res.redirect("/admin/showinventorys");
+		// } else {
+		// 	req.flash("error", result.message);
+		// 	res.redirect("back");
+		// }
+	}
+	catch (err) {
+		console.log(err);
+		req.flash("error", "Some error occurred on the server.")
+		res.redirect("back");
+	}
+});
 module.exports = router;

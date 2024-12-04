@@ -61,6 +61,7 @@ app.use(consultantRoutes);
 app.use('/api/user',require('./routes/user.route.js'));
 app.use('/api/lead', require('./routes/lead.route.js'));
 app.use('/api', require('./routes/index.routes.js'));
+app.use('/test', require('./routes/admin.routes.js'));
 
 // 404 page
 // app.use((req,res) => {

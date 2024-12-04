@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const leadController = require('../controllers/lead.controller');
-const Admin  = require('../controllers/admin.controller');
+const Auth  = require('../controllers/auth.controller');
 const bitrix = require('../utility/bitrix');
 
 
@@ -22,18 +22,18 @@ router.get('/leadapi/getleadsview/:leadId', leadController.getleadsview);
 // router.get('/leadapi/getAdditionalData/:leadId', leadController.getAdditionalData);
 
 
-router.get('/adminapi/',Admin.GetAllUser)
-router.post('/adminapi/getUserData',Admin.GetUserData)
-// router.post('/adminapi/getSearcheduser',Admin.GetSearchedUser)
-router.post('/adminapi/login',Admin.Login)
-router.post('/adminapi/register',Admin.Register)
-router.post('/adminapi/edit',Admin.Edit)
-router.patch('/adminapi/update/:id', Admin.Update);
-router.delete('/adminapi/delete/:id', Admin.Delete);
-router.post('/adminapi/forgotPassword',Admin.forgotPassword)
-router.post('/adminapi/resetPassword',Admin.resetPassword)
+router.get('/adminapi/',Auth.GetAllUser)
+router.post('/adminapi/getUserData',Auth.GetUserData)
+// router.post('/adminapi/getSearcheduser',Auth.GetSearchedUser)
+router.post('/adminapi/login',Auth.Login)
+router.post('/adminapi/register',Auth.Register)
+router.post('/adminapi/edit',Auth.Edit)
+router.patch('/adminapi/update/:id', Auth.Update);
+router.delete('/adminapi/delete/:id', Auth.Delete);
+router.post('/adminapi/forgotPassword',Auth.forgotPassword)
+router.post('/adminapi/resetPassword',Auth.resetPassword)
 
-router.get('/exceluserdata',Admin.getuserexcel)
+router.get('/exceluserdata',Auth.getuserexcel)
 
 router.post('/bitrix/getconvertedleads',bitrix.getConvertedLead)
 router.get('/bitrix/getleaddata',bitrix.getstagedata)

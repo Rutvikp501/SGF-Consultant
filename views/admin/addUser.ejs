@@ -1,5 +1,5 @@
 <main>
-    <%- include('../partials/adminSidebar') %>
+    <%- include('../partials/managementSidebar') %>
 
     <div id="main-wrapper">
         <p class="title">Add User</p>
@@ -17,6 +17,25 @@
             <div class="section">
                 <h3>User Information</h3>
                 <div class="gridf">
+                    <label>
+                        <select class="input" name="role" id="role">
+                            <option value="" disabled selected>Select User Type</option>
+                            <option value="consultant">Consultant</option>
+                            <option value="admin">Admin</option>
+                            <option value="partners">Partners</option>
+                        </select>
+                        <span>Signup as</span>
+                    </label>
+                    <label>
+                        <select class="input" name="department" id="department">
+                            <option value="" disabled selected>Select department</option>
+                            <option value="management">Management</option>
+                            <option value="ho">HO</option>
+                            <option value="accounts">Accounts</option>
+                            <option value="marketing">Marketing</option>
+                        </select>
+                        <span>Signup as</span>
+                    </label>
                     <label>
                         <input type="text" name="user_code" class="input" id="user-code"
                             value="<%= typeof user_code != 'undefined' ? user_code : '' %>" required>
@@ -53,15 +72,7 @@
                         <span>Mobile Number</span>
                     </label>
 
-                    <label>
-                        <select class="input" name="role" id="role">
-                            <option value="" disabled selected>Select User Type</option>
-                            <option value="consultant">Consultant</option>
-                            <option value="admin">Admin</option>
-                            <option value="partners">Partners</option>
-                        </select>
-                        <span>Signup as</span>
-                    </label>
+
 
                     <label>
                         <input type="text" name="user_city" class="input" id="user-city"
@@ -95,7 +106,7 @@
                 </div>
             </div>
 
-            <div class="section">
+            <div class="section" id ="bank-details-section">
                 <h3>Bank Details</h3>
                 <div class="gridf">
                     <label>
@@ -154,19 +165,44 @@
     document.addEventListener("DOMContentLoaded", function() {
             const roleSelect = document.getElementById('role');
             const salesAssistantSection = document.getElementById('sales-assistant-section');
+            const department = document.getElementById('department');
+            const dateofjoining = document.getElementById('date-of-joining');
+            const usercode = document.getElementById('user-code');
+            const bankdetailsSection = document.getElementById('bank-details-section');
             const salesAssistantInputs = salesAssistantSection.querySelectorAll('input');
+            const bankdetailsInputs = bankdetailsSection.querySelectorAll('input');
     
             function toggleSalesAssistantFields() {
-                if (roleSelect.value === 'admin' || roleSelect.value === '') {
+                if (roleSelect.value === 'admin' ) {
                     salesAssistantSection.style.display = 'none';
                     salesAssistantInputs.forEach(input => {
                         input.disabled = true; // Disable the inputs
                     });
+                    bankdetailsSection.style.display = 'none';
+                    bankdetailsInputs.forEach(input => {
+                        input.disabled = true; // Disable the inputs
+                    });
+                    department.required = true;
+                    department.parentElement.style.display = "block";
+                    dateofjoining.required = false;
+                    dateofjoining.parentElement.style.display = "none";
+                    usercode.required = false;
+                    usercode.parentElement.style.display = "none";
                 } else {
+                    bankdetailsSection.style.display = 'block';
+                    bankdetailsInputs.forEach(input => {
+                        input.disabled = false; // Disable the inputs
+                    });
                     salesAssistantSection.style.display = 'block';
                     salesAssistantInputs.forEach(input => {
                         input.disabled = false; // Enable the inputs
                     });
+                    department.required = false;
+                    department.parentElement.style.display = "none";
+                    dateofjoining.required = false;
+                    dateofjoining.parentElement.style.display = "block";
+                    usercode.required = false;
+                    usercode.parentElement.style.display = "block";
                 }
             }
     

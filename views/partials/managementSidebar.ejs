@@ -1,0 +1,33 @@
+<div id="sidebar">
+	<ul id="sidebar-nav">
+		<li class="welcome-message">Welcome <%= currentUser.name %></li>
+		<li><a href="/admin/dashboard"><i class="bx bx-home"></i> Dashboard</a></li>
+
+		<% if (department === "management") { %>
+			<li><a href="/admin/consultants"><i class="bx bx-user"></i> Consultant</a></li>
+			<li><a href="/admin/admins"><i class="bx bx-user"></i> Admins</a></li>
+			<li><a href="/admin/addUser"><i class="bx bx-plus-circle"></i> Add User</a></li>
+			<li><a href="/admin/showinventorys"><i class="bx bx-list-ul"></i> show inventorys</a></li>
+	     	<li><a href="/admin/createproforma"><i class="bx bx-check-circle"></i> Create proforma </a></li>
+
+		<% } else if (department === "ho") { %>
+			<li><a href="/admin/consultants"><i class="bx bx-user"></i> Consultant</a></li>
+			<li><a href="/admin/admins"><i class="bx bx-user"></i> Admins</a></li>
+			<li><a href="/admin/addUser"><i class="bx bx-plus-circle"></i> Add User</a></li>
+		<% } else if (department === "accounts") { %>
+			
+		    <li><a href="/admin/createproforma"><i class="bx bx-check-circle"></i> Create proforma  </a></li>
+			<li><a href="/admin/showinventorys"><i class="bx bx-list-ul"></i> show inventorys</a></li>
+		<% }  else if (department === "marketing") { %>
+			
+			<li><a href="/admin/consultants"><i class="bx bx-user"></i> Consultant</a></li>
+		<% } %>
+		<li><a href="/admin/profile"><i class="bx bx-user-circle"></i> My Profile</a></li>
+		<li><a href="/auth/logout" class="btn"><i class="bx bx-log-out"></i> Logout</a></li>
+		<li>
+			<a href="#" data-resize-btn>
+			  <i class="bx bx-chevrons-right" style="rotate: 180deg;"></i> Collapse
+			</a>
+		</li>
+	</ul>
+</div>

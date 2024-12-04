@@ -1,0 +1,145 @@
+<main>
+  <%- include('../partials/managementSidebar') %>
+  <div id="main-wrapper">
+    <p class="title">Add Inventory</p>
+    <form id="proformaForm">
+      <h3 style="color: aliceblue;">Lead Information</h3>
+
+      <label for="bookingName" style="color: aliceblue;">Booking Name:</label>
+      <input type="text" id="bookingName" name="booking_name" placeholder="Enter Booking Name" />
+      <br />
+
+      <label for="specialsName" style="color: aliceblue;">Specials Name:</label>
+      <input type="text" id="specialsName" name="specials_name" placeholder="Enter Specials Name" />
+      <br />
+
+      <label for="eventName" style="color: aliceblue;">Event Name:</label>
+      <input type="text" id="eventName" name="event_name" placeholder="Enter Event Name" />
+      <br />
+
+      <label for="emailId" style="color: aliceblue;">Email ID:</label>
+      <input type="email" id="emailId" name="email_id" placeholder="Enter Email ID" />
+      <br />
+
+      <label for="mobileNo" style="color: aliceblue;">Mobile No:</label>
+      <input type="text" id="mobileNo" name="mobile_no" placeholder="Enter Mobile No" />
+      <br />
+
+      <label for="quotationNo" style="color: aliceblue;">Quotation No:</label>
+      <input type="text" id="quotationNo" name="quotation_no" placeholder="Enter Quotation No" />
+      <br />
+
+      <label for="quotationDate" style="color: aliceblue;">Quotation Date:</label>
+      <input type="date" id="quotationDate" name="quotation_date" />
+      <br />
+
+      <label for="eventDate" style="color: aliceblue;">Event Date:</label>
+      <input type="date" id="eventDate" name="event_date" />
+      <br />
+
+      <label for="eventTime" style="color: aliceblue;">Event Time:</label>
+      <input type="time" id="eventTime" name="event_time" />
+      <br />
+
+      <label for="eventLocation" style="color: aliceblue;">Event Location:</label>
+      <textarea id="eventLocation" name="event_location" placeholder="Enter Event Location"></textarea>
+      <br />
+
+      <label for="homeAddress" style="color: aliceblue;">Home Address:</label>
+      <textarea id="homeAddress" name="home_address" placeholder="Enter Home Address"></textarea>
+      <br />
+
+      <label for="serviceType" style="color: aliceblue;">Service Type:</label>
+      <select id="serviceType" name="service_type" style="color: black;">
+        <option value="">-- Select a Service --</option>
+        <option value="film_service">Films Service</option>
+        <option value="album_service">Album / PhotoFrame</option>
+        <option value="videography_service">Venue Service</option>
+      </select>
+      <br />
+
+      <label for="format" style="color: aliceblue;">Format:</label>
+      <select id="format" name="format" style="color: black;">
+        <option value="">-- Select a Format --</option>
+        <option value="10-40-50">10-40-50</option>
+        <option value="20-30-40">20-30-40</option>
+        <option value="50-50">50-50</option>
+      </select>
+      <br />
+
+      <label for="itemSelect" style="color: aliceblue;">Select Item:</label>
+      <select id="itemSelect">
+        <option value="">-- Select an Item --</option>
+        <% inventorys.forEach((item) => { %>
+          <option value="<%= item._id %>" data-name="<%= item.name %>" data-price="<%= item.retail_price %>">
+            <%= item.name %> - ₹<%= item.retail_price %>
+          </option>
+        <% }); %>
+      </select>
+      <button type="button" id="addItem">Add Item</button>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Item Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="itemTableBody"></tbody>
+      </table>
+
+      <div class="summary">
+        <p><strong>Subtotal: </strong> ₹<span id="subtotal">0</span></p>
+        <label for="discount" style="color: aliceblue;">Discount (%):</label>
+        <input type="number" id="discount" value="0" style="width: 60px;" />
+        <br />
+        <label for="gst" style="color: aliceblue;">GST (%):</label>
+        <input type="number" id="gst" value="0" style="width: 60px;" />
+        <br />
+        <p><strong>Final Total: </strong> ₹<span id="finalTotal">0</span></p>
+        <button type="submit">Generate PDF</button>
+      </div>
+    </form>
+  </div>
+</main>
+
+<script>
+  proformaForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(proformaForm);
+  const formObject = Object.fromEntries(formData.entries());
+
+  const items = [];
+  document.querySelectorAll("#itemTableBody tr").forEach((row) => {
+    const name = row.cells[0].textContent;
+    const price = parseFloat(row.cells[1].textContent);
+    const quantity = parseInt(row.querySelector(".quantity").value) || 1;
+    items.push({ name, price, quantity });
+  });
+
+  formObject.items = items;
+  formObject.subtotal = subtotal;
+  formObject.discount = parseFloat(discountInput.value) || 0;
+  formObject.gst = parseFloat(gstInput.value) || 0;
+  formObject.finalTotal = parseFloat(finalTotalEl.textContent);
+
+  fetch("/admin/createproforma", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(formObject),
+  })
+    .then((response) => {
+      if (response.ok) {
+        alert("Proforma PDF generated successfully!");
+      } else {
+        alert("Failed to generate PDF.");
+      }
+    })
+    .catch((error) => console.error("Error:", error));
+});
+
+</script>
