@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path');
+const { formatDate } = require('../helpers/sample');
 require('dotenv').config();
 
 async function Consultant_Wellcome(EmailData, password1) {
