@@ -121,9 +121,9 @@ exports.consultantregistationquery = async (params) => {
     }
 };
 
-exports.updateAdminQuery = async (params) => {
+exports.updateAdminQuery = async (params,id) => {
     try {
-      const existingAdmin = await adminModel.findById(params.userId);
+      const existingAdmin = await adminModel.findById(id);
   
       if (!existingAdmin) {
         return {
@@ -142,7 +142,7 @@ exports.updateAdminQuery = async (params) => {
         pincode: params.user_pincode || existingAdmin.pincode,
       };
   
-      await adminModel.findByIdAndUpdate(params.userId, updateFields);
+      await adminModel.findByIdAndUpdate(id, updateFields);
   
       return {
         success: true,
@@ -160,7 +160,6 @@ exports.updateAdminQuery = async (params) => {
   };
 
   exports.updateConsultantQuery = async (params,id) => {
-    console.log(params);
     
     try {
       const existingConsultant = await consultantModel.findById(id);

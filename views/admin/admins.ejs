@@ -17,6 +17,7 @@
 						<th scope="col"  style="width: 8%;">name</th>
 						<th scope="col"  style="width: 15%;">Email</th>
 						<th scope="col"  style="width: 10%;">Phone</th>
+						<th scope="col" style="width: 15%;">Action</th> <!-- Action Column for Edit/Photo -->
 					</tr>
 				</thead>
 			</table>
@@ -31,6 +32,11 @@
 							<td  style="width: 8%;"> <%= admins[i].name %> </td>
 							<td  style="width: 15%;"> <%= admins[i].email_id %> </td>
 							<td  style="width: 10%;"> <%= admins[i].mobile_no %> </td>
+							<td style="width: 15%;" >
+								<!-- Edit User Button -->
+								<a href="/admin/admins/<%= admins[i]._id %>" class="submit" > Edit </a>
+								
+							</td>
 					<% } %>
 				</tbody>
 			</table>

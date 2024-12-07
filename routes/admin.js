@@ -14,7 +14,7 @@ const { Consultant_Wellcome } = require("../utility/email.util.js");
 const { addLead } = require("../controllers/lead.controller.js");
 const packagesModel = require("../models/packages.model.js");
 const { cloudinaryUpload } = require("../config/cloudinary.js");
-const { adminregistationquery, consultantregistationquery, updateUserPhotos, addinventoryquery, updateConsultantQuery, transformedData } = require("../query/admin.query.js");
+const { adminregistationquery, consultantregistationquery, updateUserPhotos, addinventoryquery, updateConsultantQuery, transformedData, updateAdminQuery } = require("../query/admin.query.js");
 const inventorysModel = require("../models/inventory.model.js");
 const { create_proforma } = require("../utility/pdf.js");
 
@@ -193,7 +193,6 @@ router.get("/admin/admins", middleware.ensureAdminLoggedIn, async (req, res) => 
 	const { department } = req.user;
 	try {
 		const admins = await adminModel.find();
-		console.log(admins);
 
 		res.render("admin/admins", { title: "List of Admin", admins, department });
 	}
@@ -250,6 +249,50 @@ router.post("/admin/addUser", middleware.ensureAdminLoggedIn, async (req, res) =
 		req.flash("error", "Some error occurred on the server.");
 		res.redirect("back");
 	}
+});
+
+router.get("/admin/admins/:id", middleware.ensureAdminLoggedIn, async (req, res) => {
+    const { department } = req.user;
+    const { id } = req.params;
+    
+    try {
+        const admin = await adminModel.findById(id);
+        const admins = await adminModel.find();
+		
+        if (!admin) {
+            req.flash("error", "consultant not found.");
+            return res.redirect("back");
+        }
+        
+        res.render("admin/updateadmins", { title: "Update User", admin , admins, department });
+    } catch (err) {
+        console.log(err);
+        req.flash("error", "Some error occurred on the server.");
+        res.redirect("back");
+    }
+});
+router.post("/admin/admins/:id", middleware.ensureAdminLoggedIn, async (req, res) => {
+    const { id } = req.params;
+    const params = req.body;
+	
+    try {
+        
+        // Find user by ID and update
+        let updatedUser = await updateAdminQuery(params, id); // Assuming this function handles updates for consultant
+    
+        
+        if (updatedUser.success) {
+            req.flash("success", updatedUser.message);
+            res.redirect("/admin/admins");
+        } else {
+            req.flash("error", updatedUser.message);
+            res.redirect("back");
+        }
+    } catch (err) {
+        console.error(err);
+        req.flash("error", "Some error occurred on the server.");
+        res.redirect("back");
+    }
 });
 router.get("/admin/updateconsultant/:id", middleware.ensureAdminLoggedIn, async (req, res) => {
     const { department } = req.user;
@@ -501,7 +544,6 @@ router.post('/admin/addinventory', middleware.ensureAdminLoggedIn, async (req, r
 
 	try {
 		const params = req.body;
-		console.log(params);
 
 		let result;
 
@@ -525,7 +567,6 @@ router.get("/admin/showinventorys", middleware.ensureAdminLoggedIn, async (req, 
 	const { department } = req.user;
 	try {
 		const inventorys = await inventorysModel.find();
-		console.log(inventorys);
 
 		res.render("admin/showinventorys", { title: "List of inventorys", inventorys, department });
 	}

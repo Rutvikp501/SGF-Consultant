@@ -5,7 +5,6 @@ const { read_image } = require("../helpers/common");
 const {create_50_50_pdf ,create_10_40_50_pdf} = require('../helpers/pdfhelper');
 
 exports.create_proforma = async (pdfdata) => {
-    console.log(pdfdata);
     
   try {
     let pdfBuffer;

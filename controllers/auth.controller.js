@@ -10,6 +10,7 @@ const { SendOTP } = require("../utility/email.util.js");
 const bcrypt = require("bcryptjs");
 const { getuserexcel } = require('../utility/excel.util.js');
 const { cloudinaryUpload } = require("../config/cloudinary.js");
+const adminModel = require('../models/admin.model.js');
 
 exports.GetAllUser = async (req, res) => {
     try {
@@ -362,42 +363,56 @@ exports.Logout = async (req, res) => {
 }
 
 exports.forgotPassword = async (req, res) => {
-    
+
     const { email_id } = req.body;
     try {
-        const user = await consultantModel.findOne({ email_id });
+        let user = await adminModel.findOne({ email_id });
+        if (!user) {
+            user = await consultantModel.findOne({ email_id });
+        }
+
         if (!user) {
             return res.send({
                 success: false,
                 statusCode: 500,
-                message: "No user found with that email address."
+                message: "No user found with that email address.",
             });
         }
 
         // Generate OTP and set expiration
-        //   const otp = Math.floor(100000 + Math.random() * 900000).toString(); 
         const otp = Math.floor(1000 + Math.random() * 9000).toString();
         user.otp = otp;
         user.otpExpires = Date.now() + 3600000; // 1 hour expiration
 
-        await user.save();
+        // Save user and handle errors
+        try {
+            await user.save();
+        } catch (err) {
+            console.error('Error saving user:', err);
+            return res.send({
+                success: false,
+                statusCode: 500,
+                message: "Error saving OTP details.",
+            });
+        }
 
         // Send the OTP via email
-        const OTPMail = await SendOTP(user.email_id, otp)
+        const OTPMail = await SendOTP(user.email_id, otp);
         res.send({
             success: true,
             statusCode: 200,
-            message: 'OTP sent to your email.'
+            message: "OTP sent to your email.",
         });
     } catch (error) {
         console.error(error);
         res.send({
             success: false,
             statusCode: 500,
-            message: 'Error sending OTP.'
+            message: "Error sending OTP.",
         });
     }
 };
+
 
 exports.resetPassword = async (req, res) => {
     const { otp, email_id, newPassword } = req.body;
@@ -408,11 +423,20 @@ exports.resetPassword = async (req, res) => {
     //     return res.status(400).send({message:valid[0]})
     // }
     try {
-        const user = await consultantModel.findOne({
+        let user = await consultantModel.findOne({
             email_id,
             otp,
-            otpExpires: { $gt: Date.now() } // Check if OTP is valid and not expired
+            otpExpires: { $gt: Date.now() }, // Check if OTP is valid and not expired
         });
+
+        if (!user) {
+            user = await adminModel.findOne({
+                email_id,
+                otp,
+                otpExpires: { $gt: Date.now() },
+            });
+        }
+
         if (!user) {
             return res.send({
                 success: false,
@@ -423,8 +447,8 @@ exports.resetPassword = async (req, res) => {
         const salt = bcrypt.genSaltSync(10);
         const hashPASS = bcrypt.hashSync(newPassword, salt);
         user.password = hashPASS;
-        user.otp = undefined;
-        user.otpExpires = undefined;
+        user.otp = null;
+        user.otpExpires = null;
 
         await user.save();
         res.send({

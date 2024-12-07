@@ -1,0 +1,68 @@
+<main>
+    <%- include('../partials/managementSidebar') %>
+
+    <div id="main-wrapper">
+        <p class="title">Update User</p>
+        <form action="/admin/admins/<%= admin._id %>" method="POST" class="form">
+
+            <!-- Error Alerts -->
+            <% if (typeof errors != 'undefined') { %>
+                <% errors.forEach(function (error) { %>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <%= error.msg %>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <% }); %>
+            <% } %>
+
+            <div class="section">
+                <h3>User Information</h3>
+                <div class="gridf">
+                    <!-- Name -->
+                    <label>
+                        <input type="text" name="user_name" class="input" id="user-name" 
+                               value="<%= admin.name %>" required>
+                        <span>Name</span>
+                    </label>
+
+                    <!-- Email -->
+                    <label>
+                        <input type="text" name="email_id" class="input" id="email-id" 
+                               value="<%= admin.email_id %>" disabled>
+                        <span>Email ID</span>
+                    </label>
+
+                    <!-- Mobile Number -->
+                    <label>
+                        <input type="text" name="mobile_no" class="input" id="mobile-no" 
+                               value="<%= admin.mobile_no %>" required>
+                        <span>Mobile Number</span>
+                    </label>
+
+                    <!-- Department -->
+                    <label>
+                        <input type="text" name="department" class="input" id="department" 
+                               value="<%= admin.department %>" disabled>
+                        <span>Department</span>
+                    </label>
+
+                    <!-- City -->
+                    <label>
+                        <input type="text" name="user_city" class="input" id="user-city" 
+                               value="<%= admin.city %>" >
+                        <span>City</span>
+                    </label>
+
+                    <!-- Pincode -->
+                    <label>
+                        <input type="text" name="user_pincode" class="input" id="user-pincode" 
+                               value="<%= admin.pincode %>" >
+                        <span>Pincode</span>
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="submit d-block m-auto mt-4">Update</button>
+        </form>
+    </div>
+</main>

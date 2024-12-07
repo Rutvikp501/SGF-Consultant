@@ -259,7 +259,6 @@ exports.getConvertedLead = async (req, res) => {
                 message: 'Consultant not found',
             });
         }
-        console.log(consultantDetails);
 
         // Calculate lead cycle and other relevant info
         consultantDetails.calculateLifetimeCycleNumber();

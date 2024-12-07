@@ -37,7 +37,6 @@ exports.authenticateUser = async(email_id, password)=> {
 	console.log(email_id, password);
 	try {
 	  const user = await User.findOne({ email_id });
-	  console.log(user);
 	  
 	  if (!user) {
 		return { error: 'Incorrect email.' };
