@@ -577,6 +577,57 @@ router.get("/admin/showinventorys", middleware.ensureAdminLoggedIn, async (req, 
 	}
 });
 
+router.get("/admin/addpackages", middleware.ensureAdminLoggedIn, async (req, res) => {
+	const { department } = req.user;
+	try {
+		const packages = await packagesModel.find();
+		res.render("admin/addpackages", { title: "List of packages", packages, department });
+	}
+	catch (err) {
+		console.log(err);
+		req.flash("error", "Some error occurred on the server.")
+		res.redirect("back");
+	}
+});
+
+router.post('/admin/addpackages', middleware.ensureAdminLoggedIn, async (req, res) => {
+
+
+	try {
+		const params = req.body;
+return console.log(params)
+		let result;
+
+		result = await addpackagesquery(params);
+
+
+		if (result.success) {
+			req.flash("success", result.message);
+			res.redirect("/admin/showpackages");
+		} else {
+			req.flash("error", result.message);
+			res.redirect("back");
+		}
+	} catch (error) {
+		console.error(error);
+		res.status(500).send({ message: 'Internal server error' });
+	}
+});
+
+router.get("/admin/showpackages", middleware.ensureAdminLoggedIn, async (req, res) => {
+	const { department } = req.user;
+	try {
+		const packages = await packagesModel.find();
+
+		res.render("admin/showpackages", { title: "List of packages", packages, department });
+	}
+	catch (err) {
+		console.log(err);
+		req.flash("error", "Some error occurred on the server.")
+		res.redirect("back");
+	}
+});
+
 router.get("/admin/createproforma", middleware.ensureAdminLoggedIn, async (req, res) => {
 	const { department } = req.user;
 	try {

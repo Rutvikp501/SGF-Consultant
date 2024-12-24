@@ -1,0 +1,110 @@
+<main>
+    <%- include('../partials/managementSidebar') %>
+
+    <div id="main-wrapper">
+
+        <p class="title">Add Package</p>
+        <form action="/admin/addpackage" method="POST" class="form">
+
+            <% if (typeof errors != 'undefined') { %>
+                <% errors.forEach(function(error) { %>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <%= error.msg %>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <% }); %>
+            <% } %>
+
+            <div class="gridf">
+                <label>
+                    <select class="input" name="package_type" id="package-type" required>
+                        <option value="" disabled selected>Select Type</option>
+                        <option value="CLASSIC">Classic</option>
+                        <option value="PREMIUM">Premium</option>
+                    </select>
+                    <span>Package Type</span>
+                </label>
+
+                <label>
+                    <input type="text" name="package_name" class="input" id="package-name" required>
+                    <span>Package Name</span>
+                </label>
+
+                <label>
+                    <input type="text" name="subname" class="input" id="subname">
+                    <span>Sub Name</span>
+                </label>
+
+                <label>
+                    <input type="text" name="description" class="input" id="description">
+                    <span>Description</span>
+                </label>
+
+                <label>
+                    <input type="text" name="price" class="input" id="price" required>
+                    <span>Price</span>
+                </label>
+
+                <label>
+                    <input type="number" name="graphers" class="input" id="graphers">
+                    <span>No. of Graphers</span>
+                </label>
+
+                <label>
+                    <input type="text" name="delivery" class="input" id="delivery">
+                    <span>Delivery Time</span>
+                </label>
+
+                <label>
+                    <input type="text" name="duration" class="input" id="duration">
+                    <span>Duration</span>
+                </label>
+
+                <!-- Services -->
+                <div id="services-container">
+                    <label>
+                        <input type="text" name="services[]" class="input" placeholder="Service Name" required>
+                        <span>Service</span>
+                    </label>
+                </div>
+                <button type="button" id="add-service-btn" class="btn btn-secondary">Add Service</button>
+
+                <!-- Products -->
+                <div id="products-container">
+                    <label>
+                        <input type="text" name="products[]" class="input" placeholder="Product Name" required>
+                        <span>Product</span>
+                    </label>
+                </div>
+                <button type="button" id="add-product-btn" class="btn btn-secondary">Add Product</button>
+            </div>
+
+            <button type="submit" class="submit d-block m-auto mt-4">Submit</button>
+
+        </form>
+
+    </div>
+
+    <!-- JavaScript for Adding Multiple Fields -->
+    <script>
+        document.getElementById('add-service-btn').addEventListener('click', function() {
+            const servicesContainer = document.getElementById('services-container');
+            const serviceField = document.createElement('label');
+            serviceField.innerHTML = `
+                <input type="text" name="services[]" class="input" placeholder="Service Name" required>
+                <span>Service</span>
+            `;
+            servicesContainer.appendChild(serviceField);
+        });
+
+        document.getElementById('add-product-btn').addEventListener('click', function() {
+            const productsContainer = document.getElementById('products-container');
+            const productField = document.createElement('label');
+            productField.innerHTML = `
+                <input type="text" name="products[]" class="input" placeholder="Product Name" required>
+                <span>Product</span>
+            `;
+            productsContainer.appendChild(productField);
+        });
+    </script>
+</main>

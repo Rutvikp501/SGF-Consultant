@@ -1,0 +1,92 @@
+<main>
+	<%- include('../partials/managementSidebar') %>
+
+	<div id="main-wrapper">
+		<p class="title">Download Package Data</p>
+
+		<!-- Filter Form for Download -->
+		<form id="filterFormPackages" class="form-inline">
+			<div class="gridf" style="display: flex; align-items: center; gap: 10px;">
+				<!-- Example filter input -->
+				<!-- <label style="flex-grow: 1;">
+					<input type="text" name="packageName" id="packageName" class="input" placeholder="Enter Package Name">
+					<span>Package Name</span>
+				</label> -->
+				<!-- <button type="button" id="download-btn-packages" class="submit" style="margin-bottom: 23px;">Download Excel</button> -->
+				<button type="button" id="add-btn-packages" class="submit" style="margin-bottom: 23px;">Add Package</button>
+			</div>
+		</form>
+
+		<!-- Table Section for Packages -->
+		<div class="tbl-header" style="max-height: 75%; overflow: auto;">
+			<table cellpadding="0" cellspacing="0" border="0">
+				<thead>
+					<tr>
+						<th scope="col">#</th>
+						<th scope="col">Package Name</th>
+						<th scope="col">Subname</th>
+						<th scope="col">Retail Price</th>
+						<th scope="col">Description</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+		<div class="tbl-content">
+			<table cellpadding="0" cellspacing="0" border="0">
+				<tbody>
+					<% for(let i=0; i<packages.length; i++) { %>
+						<tr>
+							<th scope="row"> <%= i+1 %> </th>
+							<td> <%= packages[i].packageName %> </td>
+							<td> <%= packages[i].subname %> </td>
+							<td> <%= packages[i].retail_price %> </td>
+							<td> <%= packages[i].description %> </td>
+						</tr>
+					<% } %>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<script>
+document.getElementById('add-btn-packages').addEventListener('click', function() {
+        // Redirect to the Add Package page
+        window.location.href = '/admin/addpackage';
+    });
+		// Uncomment and modify this block if you need a download functionality for packages:
+		// document.getElementById('download-btn-packages').addEventListener('click', function() {
+		// 	// Get the filter values
+		// 	const packageName = document.getElementById('packageName').value;
+
+		// 	// Create the query string for the request
+		// 	const queryParams = new URLSearchParams({
+		// 		packageName: packageName,
+		// 	}).toString();
+
+		// 	// Make a GET request to the API for the Excel download
+		// 	fetch(`/api/excelpackagedata?${queryParams}`, {
+		// 		method: 'GET',
+		// 	})
+		// 	.then(response => {
+		// 		if (response.ok) {
+		// 			return response.blob(); // Get the file blob
+		// 		} else {
+		// 			throw new Error('Something went wrong!');
+		// 		}
+		// 	})
+		// 	.then(blob => {
+		// 		// Create a download link for the file
+		// 		const url = window.URL.createObjectURL(new Blob([blob]));
+		// 		const link = document.createElement('a');
+		// 		link.href = url;
+		// 		link.setAttribute('download', 'Package_Data.xlsx'); // Set the download file name
+		// 		document.body.appendChild(link);
+		// 		link.click();
+		// 		link.parentNode.removeChild(link); // Remove the link element
+		// 	})
+		// 	.catch(error => {
+		// 		console.error('Error:', error);
+		// 	});
+		// });
+	</script>
+</main>
