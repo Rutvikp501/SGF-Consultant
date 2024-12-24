@@ -530,7 +530,7 @@ router.get("/admin/addinventory", middleware.ensureAdminLoggedIn, async (req, re
 	const { department } = req.user;
 	try {
 		const inventorys = await inventorysModel.find();
-		res.render("admin/addinventory", { title: "List of inventory", inventorys, department });
+		res.render("admin/addinventorys", { title: "List of inventory", inventorys, department });
 	}
 	catch (err) {
 		console.log(err);
@@ -578,6 +578,7 @@ router.get("/admin/showinventorys", middleware.ensureAdminLoggedIn, async (req, 
 });
 
 router.get("/admin/addpackages", middleware.ensureAdminLoggedIn, async (req, res) => {
+	
 	const { department } = req.user;
 	try {
 		const packages = await packagesModel.find();
@@ -615,6 +616,7 @@ return console.log(params)
 });
 
 router.get("/admin/showpackages", middleware.ensureAdminLoggedIn, async (req, res) => {
+	
 	const { department } = req.user;
 	try {
 		const packages = await packagesModel.find();

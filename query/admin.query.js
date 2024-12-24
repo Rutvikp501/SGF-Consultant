@@ -285,6 +285,53 @@ exports.addinventoryquery = async (params) => {
     }
 };
 
+exports.addPackagesQuery = async (params) => {
+  try {
+      // Check if a package with the same name already exists
+      const existingPackage = await packagesModel.findOne({ name: params.name });
+
+      if (existingPackage) {
+          return {
+              success: false,
+              statusCode: 409,
+              message: `${params.name} already exists.`,
+          };
+      }
+
+      // Create a new package object using the provided params
+      const newPackage = new packagesModel({
+          type: params.type || null, // e.g., CLASSIC, PREMIUM
+          name: params.name,        // Package name
+          description: params.description || null,
+          graphers: params.graphers || 0,
+          price: params.price || null,
+          delivery: params.delivery || null,
+          duration: params.duration || null,
+          services: params.services || [], // List of services
+          products: params.products || [], // List of products
+          totalServices: params.totalServices || 0,
+          totalProducts: params.totalProducts || 0,
+      });
+
+      // Save the new package to the database
+      await newPackage.save();
+
+      return {
+          success: true,
+          statusCode: 200,
+          message: "Package successfully added.",
+      };
+  } catch (err) {
+      console.error(err);
+      return {
+          success: false,
+          statusCode: 500,
+          message: "Some error occurred on the server.",
+      };
+  }
+};
+
+
 exports.transformedData = async (params) => {
     const serviceitems = await Promise.all(
       params.items.map(async (item) => {
