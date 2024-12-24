@@ -15,9 +15,10 @@ const fonts = {
     }
 };
 exports.create_50_50_pdf = async (pdfdata) => {
+    console.log("im here create_50_50_pdf")
     try {
         const printer = new PdfPrinter(fonts);
-        const { leaddata, serviceitems, discount, gst, finalTotal, subtotal, discountamnt, paymentstatus } = pdfdata;
+        const { params, serviceitems,     paymentstatus } = pdfdata;
         // 50-50 Split
         const part1_50_50 = finalTotal * 0.50;
         const part2_50_50 = finalTotal * 0.50;
@@ -91,13 +92,13 @@ exports.create_50_50_pdf = async (pdfdata) => {
                                 {
                                     rowSpan: 3,
                                     fontSize: 10,
-                                    text: `Booking Name: ${leaddata.booking_name}\nQuotation No: ${leaddata.quotation_no}\nQuotation Date: ${leaddata.quotation_date}`
+                                    text: `Booking Name: ${params.booking_name}\nQuotation No: ${params.quotation_no}\nQuotation Date: ${params.quotation_date}`
                                 },
                                 {
                                     colSpan: 2,
                                     rowSpan: 3,
                                     fontSize: 10,
-                                    text: `Specials Name: ${leaddata.specials_name}\nEvent Name: ${leaddata.event_name}`
+                                    text: `Specials Name: ${params.specials_name}\nEvent Name: ${params.event_name}`
                                 },
                                 {}
                             ],
@@ -120,9 +121,9 @@ exports.create_50_50_pdf = async (pdfdata) => {
                         widths: ["100%"],
                         body: [
                             [
-                                { text: `Email :${leaddata.email_id} \nMobile No:${leaddata.mobile_no}
-                                Date Of Event: ${leaddata.event_date}\nTime Of Event:${leaddata.event_time}
-                                Event Location: ${leaddata.event_location}\nHome Address: ${leaddata.home_add} `, },
+                                { text: `Email :${params.email_id} \nMobile No:${params.mobile_no}
+                                Date Of Event: ${params.event_date}\nTime Of Event:${params.event_time}
+                                Event Location: ${params.event_location}\nHome Address: ${params.home_add} `, },
                             ],
 
                         ],
@@ -249,24 +250,31 @@ exports.create_10_40_50_pdf = async (pdfdata) => {
     try {
         const printer = new PdfPrinter(fonts);
 
-        const { leaddata, serviceitems, discount, gst, finalTotal, subtotal, discountamnt, paymentstatus } = pdfdata;
+        const { params, serviceitems,finalTotal,  } = pdfdata;
 
         // 10-40-50 Split
         const part1_10 = finalTotal * 0.10;
         const part2_40 = finalTotal * 0.40;
         const part3_50 = finalTotal * 0.50;
 
-        const paidText1 = paymentstatus[0] && paymentstatus[0].isPaid
-            ? `Paid ${paymentstatus[0].paymentDate}`
-            : paymentstatus[0] ? `Pending ${paymentstatus[0].paymentDate}` : 'No Data';
-
-        const paidText2 = paymentstatus[1] && paymentstatus[1].isPaid
-            ? `Paid ${paymentstatus[1].paymentDate}`
-            : paymentstatus[1] ? `Pending ${paymentstatus[1].paymentDate}` : 'No Data';
-
-        const paidText3 = paymentstatus[2] && paymentstatus[2].isPaid
-            ? `Paid ${paymentstatus[2].paymentDate}`
-            : paymentstatus[2] ? `Pending ${paymentstatus[2].paymentDate}` : 'No Data';
+        const paidText1 = params.paymentstatus && params.paymentstatus[0]
+        ? params.paymentstatus[0].isPaid
+            ? `Paid ${params.paymentstatus[0].paymentDate}`
+            : `Pending ${params.paymentstatus[0].paymentDate}`
+        : 'No Data';
+    
+    const paidText2 = params.paymentstatus && params.paymentstatus[1]
+        ? params.paymentstatus[1].isPaid
+            ? `Paid ${params.paymentstatus[1].paymentDate}`
+            : `Pending ${params.paymentstatus[1].paymentDate}`
+        : 'No Data';
+    
+    const paidText3 = params.paymentstatus && params.paymentstatus[2]
+        ? params.paymentstatus[2].isPaid
+            ? `Paid ${params.paymentstatus[2].paymentDate}`
+            : `Pending ${params.paymentstatus[2].paymentDate}`
+        : 'No Data';
+    
 
         // Create table headers
         const tableHeaders = [
@@ -286,7 +294,7 @@ exports.create_10_40_50_pdf = async (pdfdata) => {
             { text: item.detailed_description, alignment: "center", fontSize: 10, },
             { text: item.date, alignment: "center", fontSize: 10, },
             { text: item.quantity, alignment: "center", fontSize: 10, },
-            { text: discount ? `${discount}%` : "-", alignment: "center", fontSize: 10, },
+            { text: params.discount ? `${params.discount}%` : "-", alignment: "center", fontSize: 10, },
             { text: item.quantity * item.retail_price, alignment: "right", fontSize: 10, }, // Calculate total for each row
         ]);
 
@@ -328,13 +336,13 @@ exports.create_10_40_50_pdf = async (pdfdata) => {
                                 {
                                     rowSpan: 3,
                                     fontSize: 10,
-                                    text: `Booking Name: ${leaddata.booking_name}\nQuotation No: ${leaddata.quotation_no}\nQuotation Date: ${leaddata.quotation_date}`
+                                    text: `Booking Name: ${params.booking_name}\nQuotation No: ${params.quotation_no}\nQuotation Date: ${params.quotation_date}`
                                 },
                                 {
                                     colSpan: 2,
                                     rowSpan: 3,
                                     fontSize: 10,
-                                    text: `Specials Name: ${leaddata.specials_name}\nEvent Name: ${leaddata.event_name}`
+                                    text: `Specials Name: ${params.specials_name}\nEvent Name: ${params.event_name}`
                                 },
                                 {}
                             ],
@@ -356,9 +364,9 @@ exports.create_10_40_50_pdf = async (pdfdata) => {
                     table: {
                         widths: ["100%"],
                         body: [
-                            [ { text: `Email :${leaddata.email_id} \nMobile No:${leaddata.mobile_no}
-                                Date Of Event: ${leaddata.event_date}\nTime Of Event:${leaddata.event_time}
-                                Event Location: ${leaddata.event_location}\nHome Address: ${leaddata.home_add} `, },
+                            [ { text: `Email :${params.email_id} \nMobile No:${params.mobile_no}
+                                Date Of Event: ${params.event_date}\nTime Of Event:${params.event_time}
+                                Event Location: ${params.event_location}\nHome Address: ${params.home_add} `, },
                             ],
                         ],
                     },
@@ -394,22 +402,22 @@ exports.create_10_40_50_pdf = async (pdfdata) => {
                         body: [
                             [
                                 { text: "Gross Cost", alignment: "right", bold: true, fontSize: 10, },
-                                { text: subtotal, alignment: "right", fontSize: 10, },
+                                { text: params.subtotal, alignment: "right", fontSize: 10, },
                             ],
                             [
                                 { text: "Discount", alignment: "right", bold: true, fontSize: 10, },
                                 {
-                                    text: `(${discount}%)    -${discountamnt}`,
+                                    text: `(${params.discount}%)    -${params.discountamnt}`,
                                     alignment: "right", fontSize: 10,
                                 },
                             ],
                             [
                                 { text: "GST", alignment: "right", bold: true, fontSize: 10, },
-                                { text: gst, alignment: "right", fontSize: 10, },
+                                { text: params.gst, alignment: "right", fontSize: 10, },
                             ],
                             [
                                 { text: "Net Cost", alignment: "right", bold: true, fontSize: 10, },
-                                { text: finalTotal, alignment: "right", fontSize: 10, },
+                                { text: params.finalTotal, alignment: "right", fontSize: 10, },
                             ],
                         ],
                     },

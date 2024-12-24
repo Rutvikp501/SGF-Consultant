@@ -14,7 +14,7 @@ const { Consultant_Wellcome } = require("../utility/email.util.js");
 const { addLead } = require("../controllers/lead.controller.js");
 const packagesModel = require("../models/packages.model.js");
 const { cloudinaryUpload } = require("../config/cloudinary.js");
-const { adminregistationquery, consultantregistationquery, updateUserPhotos, addinventoryquery, updateConsultantQuery, transformedData, updateAdminQuery } = require("../query/admin.query.js");
+const { adminregistationquery, consultantregistationquery, updateUserPhotos, addinventoryquery, updateConsultantQuery, transformedData, updateAdminQuery, createOrUpdateProforma } = require("../query/admin.query.js");
 const inventorysModel = require("../models/inventory.model.js");
 const { create_proforma } = require("../utility/pdf.js");
 
@@ -593,25 +593,36 @@ router.get("/admin/createproforma", middleware.ensureAdminLoggedIn, async (req, 
 });
 
 router.post("/admin/createproforma", middleware.ensureAdminLoggedIn, async (req, res) => {
-	const { items, discount, gst, subtotal, finalTotal, leaddata, qdata,paymentstatus } = req.body;
+	const { items, subtotal, finalTotal  } = req.body;
+	const params = req.body
+	console.log(params);
+	
+	params.discountamnt=(subtotal-finalTotal)
 	const result = await transformedData({ items });
     const serviceitems = result.serviceitems;
-	const pdfdata = {
-		qdata,
-		leaddata,
-		serviceitems,
-		discount,
-		gst,
-		finalTotal,
-		subtotal,
-		discountamnt:(subtotal-finalTotal),
-		paymentstatus
-	  };
+	let paymentstatus=[{
+		isPaid:true,
+		paymentDate:"29/11/2024"
+	},
+	{
+		isPaid:false,
+		paymentDate:"29/12/2024"
+	},
+	{
+		isPaid:false,
+		paymentDate:"29/01/2025"
+	} ]
+  
+let  data = {
+params,
+serviceitems,
+};
+data.paymentstatus=paymentstatus;
 	try {
 		//console.log(params);
 		
-		const pdfBuffer = await create_proforma(pdfdata);
-
+		const pdfBuffer = await create_proforma(data);
+		const saveproforma = await createOrUpdateProforma(data);
 		// Send the PDF in the response
 		res.setHeader('Content-Disposition', 'attachment; filename=Proforma_with_Terms.pdf');
 		res.setHeader('Content-Type', 'application/pdf');

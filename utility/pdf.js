@@ -10,18 +10,19 @@ exports.create_proforma = async (pdfdata) => {
     let pdfBuffer;
     let  t_c_PdfPath;
     // Step 1: Generate the dynamically created Proforma PDF
-    if (pdfdata.qdata.format === '50-50') {
-        pdfBuffer = await create_50_50_pdf(pdfdata); // For 50-50 payment structure
-    } else if (pdfdata.qdata.format === '10-40-50') {
+    if (pdfdata.params.format == '50-50') {
+      console.log("im here 50-50");
+      pdfBuffer = await create_50_50_pdf(pdfdata); // For 50-50 payment structure
+    } else if (pdfdata.params.format == '10-40-50') {
         pdfBuffer = await create_10_40_50_pdf(pdfdata); // For 10-40-50 payment structure
     } else {
         throw new Error('Unsupported payment structure');
     }
     const proformaPdfDoc = await PDFDocument.load(pdfBuffer);
     // Step 2: Load the T&C PDF from the filesystem
-    if (pdfdata.qdata.type === 'film_service') {
+    if (pdfdata.params.service_type === 'film_service') {
             t_c_PdfPath = path.join(__dirname, `../assets/pdf/PHOTOGRAPHY SERVICE’S T&C.pdf`);
-    } else if (pdfdata.qdata.format === 'album_service') {
+    } else if (pdfdata.params.service_type === 'album_service') {
         t_c_PdfPath = path.join(__dirname, `../assets/pdf/PHOTOGRAPHY SERVICE’S T&C.pdf`);
     } else {
         throw new Error('Unsupported Service Type');

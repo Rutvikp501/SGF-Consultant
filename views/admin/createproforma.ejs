@@ -1,9 +1,13 @@
 <main>
   <%- include('../partials/managementSidebar') %>
   <div id="main-wrapper">
-    <p class="title">Add Inventory</p>
+    <p class="title">Create Proforma</p>
     <form id="proformaForm">
       <h3 style="color: aliceblue;">Lead Information</h3>
+      
+      <label for="leadId" style="color: aliceblue;">lead Id:</label>
+      <input type="text" id="leadId" name="lead_Id" placeholder="Enter lead Id " />
+      <br />
 
       <label for="bookingName" style="color: aliceblue;">Booking Name:</label>
       <input type="text" id="bookingName" name="booking_name" placeholder="Enter Booking Name" />
@@ -66,7 +70,9 @@
         <option value="50-50">50-50</option>
       </select>
       <br />
-
+      <label for="discount" style="color: aliceblue;">Discount (%):</label>
+      <input type="number" id="discount" value="0" style="width: 60px;" />
+      <br />
       <label for="itemSelect" style="color: aliceblue;">Select Item:</label>
       <select id="itemSelect">
         <option value="">-- Select an Item --</option>
@@ -93,9 +99,6 @@
 
       <div class="summary">
         <p><strong>Subtotal: </strong> ₹<span id="subtotal">0</span></p>
-        <label for="discount" style="color: aliceblue;">Discount (%):</label>
-        <input type="number" id="discount" value="0" style="width: 60px;" />
-        <br />
         <label for="gst" style="color: aliceblue;">GST (%):</label>
         <input type="number" id="gst" value="0" style="width: 60px;" />
         <br />
@@ -107,39 +110,125 @@
 </main>
 
 <script>
-  proformaForm.addEventListener("submit", (e) => {
-  e.preventDefault();
+  const proformaForm = document.getElementById('proformaForm');
+  const addItemButton = document.getElementById('addItem');
+  const itemSelect = document.getElementById('itemSelect');
+  const itemTableBody = document.getElementById('itemTableBody');
+  const discountInput = document.getElementById('discount');
+  const gstInput = document.getElementById('gst');
+  const subtotalElement = document.getElementById('subtotal');
+  const finalTotalElement = document.getElementById('finalTotal');
 
-  const formData = new FormData(proformaForm);
-  const formObject = Object.fromEntries(formData.entries());
+  addItemButton.addEventListener('click', function() {
+    const selectedOption = itemSelect.options[itemSelect.selectedIndex];
+    const itemId = selectedOption.value;
+    const itemName = selectedOption.getAttribute('data-name');
+    const itemPrice = parseFloat(selectedOption.getAttribute('data-price'));
 
-  const items = [];
-  document.querySelectorAll("#itemTableBody tr").forEach((row) => {
-    const name = row.cells[0].textContent;
-    const price = parseFloat(row.cells[1].textContent);
-    const quantity = parseInt(row.querySelector(".quantity").value) || 1;
-    items.push({ name, price, quantity });
+    if (itemId === '') return;
+
+    // Check if item already exists in the table
+    const existingRow = [...itemTableBody.rows].find(row => row.dataset.id === itemId);
+    if (existingRow) {
+      const quantityInput = existingRow.querySelector('.quantity');
+      quantityInput.value = parseInt(quantityInput.value) + 1;
+      updateRowTotal(existingRow);
+    } else {
+      const row = document.createElement('tr');
+      row.dataset.id = itemId;
+      row.innerHTML = `
+        <td>${itemName}</td>
+        <td>${itemPrice.toFixed(2)}</td>
+        <td><input type="number" class="quantity" value="1" min="1" style="width: 60px;" /></td>
+        <td class="total">₹${itemPrice.toFixed(2)}</td>
+        <td><button type="button" class="removeItem">Remove</button></td>
+      `;
+      itemTableBody.appendChild(row);
+
+      // Add event listener for quantity input
+      row.querySelector('.quantity').addEventListener('change', function() {
+        updateRowTotal(row);
+        calculateTotal();
+      });
+
+      // Add event listener for remove button
+      row.querySelector('.removeItem').addEventListener('click', function() {
+        row.remove();
+        calculateTotal();
+      });
+    }
+
+    calculateTotal();
   });
 
-  formObject.items = items;
-  formObject.subtotal = subtotal;
-  formObject.discount = parseFloat(discountInput.value) || 0;
-  formObject.gst = parseFloat(gstInput.value) || 0;
-  formObject.finalTotal = parseFloat(finalTotalEl.textContent);
+  function updateRowTotal(row) {
+    const price = parseFloat(row.cells[1].textContent.replace('₹', ''));
+    const quantity = parseInt(row.querySelector('.quantity').value);
+    const totalCell = row.querySelector('.total');
 
-  fetch("/admin/createproforma", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(formObject),
-  })
-    .then((response) => {
-      if (response.ok) {
-        alert("Proforma PDF generated successfully!");
-      } else {
-        alert("Failed to generate PDF.");
-      }
+    totalCell.textContent = `₹${(price * quantity).toFixed(2)}`;
+  }
+
+  function calculateTotal() {
+    let subtotal = 0;
+    document.querySelectorAll('#itemTableBody tr').forEach(row => {
+      subtotal += parseFloat(row.querySelector('.total').textContent.replace('₹', ''));
+    });
+
+    const discount = parseFloat(discountInput.value) || 0;
+    const gst = parseFloat(gstInput.value) || 0;
+
+    const discountAmount = (subtotal * discount) / 100;
+    const gstAmount = (subtotal * gst) / 100;
+    const finalTotal = subtotal - discountAmount + gstAmount;
+
+    subtotalElement.textContent = subtotal.toFixed(2);
+    finalTotalElement.textContent = finalTotal.toFixed(2);
+  }
+
+  proformaForm.addEventListener("submit",  async function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(proformaForm);
+    const formObject = Object.fromEntries(formData.entries());
+
+    const items = [];
+    document.querySelectorAll("#itemTableBody tr").forEach((row) => {
+      const name = row.cells[0].textContent;
+      const price = parseFloat(row.cells[1].textContent.replace('₹', ''));
+      const quantity = parseInt(row.querySelector(".quantity").value);
+      items.push({ name, price, quantity });
+    });
+
+    // formObject.qdata = {
+    //   type: document.getElementById('serviceType').value,
+    //   format: document.getElementById('format').value,
+    // };
+    formObject.items = items;
+    formObject.subtotal = subtotalElement.textContent;
+    formObject.discount = parseFloat(discountInput.value);
+    formObject.gst = parseFloat(gstInput.value);
+    formObject.finalTotal = parseFloat(finalTotalElement.textContent);
+
+    fetch("/admin/createproforma", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formObject),
     })
-    .catch((error) => console.error("Error:", error));
-});
-
+      .then((response) =>  async function(e) {
+        if (response.ok) {
+          const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Proforma_with_Terms.pdf';
+        document.body.appendChild(a);
+        a.click();
+        a.remove(); // Clean up
+        } else {
+          alert("Failed to generate PDF.");
+        }
+      })
+      .catch((error) => console.error("Error:", error));
+  });
 </script>
