@@ -335,7 +335,7 @@ exports.addPackagesQuery = async (params) => {
 exports.transformedData = async (params) => {
     const serviceitems = await Promise.all(
       params.items.map(async (item) => {
-        const inventory = await inventorysModel.findOne({ name: item.name });
+        const inventory = await inventorysModel.findOne({ name: item.name ,subname:item.subname});
         return {
           _id: inventory?._id,
           name: inventory?.name,

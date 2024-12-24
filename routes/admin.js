@@ -17,6 +17,7 @@ const { cloudinaryUpload } = require("../config/cloudinary.js");
 const { adminregistationquery, consultantregistationquery, updateUserPhotos, addinventoryquery, updateConsultantQuery, transformedData, updateAdminQuery, createOrUpdateProforma } = require("../query/admin.query.js");
 const inventorysModel = require("../models/inventory.model.js");
 const { create_proforma } = require("../utility/pdf.js");
+const { sendEmailWithPdf } = require("../helpers/email.js");
 
 router.get("/admin/dashboard", middleware.ensureAdminLoggedIn, async (req, res) => {
 	const { department } = req.user;
@@ -653,6 +654,7 @@ router.post("/admin/createproforma", middleware.ensureAdminLoggedIn, async (req,
 	params.discountamnt=(subtotal-finalTotal)
 	const result = await transformedData({ items });
     const serviceitems = result.serviceitems;
+	
 	let paymentstatus=[{
 		isPaid:true,
 		paymentDate:"29/11/2024"
@@ -675,11 +677,11 @@ data.paymentstatus=paymentstatus;
 		//console.log(params);
 		
 		const pdfBuffer = await create_proforma(data);
-		const saveproforma = await createOrUpdateProforma(data);
+		//const saveproforma = await createOrUpdateProforma(data);
 		// Send the PDF in the response
 		res.setHeader('Content-Disposition', 'attachment; filename=Proforma_with_Terms.pdf');
 		res.setHeader('Content-Type', 'application/pdf');
-		res.end(pdfBuffer);
+		sendEmailWithPdf(pdfBuffer)
 		// if (result.success) {
 		// 	req.flash("success", result.message);
 		// 	res.redirect("/admin/showinventorys");

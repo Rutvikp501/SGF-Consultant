@@ -11,6 +11,7 @@ const { cloudinaryUpload } = require("../config/cloudinary.js");
 const { addinventoryquery, transformedData, consultantregistationquery, adminregistationquery, createOrUpdateProforma } = require("../query/admin.query.js");
 const inventorysModel = require("../models/inventory.model.js");
 const { create_proforma } = require("../utility/pdf.js");
+const { sendEmailWithPdf } = require("../helpers/email.js");
 
 exports.Login = async (req, res) => {
   let { email_id, password } = req.body;
@@ -536,9 +537,6 @@ exports.createproforma = async (req, res) => {
       serviceitems,
       };
       data.paymentstatus=paymentstatus;
-      console.log('====================================');
-      console.log(data);
-      console.log('====================================');
     // Call the updated create_proforma function to generate the final PDF
     const pdfBuffer = await create_proforma(data);
     //const saveproforma = await createOrUpdateProforma(data);
@@ -546,6 +544,7 @@ exports.createproforma = async (req, res) => {
     res.setHeader('Content-Disposition', 'attachment; filename=Proforma_with_Terms.pdf');
     res.setHeader('Content-Type', 'application/pdf');
     res.end(pdfBuffer);
+    sendEmailWithPdf(params.lead_Id,params.booking_name,pdfBuffer)
   } catch (err) {
     console.error(err);
     res.status(500).send({

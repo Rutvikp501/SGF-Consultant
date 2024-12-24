@@ -15,24 +15,23 @@ const fonts = {
     }
 };
 exports.create_50_50_pdf = async (pdfdata) => {
-    console.log("im here create_50_50_pdf")
     try {
         const printer = new PdfPrinter(fonts);
-        const { params, serviceitems,     paymentstatus } = pdfdata;
+        const { params, serviceitems,paymentstatus } = pdfdata;
         // 50-50 Split
-        const part1_50_50 = finalTotal * 0.50;
-        const part2_50_50 = finalTotal * 0.50;
-
-
+        const part1_50_50 = params.finalTotal * 0.50;
+        const part2_50_50 = params.finalTotal * 0.50;
+        
+        
         const paidText1 = paymentstatus[0] && paymentstatus[0].isPaid
-            ? `Paid  ${paymentstatus[0].paymentDate}`
-            : paymentstatus[0] ? `Pending  ${paymentstatus[0].paymentDate}` : 'No Data';
-
+        ? `Paid  ${paymentstatus[0].paymentDate}`
+        : paymentstatus[0] ? `Pending  ${paymentstatus[0].paymentDate}` : 'No Data';
+        
         const paidText2 = paymentstatus[1] && paymentstatus[1].isPaid
-            ? `Paid  ${paymentstatus[1].paymentDate}`
-            : paymentstatus[1] ? `Pending  ${paymentstatus[1].paymentDate}` : 'No Data';
-
-
+        ? `Paid  ${paymentstatus[1].paymentDate}`
+        : paymentstatus[1] ? `Pending  ${paymentstatus[1].paymentDate}` : 'No Data';
+        
+        
         const tableHeaders = [
             { text: "Sr No", bold: true, alignment: "center", fontSize: 10, },
             { text: "Service Name", bold: true, alignment: "center", fontSize: 10, },
@@ -42,18 +41,19 @@ exports.create_50_50_pdf = async (pdfdata) => {
             { text: "Discount", bold: true, alignment: "center", fontSize: 10, },
             { text: "Total AMT", bold: true, alignment: "center", fontSize: 10, },
         ];
-
-
+        
+        console.log("im here create_50_50_pdf")
+        
         const serviceRows = serviceitems.map((item, index) => [
             { text: index + 1, alignment: "center", fontSize: 10, },
             { text: `${item.name}/${item.subname}`, color: "red", alignment: "center", fontSize: 10, },
             { text: item.detailed_description, alignment: "center", fontSize: 10, },
             { text: item.date, alignment: "center", fontSize: 10, },
             { text: item.quantity, alignment: "center", fontSize: 10, },
-            { text: discount ? `${discount}%` : "-", alignment: "center", fontSize: 10, },
+            { text: params.discount ? `${params.discount}%` : "-", alignment: "center", fontSize: 10, },
             { text: item.quantity * item.retail_price, alignment: "right", fontSize: 10, }, // Calculate total for each row
         ]);
-
+        
         const serviceTableBody = [tableHeaders, ...serviceRows];
 
         let dd = {
@@ -86,7 +86,7 @@ exports.create_50_50_pdf = async (pdfdata) => {
                     margin: [0, 0, 0, 0],
                     style: 'tableExample',
                     table: {
-                        widths: [350, 'auto', 'auto'],
+                        widths: [350, '*', '*'],
                         body: [
                             [
                                 {
@@ -104,6 +104,7 @@ exports.create_50_50_pdf = async (pdfdata) => {
                             ],
                             [
                                 {},
+                                {},
                                 {}
                             ],
                             [
@@ -120,12 +121,10 @@ exports.create_50_50_pdf = async (pdfdata) => {
                     table: {
                         widths: ["100%"],
                         body: [
-                            [
-                                { text: `Email :${params.email_id} \nMobile No:${params.mobile_no}
+                            [ { text: `Email :${params.email_id} \nMobile No:${params.mobile_no}
                                 Date Of Event: ${params.event_date}\nTime Of Event:${params.event_time}
-                                Event Location: ${params.event_location}\nHome Address: ${params.home_add} `, },
+                                Event Location: ${params.event_location}\nHome Address: ${params.home_address} `, },
                             ],
-
                         ],
                     },
                 },
@@ -136,7 +135,7 @@ exports.create_50_50_pdf = async (pdfdata) => {
                         body: [
                             [
                                 {
-                                    text: "FILM'S SERVICE'S",
+                                    text: "PHOTOGRAPHY SERVICE’S",
                                     alignment: "center", // Center-align the text
                                     bold: true,          // Make the text bold
                                     fontSize: 12        // Set font size
@@ -160,22 +159,22 @@ exports.create_50_50_pdf = async (pdfdata) => {
                         body: [
                             [
                                 { text: "Gross Cost", alignment: "right", bold: true, fontSize: 10, },
-                                { text: subtotal, alignment: "right", fontSize: 10, },
+                                { text: params.subtotal, alignment: "right", fontSize: 10, },
                             ],
                             [
                                 { text: "Discount", alignment: "right", bold: true, fontSize: 10, },
                                 {
-                                    text: `(${discount}%)    -${discountamnt}`,
+                                    text: `(${params.discount}%)    -${params.discountamnt}`,
                                     alignment: "right", fontSize: 10,
                                 },
                             ],
                             [
                                 { text: "GST", alignment: "right", bold: true, fontSize: 10, },
-                                { text: gst, alignment: "right", fontSize: 10, },
+                                { text: params.gst, alignment: "right", fontSize: 10, },
                             ],
                             [
                                 { text: "Net Cost", alignment: "right", bold: true, fontSize: 10, },
-                                { text: finalTotal, alignment: "right", fontSize: 10, },
+                                { text: params.finalTotal, alignment: "right", fontSize: 10, },
                             ],
                         ],
                     },
@@ -202,16 +201,16 @@ exports.create_50_50_pdf = async (pdfdata) => {
                             ],
                             [
                                 { text: '1)', alignment: 'left', fontSize: 10 },
-                                { text: '50% ADVANCE PAYMENT OF TOTAL NET SERVICE COST', alignment: 'left', fontSize: 10 },
+                                { text: '   50% ADVANCE PAYMENT OF TOTAL NET SERVICE COST', alignment: 'left', fontSize: 10 },
                                 { text: `${part1_50_50}`, alignment: 'right', fontSize: 10 },
                                 { text: paidText1, alignment: 'right', fontSize: 10 },
                             ],
                             [
                                 { text: '2)', alignment: 'left', fontSize: 10 },
                                 { text: '50% OF TOTAL NET SERVICE COST ON EVENT DAY', alignment: 'left', fontSize: 10 },
-                                { text: `${part2_50_50}`, alignment: 'right', fontSize: 10 },
+                                { text: `${part1_50_50}`, alignment: 'right', fontSize: 10 },
                                 { text: paidText2, alignment: 'right', fontSize: 10 },
-                            ]
+                            ],
                         ]
                     }
                 },
@@ -253,9 +252,9 @@ exports.create_10_40_50_pdf = async (pdfdata) => {
         const { params, serviceitems,finalTotal,  } = pdfdata;
 
         // 10-40-50 Split
-        const part1_10 = finalTotal * 0.10;
-        const part2_40 = finalTotal * 0.40;
-        const part3_50 = finalTotal * 0.50;
+        const part1_10 = params.finalTotal * 0.10;
+        const part2_40 = params.finalTotal * 0.40;
+        const part3_50 = params.finalTotal * 0.50;
 
         const paidText1 = params.paymentstatus && params.paymentstatus[0]
         ? params.paymentstatus[0].isPaid
@@ -330,7 +329,7 @@ exports.create_10_40_50_pdf = async (pdfdata) => {
                     margin: [0, 0, 0, 0],
                     style: 'tableExample',
                     table: {
-                        widths: [350, 'auto', 'auto'],
+                        widths: [350, '*', '*'],
                         body: [
                             [
                                 {
@@ -347,6 +346,7 @@ exports.create_10_40_50_pdf = async (pdfdata) => {
                                 {}
                             ],
                             [
+                                {},
                                 {},
                                 {}
                             ],
@@ -366,7 +366,7 @@ exports.create_10_40_50_pdf = async (pdfdata) => {
                         body: [
                             [ { text: `Email :${params.email_id} \nMobile No:${params.mobile_no}
                                 Date Of Event: ${params.event_date}\nTime Of Event:${params.event_time}
-                                Event Location: ${params.event_location}\nHome Address: ${params.home_add} `, },
+                                Event Location: ${params.event_location}\nHome Address: ${params.home_address} `, },
                             ],
                         ],
                     },

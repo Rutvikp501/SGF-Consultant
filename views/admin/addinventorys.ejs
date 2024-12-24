@@ -24,11 +24,16 @@
                     </select>
                    <span>Inventory Type</span>
                 </label>
-                
-                <label>
-                    <input type="text" name="inventory_name" class="input" id="inventory-name" value="<%= typeof inventory_name != 'undefined' ? inventory_name : '' %>" required>
-                    <span>Name</span>
-                </label>
+              
+                    <label>
+                        <select class="input" name="inventory_name" id="inventory-name">
+                            <option value="" disabled selected>Select Name</option>
+                            <option value="CLASSIC">Classic</option>
+                            <option value="PREMIUM">Premium</option>
+                        </select>
+                       <span>Name</span>
+                    </label>
+            
 
                 <label>
                     <input type="text" name="subname" class="input" id="subname" value="<%= typeof subname != 'undefined' ? subname : '' %>" >

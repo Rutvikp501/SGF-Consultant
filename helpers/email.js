@@ -45,5 +45,40 @@ async function SendOTP( Email,otp) {
     return info;
 }
 
+async function sendEmailWithPdf(lead_Id,booking_name,pdfBuffer ) {
+  const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 587,
+      auth: {
+          user: process.env.RUTVIK,
+          pass: process.env.RAPP_PASS
+          // user: process.env.USERS,
+          // pass: process.env.APP_PASS
+      },
+      tls: { rejectUnauthorized: false },
 
-module.exports = { SendOTP};
+      debug: true
+  });
+
+  const mailOptions = {
+    from: `Swaptography`, // Sender address
+    to: `swaptography.acc.departments@gmail.com`, // Recipient email
+    subject: `${lead_Id}-${booking_name}-Proforma with Terms PDF`, // Email subject
+    text: `Please find the Proforma with Terms PDF attached For ${lead_Id}-${booking_name}`, // Email body
+    attachments: [
+        {
+            filename: 'Proforma_with_Terms.pdf', // File name for the attachment
+            content: pdfBuffer, // The PDF buffer
+            contentType: 'application/pdf', // MIME type
+        },
+    ],
+};
+
+// Step 3: Send the email
+const info = await transporter.sendMail(mailOptions);
+console.log('Email sent: %s', info.messageId);
+  // console.log(info)
+  return info;
+}
+module.exports = { SendOTP,sendEmailWithPdf};
