@@ -536,9 +536,12 @@ exports.createproforma = async (req, res) => {
       serviceitems,
       };
       data.paymentstatus=paymentstatus;
+      console.log('====================================');
+      console.log(data);
+      console.log('====================================');
     // Call the updated create_proforma function to generate the final PDF
     const pdfBuffer = await create_proforma(data);
-    const saveproforma = await createOrUpdateProforma(data);
+    //const saveproforma = await createOrUpdateProforma(data);
     // Send the PDF in the response
     res.setHeader('Content-Disposition', 'attachment; filename=Proforma_with_Terms.pdf');
     res.setHeader('Content-Type', 'application/pdf');

@@ -306,79 +306,90 @@ exports.transformedData = async (params) => {
     };
   };
 
-  exports.createOrUpdateProforma = async (params) => {
+exports.createOrUpdateProforma = async (data) => {
     try {
-      // Check if a Proforma with the same lead_Id already exists
-      const existingProforma = await proformaModel.findOne({ lead_Id: params.lead_Id });
+        // Extract data fields
+        const { params, serviceitems, paymentstatus } = data;
 
-      if (existingProforma) {
-          // Update existing Proforma
-          existingProforma.booking_name = params.booking_name;
-          existingProforma.specials_name = params.specials_name || existingProforma.specials_name;
-          existingProforma.event_name = params.event_name;
-          existingProforma.email_id = params.email_id;
-          existingProforma.mobile_no = params.mobile_no;
-          existingProforma.quotation_no = params.quotation_no;
-          existingProforma.quotation_date = params.quotation_date;
-          existingProforma.event_date = params.event_date;
-          existingProforma.event_time = params.event_time;
-          existingProforma.event_location = params.event_location;
-          existingProforma.home_address = params.home_address || existingProforma.home_address;
-          existingProforma.service_type = params.service_type;
-          existingProforma.format = params.format;
-          existingProforma.items = params.items;
-          existingProforma.subtotal = params.subtotal;
-          existingProforma.discount = params.discount;
-          existingProforma.gst = params.gst;
-          existingProforma.finalTotal = params.finalTotal;
+        // Check if a Proforma with the same lead_Id already exists
+        const existingProforma = await proformaModel.findOne({ lead_Id: params.lead_Id });
 
-          await existingProforma.save();
+        if (existingProforma) {
+            // Update existing Proforma
+            existingProforma.booking_name = params.booking_name;
+            existingProforma.specials_name = params.specials_name || existingProforma.specials_name;
+            existingProforma.event_name = params.event_name;
+            existingProforma.email_id = params.email_id;
+            existingProforma.mobile_no = params.mobile_no;
+            existingProforma.quotation_no = params.quotation_no;
+            existingProforma.quotation_date = params.quotation_date;
+            existingProforma.event_date = params.event_date;
+            existingProforma.event_time = params.event_time;
+            existingProforma.event_location = params.event_location;
+            existingProforma.home_address = params.home_address || existingProforma.home_address;
+            existingProforma.service_type = params.service_type;
+            existingProforma.format = params.format;
 
-          return {
-              success: true,
-              statusCode: 200,
-              message: `Proforma for Lead ID ${params.lead_Id} successfully updated.`,
-              data: existingProforma,
-          };
-      }
+            // Update items and payment status
+            existingProforma.items = serviceitems; // Use the transformed service items
+            existingProforma.paymentstatus = paymentstatus; // Update payment status array
 
-      // Create a new Proforma
-      const newProforma = new proformaModel({
-          lead_Id: params.lead_Id,
-          booking_name: params.booking_name,
-          specials_name: params.specials_name,
-          event_name: params.event_name,
-          email_id: params.email_id,
-          mobile_no: params.mobile_no,
-          quotation_no: params.quotation_no,
-          quotation_date: params.quotation_date,
-          event_date: params.event_date,
-          event_time: params.event_time,
-          event_location: params.event_location,
-          home_address: params.home_address,
-          service_type: params.service_type,
-          format: params.format,
-          items: params.items,
-          subtotal: params.subtotal,
-          discount: params.discount,
-          gst: params.gst,
-          finalTotal: params.finalTotal,
-      });
+            // Update financial details
+            existingProforma.subtotal = params.subtotal;
+            existingProforma.discount = params.discount;
+            existingProforma.gst = params.gst;
+            existingProforma.finalTotal = params.finalTotal;
 
-      await newProforma.save();
+            // Save the updated Proforma
+            await existingProforma.save();
 
-      return {
-          success: true,
-          statusCode: 201,
-          message: "Proforma successfully created.",
-          data: newProforma,
-      };
-  } catch (err) {
-      console.error(err);
-      return {
-          success: false,
-          statusCode: 500,
-          message: "Some error occurred on the server.",
-      };
-  }
-  };
+            return {
+                success: true,
+                statusCode: 200,
+                message: `Proforma for Lead ID ${params.lead_Id} successfully updated.`,
+                data: existingProforma,
+            };
+        }
+
+        // Create a new Proforma
+        const newProforma = new proformaModel({
+            lead_Id: params.lead_Id,
+            booking_name: params.booking_name,
+            specials_name: params.specials_name,
+            event_name: params.event_name,
+            email_id: params.email_id,
+            mobile_no: params.mobile_no,
+            quotation_no: params.quotation_no,
+            quotation_date: params.quotation_date,
+            event_date: params.event_date,
+            event_time: params.event_time,
+            event_location: params.event_location,
+            home_address: params.home_address,
+            service_type: params.service_type,
+            format: params.format,
+            items: serviceitems, // Use the transformed service items
+            paymentstatus, // Save the payment status array
+            subtotal: params.subtotal,
+            discount: params.discount,
+            gst: params.gst,
+            finalTotal: params.finalTotal,
+        });
+
+        // Save the new Proforma
+        await newProforma.save();
+
+        return {
+            success: true,
+            statusCode: 201,
+            message: "Proforma successfully created.",
+            data: newProforma,
+        };
+    } catch (err) {
+        console.error(err);
+        return {
+            success: false,
+            statusCode: 500,
+            message: "Some error occurred on the server.",
+        };
+    }
+};

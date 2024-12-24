@@ -16,20 +16,35 @@ const ProformaSchema = new mongoose.Schema(
         home_address: { type: String }, // Home address
         service_type: { type: String, required: true }, // Type of service
         format: { type: String }, // Format details
+
+        // Updated items array schema
         items: [
             {
                 name: { type: String, required: true }, // Item name
                 price: { type: Number, required: true }, // Item price
                 quantity: { type: Number, required: true }, // Quantity
+                description: { type: String }, // Optional description
+                item_id: { type: mongoose.Schema.Types.ObjectId }, // Optional reference to an inventory item
+                date_added: { type: Date, default: Date.now }, // Timestamp for when the item was added
             },
         ],
+
         subtotal: { type: Number, required: true }, // Subtotal amount
         discount: { type: Number }, // Discount percentage
         gst: { type: Number }, // GST percentage
         finalTotal: { type: Number, required: true }, // Final total
+
+        // Payment status array
+        paymentstatus: [
+            {
+                isPaid: { type: Boolean, required: true }, // Payment status
+                paymentDate: { type: Date, required: true }, // Payment due/received date
+            },
+        ],
     },
     { timestamps: true } // Automatically adds `createdAt` and `updatedAt`
 );
+
 const proformaModel = mongoose.model('Proforma', ProformaSchema);
 
 module.exports = proformaModel;
