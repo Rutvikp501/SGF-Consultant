@@ -46,6 +46,8 @@ async function SendOTP( Email,otp) {
 }
 
 async function sendEmailWithPdf(lead_Id,booking_name,pdfBuffer ) {
+  console.log("in email");
+  
   const transporter = nodemailer.createTransport({
       service: 'gmail',
       host: 'smtp.gmail.com',
