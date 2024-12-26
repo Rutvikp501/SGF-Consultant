@@ -46,7 +46,6 @@ async function SendOTP( Email,otp) {
 }
 
 async function sendEmailWithPdf(lead_Id,booking_name,pdfBuffer ) {
-  console.log("in email");
   
   const transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -79,8 +78,9 @@ async function sendEmailWithPdf(lead_Id,booking_name,pdfBuffer ) {
 
 // Step 3: Send the email
 const info = await transporter.sendMail(mailOptions);
-console.log('Email sent: %s', info.messageId);
+console.log(`${lead_Id}-${booking_name}-Proforma with Terms PDF Email sent`,);
   // console.log(info)
-  return info;
+  return {info:info,
+    message:`${lead_Id}-${booking_name}-Proforma with Terms PDF Email sent`};
 }
 module.exports = { SendOTP,sendEmailWithPdf};

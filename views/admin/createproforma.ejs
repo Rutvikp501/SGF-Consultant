@@ -214,25 +214,29 @@
     formObject.gst = parseFloat(gstInput.value);
     formObject.finalTotal = parseFloat(finalTotalElement.textContent);
 
+
     fetch("/admin/createproforma", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formObject),
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(formObject),
+})
+    .then((response) => {
+        if (!response.ok) {
+            throw new Error("Failed to generate PDF.");
+        }
+        return response.blob(); // Ensure it's treated as binary data
     })
-      .then((response) =>  async function(e) {
-        if (response.ok) {
-          const blob = await response.blob();
+    .then((blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'Proforma_with_Terms.pdf';
+        a.download = 'Proforma_with_Terms.pdf'; // Ensure correct filename
         document.body.appendChild(a);
         a.click();
         a.remove(); // Clean up
-        } else {
-          alert("Failed to generate PDF.");
-        }
-      })
-      .catch((error) => console.error("Error:", error));
+    })
+    .catch((error) => console.error("Error:", error));
+
+
   });
 </script>

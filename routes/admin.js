@@ -647,53 +647,91 @@ router.get("/admin/createproforma", middleware.ensureAdminLoggedIn, async (req, 
 });
 
 router.post("/admin/createproforma", middleware.ensureAdminLoggedIn, async (req, res) => {
-	const { items, subtotal, finalTotal  } = req.body;
-	const params = req.body
-	console.log(params);
-	
-	params.discountamnt=(subtotal-finalTotal)
-	const result = await transformedData({ items });
+    const { items, subtotal, finalTotal } = req.body;
+    const params = req.body;
+    params.discountamnt = subtotal - finalTotal;
+
+    const result = await transformedData({ items });
     const serviceitems = result.serviceitems;
-	
-	let paymentstatus=[{
-		isPaid:true,
-		paymentDate:"29/11/2024"
-	},
-	{
-		isPaid:false,
-		paymentDate:"29/12/2024"
-	},
-	{
-		isPaid:false,
-		paymentDate:"29/01/2025"
-	} ]
-  
-let  data = {
-params,
-serviceitems,
-};
-data.paymentstatus=paymentstatus;
-	try {
-		//console.log(params);
-		
-		const pdfBuffer = await create_proforma(data);
+
+    let paymentstatus = [
+        { isPaid: true, paymentDate: "" },
+        { isPaid: false, paymentDate: "" },
+        { isPaid: false, paymentDate: "" }
+    ];
+
+    let data = { params, serviceitems, paymentstatus };
+
+    try {
+        const pdfBuffer = await create_proforma(data);
+
+        // Send raw binary data with appropriate headers
+        res.setHeader('Content-Disposition', 'attachment; filename=Proforma_with_Terms.pdf');
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Length', pdfBuffer.length);
+        res.end(pdfBuffer); // Use end to send raw data
 		//const saveproforma = await createOrUpdateProforma(data);
-		// Send the PDF in the response
-		res.setHeader('Content-Disposition', 'attachment; filename=Proforma_with_Terms.pdf');
-		res.setHeader('Content-Type', 'application/pdf');
-		sendEmailWithPdf(pdfBuffer)
-		// if (result.success) {
-		// 	req.flash("success", result.message);
-		// 	res.redirect("/admin/showinventorys");
-		// } else {
-		// 	req.flash("error", result.message);
-		// 	res.redirect("back");
-		// }
-	}
-	catch (err) {
-		console.log(err);
-		req.flash("error", "Some error occurred on the server.")
-		res.redirect("back");
-	}
+		sendEmailWithPdf(params.lead_Id,params.booking_name,pdfBuffer)
+		
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ success: false, message: "Internal server error" });
+    }
 });
+
+
+// router.post("/admin/createproforma", middleware.ensureAdminLoggedIn, async (req, res) => {
+// 	const { items, subtotal, finalTotal  } = req.body;
+// 	const params = req.body
+// 	params.discountamnt=(subtotal-finalTotal)
+// 	const result = await transformedData({ items });
+//     const serviceitems = result.serviceitems;
+	
+// 	let paymentstatus=[{
+// 		isPaid:true,
+// 		paymentDate:"29/11/2024"
+// 	},
+// 	{
+// 		isPaid:false,
+// 		paymentDate:"29/12/2024"
+// 	},
+// 	{
+// 		isPaid:false,
+// 		paymentDate:"29/01/2025"
+// 	} ]
+  
+// let  data = {
+// params,
+// serviceitems,
+// };
+// data.paymentstatus=paymentstatus;
+// 	try {
+// 		//console.log(params);
+// 		const pdfBuffer = await create_proforma(data);
+// 		res.send({
+//             success: true,
+//             statusCode: 200,
+//             data: data,
+//             pdfBuffer:pdfBuffer
+//         });
+// 		//const saveproforma = await createOrUpdateProforma(data);
+// 		// Send the PDF in the response
+// 		// res.setHeader('Content-Disposition', 'attachment; filename=Proforma_with_Terms.pdf');
+// 		// res.setHeader('Content-Type', 'application/pdf');
+// 		// res.end(pdfBuffer);
+// 		sendEmailWithPdf(params.lead_Id,params.booking_name,pdfBuffer)
+// 		// if (result.success) {
+// 		// 	req.flash("success", result.message);
+// 		// 	res.redirect("/admin/showinventorys");
+// 		// } else {
+// 		// 	req.flash("error", result.message);
+// 		// 	res.redirect("back");
+// 		// }
+// 	}
+// 	catch (err) {
+// 		console.log(err);
+// 		req.flash("error", "Some error occurred on the server.")
+// 		res.redirect("back");
+// 	}
+// });
 module.exports = router;

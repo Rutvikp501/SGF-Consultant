@@ -4,6 +4,7 @@ const connectDB = async() => {
 	{
 		const db = process.env.MONGO_LIVE;
 		//const db = process.env.MONGO_URI;
+		//const db = 'mongodb://localhost:27017/SGEF';
 		await mongoose.connect(db);
 		console.log("MongoDB connected...");
 	}
@@ -14,4 +15,4 @@ const connectDB = async() => {
 	}
 }
 
-module.exports = connectDB;  
+module.exports = connectDB;
