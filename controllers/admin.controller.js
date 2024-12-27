@@ -8,10 +8,11 @@ const JunkLeadModel = require("../models/junkLead.model.js");
 const { calculateCycle } = require("../helpers/sample.js");
 const { Consultant_Welcome, Consultant_Wellcome } = require("../utility/email.util.js");
 const { cloudinaryUpload } = require("../config/cloudinary.js");
-const { addinventoryquery, transformedData, consultantregistationquery, adminregistationquery, createOrUpdateProforma } = require("../query/admin.query.js");
+const { addinventoryquery, transformedData, consultantregistationquery, adminregistationquery, createOrUpdateProforma, addPackagesQuery } = require("../query/admin.query.js");
 const inventorysModel = require("../models/inventory.model.js");
 const { create_proforma } = require("../utility/pdf.js");
 const { sendEmailWithPdf } = require("../helpers/email.js");
+const packagesModel = require("../models/packages.model.js");
 
 exports.Login = async (req, res) => {
   let { email_id, password } = req.body;
@@ -467,6 +468,57 @@ exports.getInventory = async (req, res) => {
       success: true,
       statusCode: 200,
       data: inventorys
+    })
+
+  } catch (err) {
+    console.error(err);
+    return res.send({
+      success: false,
+      statusCode: 500,
+      message: `Some error occurred on the server.`
+    })
+  }
+};
+exports.addpackages = async (req, res) => {
+
+  try {
+    const params = req.body;
+ 
+    let result;
+    result = await addPackagesQuery(params);
+    if (result.success) {
+      return res.send({
+        success: true,
+        statusCode: 200,
+        message: result.message
+      })
+    } else {
+      return res.send({
+        success: false,
+        statusCode: 500,
+        message: result.message
+      })
+    }
+
+
+  } catch (err) {
+    console.error(err);
+    return res.send({
+      success: false,
+      statusCode: 500,
+      message: `Some error occurred on the server.`
+    })
+  }
+};
+
+exports.getpackages = async (req, res) => {
+
+  try {
+    const packages = await packagesModel.find();
+    return res.send({
+      success: true,
+      statusCode: 200,
+      data: packages
     })
 
   } catch (err) {

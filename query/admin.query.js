@@ -7,6 +7,7 @@ const { Consultant_Wellcome } = require("../utility/email.util.js");
 const inventorysModel = require("../models/inventory.model.js");
 const { calculateCycle } = require("../helpers/sample.js");
 const proformaModel = require("../models/proforma.model.js");
+const packagesModel = require("../models/packages.model.js");
 
 exports.adminregistationquery = async (params) => {
     try {
@@ -288,27 +289,27 @@ exports.addinventoryquery = async (params) => {
 exports.addPackagesQuery = async (params) => {
   try {
       // Check if a package with the same name already exists
-      const existingPackage = await packagesModel.findOne({ name: params.name });
+      const existingPackage = await packagesModel.findOne({ package_name: params.package_name });
 
       if (existingPackage) {
           return {
               success: false,
               statusCode: 409,
-              message: `${params.name} already exists.`,
+              message: `${params.package_name} already exists.`,
           };
       }
 
       // Create a new package object using the provided params
       const newPackage = new packagesModel({
-          type: params.type || null, // e.g., CLASSIC, PREMIUM
-          name: params.name,        // Package name
-          description: params.description || null,
+          service_type: params.service_type || null, // e.g., CLASSIC, PREMIUM
+          package_type: params.package_type || null, // e.g., CLASSIC, PREMIUM
+          package_name: params.package_name || null,       // Package name
+          subname: params.name || null,      // Package name
           graphers: params.graphers || 0,
           price: params.price || null,
           delivery: params.delivery || null,
           duration: params.duration || null,
-          services: params.services || [], // List of services
-          products: params.products || [], // List of products
+          services_products: params.services_products || [], // List of services
           totalServices: params.totalServices || 0,
           totalProducts: params.totalProducts || 0,
       });

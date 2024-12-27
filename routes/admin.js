@@ -14,9 +14,9 @@ const { Consultant_Wellcome } = require("../utility/email.util.js");
 const { addLead } = require("../controllers/lead.controller.js");
 const packagesModel = require("../models/packages.model.js");
 const { cloudinaryUpload } = require("../config/cloudinary.js");
-const { adminregistationquery, consultantregistationquery, updateUserPhotos, addinventoryquery, updateConsultantQuery, transformedData, updateAdminQuery, createOrUpdateProforma } = require("../query/admin.query.js");
+const { adminregistationquery, consultantregistationquery, updateUserPhotos, addinventoryquery, updateConsultantQuery, transformedData, updateAdminQuery, createOrUpdateProforma, addPackagesQuery } = require("../query/admin.query.js");
 const inventorysModel = require("../models/inventory.model.js");
-const { create_proforma } = require("../utility/pdf.js");
+const { create_proforma, create_Package_proforma } = require("../utility/pdf.js");
 const { sendEmailWithPdf } = require("../helpers/email.js");
 
 router.get("/admin/dashboard", middleware.ensureAdminLoggedIn, async (req, res) => {
@@ -596,11 +596,12 @@ router.post('/admin/addpackages', middleware.ensureAdminLoggedIn, async (req, re
 
 
 	try {
-		const params = req.body;
-return console.log(params)
+		 const params = req.body;
+		
 		let result;
 
-		result = await addpackagesquery(params);
+		result = await addPackagesQuery(params);
+console.log(result);
 
 
 		if (result.success) {
@@ -635,9 +636,10 @@ router.get("/admin/createproforma", middleware.ensureAdminLoggedIn, async (req, 
 	const { department } = req.user;
 	try {
 		const inventorys = await inventorysModel.find();
+		const packages = await packagesModel.find();
 		// console.log(inventorys);
 
-		res.render("admin/createproforma", { title: "List of inventorys", inventorys, department });
+		res.render("admin/createproforma", { title: "List of inventorys", inventorys,packages,department });
 	}
 	catch (err) {
 		console.log(err);
@@ -647,13 +649,15 @@ router.get("/admin/createproforma", middleware.ensureAdminLoggedIn, async (req, 
 });
 
 router.post("/admin/createproforma", middleware.ensureAdminLoggedIn, async (req, res) => {
+	//console.log(req.body);
+	
     const { items, subtotal, finalTotal } = req.body;
     const params = req.body;
     params.discountamnt = subtotal - finalTotal;
 
     const result = await transformedData({ items });
     const serviceitems = result.serviceitems;
-
+	const packages = await packagesModel.findOne({ package_name: params.package_name });
     let paymentstatus = [
         { isPaid: true, paymentDate: "" },
         { isPaid: false, paymentDate: "" },
@@ -664,6 +668,7 @@ router.post("/admin/createproforma", middleware.ensureAdminLoggedIn, async (req,
 
     try {
         const pdfBuffer = await create_proforma(data);
+        // const pdfBuffer = await create_Package_proforma(packages);
 
         // Send raw binary data with appropriate headers
         res.setHeader('Content-Disposition', 'attachment; filename=Proforma_with_Terms.pdf');

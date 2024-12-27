@@ -26,7 +26,9 @@
 						<th scope="col">Package Name</th>
 						<th scope="col">Subname</th>
 						<th scope="col">Retail Price</th>
-						<th scope="col">Description</th>
+						<th scope="col">Graphers</th>
+						<th scope="col">delivery</th>
+						<th scope="col">duration</th>
 					</tr>
 				</thead>
 			</table>
@@ -37,10 +39,12 @@
 					<% for(let i=0; i<packages.length; i++) { %>
 						<tr>
 							<th scope="row"> <%= i+1 %> </th>
-							<td> <%= packages[i].packageName %> </td>
-							<td> <%= packages[i].subname %> </td>
-							<td> <%= packages[i].retail_price %> </td>
-							<td> <%= packages[i].description %> </td>
+							<td> <%= packages[i].package_type %> </td>
+							<td> <%= packages[i].package_name %> </td>
+							<td> <%= packages[i].price %> </td>
+							<td> <%= packages[i].graphers %> </td>
+							<td> <%= packages[i].delivery %>  Days</td>
+							<td> <%= packages[i].duration %>  Day</td>
 						</tr>
 					<% } %>
 				</tbody>

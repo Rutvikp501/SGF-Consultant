@@ -2,10 +2,8 @@
     <%- include('../partials/managementSidebar') %>
 
     <div id="main-wrapper">
-
         <p class="title">Add Package</p>
-        <form action="/admin/addpackages" method="POST" class="form">
-
+        <form id="add-package-form" action="/admin/addpackages" method="POST" class="form">
             <% if (typeof errors != 'undefined') { %>
                 <% errors.forEach(function(error) { %>
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -16,6 +14,15 @@
             <% } %>
 
             <div class="gridf">
+                <!-- Other Fields -->
+                <label>
+                    <select class="input" name="service_type" id="service-type" required>
+                        <option value="" disabled selected>Select Service Type</option>
+                        <option value="photography">Photography</option>
+                    </select>
+                    <span>Service Type</span>
+                </label>
+
                 <label>
                     <select class="input" name="package_type" id="package-type" required>
                         <option value="" disabled selected>Select Type</option>
@@ -60,51 +67,58 @@
                     <span>Duration</span>
                 </label>
 
-                <!-- Services -->
-                <div id="services-container">
-                    <label>
-                        <input type="text" name="services[]" class="input" placeholder="Service Name" required>
-                        <span>Service</span>
-                    </label>
+                <!-- Services/Products -->
+                <div id="services-products-container">
+                    <div class="service-product">
+                        <label>
+                            <input type="text" name="services_products[0][serviceName]" class="input" placeholder="Service/Product Name" required>
+                            <span>Service/Product Name</span>
+                        </label>
+                        <label>
+                            <input type="number" name="services_products[0][quantity]" class="input" placeholder="Quantity" required>
+                            <span>Quantity</span>
+                        </label>
+                        <label>
+                            <input type="text" name="services_products[0][duration]" class="input" placeholder="Duration" required>
+                            <span>Duration</span>
+                        </label>
+                    </div>
                 </div>
-                <button type="button" id="add-service-btn" class="btn btn-secondary">Add Service</button>
-
-                <!-- Products -->
-                <div id="products-container">
-                    <label>
-                        <input type="text" name="products[]" class="input" placeholder="Product Name" required>
-                        <span>Product</span>
-                    </label>
-                </div>
-                <button type="button" id="add-product-btn" class="btn btn-secondary">Add Product</button>
+                <button type="button" id="add-service-product-btn" class="btn btn-secondary">Add Service/Product</button>
             </div>
 
             <button type="submit" class="submit d-block m-auto mt-4">Submit</button>
-
         </form>
-
     </div>
 
-    <!-- JavaScript for Adding Multiple Fields -->
+    <!-- JavaScript for Adding Dynamic Fields -->
     <script>
-        document.getElementById('add-service-btn').addEventListener('click', function() {
-            const servicesContainer = document.getElementById('services-container');
-            const serviceField = document.createElement('label');
-            serviceField.innerHTML = `
-                <input type="text" name="services[]" class="input" placeholder="Service Name" required>
-                <span>Service</span>
+        document.getElementById('add-service-product-btn').addEventListener('click', function () {
+            const container = document.getElementById('services-products-container');
+            const index = container.children.length; // Get current index for the field names
+            const serviceProductField = document.createElement('div');
+            serviceProductField.classList.add('service-product');
+            serviceProductField.innerHTML = `
+                <label>
+                    <input type="text" name="services_products[${index}][serviceName]" class="input" placeholder="Service/Product Name" required>
+                    <span>Service/Product Name</span>
+                </label>
+                <label>
+                    <input type="number" name="services_products[${index}][quantity]" class="input" placeholder="Quantity" required>
+                    <span>Quantity</span>
+                </label>
+                <label>
+                    <input type="text" name="services_products[${index}][duration]" class="input" placeholder="Duration" required>
+                    <span>Duration</span>
+                </label>
             `;
-            servicesContainer.appendChild(serviceField);
+            container.appendChild(serviceProductField);
         });
 
-        document.getElementById('add-product-btn').addEventListener('click', function() {
-            const productsContainer = document.getElementById('products-container');
-            const productField = document.createElement('label');
-            productField.innerHTML = `
-                <input type="text" name="products[]" class="input" placeholder="Product Name" required>
-                <span>Product</span>
-            `;
-            productsContainer.appendChild(productField);
+        // Form submit logic
+        document.getElementById('add-package-form').addEventListener('submit', function (event) {
+            const servicesProducts = document.querySelectorAll('.service-product');
+            document.querySelector('[name="totalServices"]').value = servicesProducts.length; // Calculate total services dynamically
         });
     </script>
 </main>
