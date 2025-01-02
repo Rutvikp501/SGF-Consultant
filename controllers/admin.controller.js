@@ -10,7 +10,7 @@ const { Consultant_Welcome, Consultant_Wellcome } = require("../utility/email.ut
 const { cloudinaryUpload } = require("../config/cloudinary.js");
 const { addinventoryquery, transformedData, consultantregistationquery, adminregistationquery, createOrUpdateProforma, addPackagesQuery } = require("../query/admin.query.js");
 const inventorysModel = require("../models/inventory.model.js");
-const { create_proforma } = require("../utility/pdf.js");
+const { create_proforma, create_corporate_proforma } = require("../utility/pdf.js");
 const { sendEmailWithPdf } = require("../helpers/email.js");
 const packagesModel = require("../models/packages.model.js");
 
@@ -572,16 +572,16 @@ exports.createproforma = async (req, res) => {
     const result = await transformedData({ items });
       const serviceitems = result.serviceitems;
       let paymentstatus=[{
-              isPaid:true,
-              paymentDate:"29/11/2024"
+              isPaid:false,
+              paymentDate:""
           },
           {
               isPaid:false,
-              paymentDate:"29/12/2024"
+              paymentDate:""
           },
           {
               isPaid:false,
-              paymentDate:"29/01/2025"
+              paymentDate:""
           } ]
         
     let  data = {
@@ -590,13 +590,20 @@ exports.createproforma = async (req, res) => {
       };
       data.paymentstatus=paymentstatus;
     // Call the updated create_proforma function to generate the final PDF
-    const pdfBuffer = await create_proforma(data);
+    if (params.service_type=="corporate_service"){
+          console.log("corporate_service");
+          
+          pdfBuffer = await create_corporate_proforma(data);
+        }
+        else{
+          pdfBuffer = await create_proforma(data);
+        }
     //const saveproforma = await createOrUpdateProforma(data);
     // Send the PDF in the response
     res.setHeader('Content-Disposition', 'attachment; filename=Proforma_with_Terms.pdf');
     res.setHeader('Content-Type', 'application/pdf');
     res.end(pdfBuffer);
-    sendEmailWithPdf(params.lead_Id,params.booking_name,pdfBuffer)
+   // sendEmailWithPdf(params.lead_Id,params.booking_name,pdfBuffer)
   } catch (err) {
     console.error(err);
     res.status(500).send({

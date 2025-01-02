@@ -16,7 +16,7 @@ const packagesModel = require("../models/packages.model.js");
 const { cloudinaryUpload } = require("../config/cloudinary.js");
 const { adminregistationquery, consultantregistationquery, updateUserPhotos, addinventoryquery, updateConsultantQuery, transformedData, updateAdminQuery, createOrUpdateProforma, addPackagesQuery } = require("../query/admin.query.js");
 const inventorysModel = require("../models/inventory.model.js");
-const { create_proforma, create_Package_proforma } = require("../utility/pdf.js");
+const { create_proforma, create_Package_proforma ,create_corporate_proforma} = require("../utility/pdf.js");
 const { sendEmailWithPdf } = require("../helpers/email.js");
 
 router.get("/admin/dashboard", middleware.ensureAdminLoggedIn, async (req, res) => {
@@ -665,9 +665,17 @@ router.post("/admin/createproforma", middleware.ensureAdminLoggedIn, async (req,
     ];
 
     let data = { params, serviceitems, paymentstatus };
-
+	
+     let pdfBuffer;
     try {
-        const pdfBuffer = await create_proforma(data);
+		if (params.service_type=="corporate_service"){
+			
+			pdfBuffer = await create_corporate_proforma(data);
+		}
+		else{
+			pdfBuffer = await create_proforma(data);
+		}
+         
         // const pdfBuffer = await create_Package_proforma(packages);
 
         // Send raw binary data with appropriate headers
