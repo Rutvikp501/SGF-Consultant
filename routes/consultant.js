@@ -3,7 +3,7 @@ const router = express.Router();
 const middleware = require("../middleware/index.js");
 const User = require("../models/user.js");
 const LeadModel = require("../models/lead.models.js");
-const { calculateLeadCycle, generateLeadID, calculateCycle } = require("../helpers/sample.js");
+const { calculateLeadCycle, generateLeadID, calculateCycle } = require("../helpers/common.js");
 const { addLead } = require("../utility/bitrix.js");
 
 router.get("/consultant/dashboard", middleware.ensureconsultantLoggedIn, async (req,res) => {

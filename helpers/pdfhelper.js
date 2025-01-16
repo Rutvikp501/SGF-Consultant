@@ -15,6 +15,8 @@ const fonts = {
     }
 };
 exports.create_50_50_pdf = async (pdfdata) => {
+    //console.log(pdfdata);
+    
     try {
         const printer = new PdfPrinter(fonts);
         const { params, serviceitems,paymentstatus } = pdfdata;
@@ -24,36 +26,52 @@ exports.create_50_50_pdf = async (pdfdata) => {
         
         
         const paidText1 = paymentstatus[0] && paymentstatus[0].isPaid
-        ? `Paid  ${paymentstatus[0].paymentDate}`
+        ? `Pending  ${paymentstatus[0].paymentDate}`
         : paymentstatus[0] ? `Pending  ${paymentstatus[0].paymentDate}` : ' ';
         
         const paidText2 = paymentstatus[1] && paymentstatus[1].isPaid
-        ? `Paid  ${paymentstatus[1].paymentDate}`
+        ? `Pending  ${paymentstatus[1].paymentDate}`
         : paymentstatus[1] ? `Pending  ${paymentstatus[1].paymentDate}` : ' ';
         
         
         const tableHeaders = [
-            { text: "Sr No", bold: true, alignment: "center", fontSize: 10, },
-            { text: "Service Name", bold: true, alignment: "center", fontSize: 10, },
-            { text: "Description", bold: true, alignment: "center", fontSize: 10, },
-            { text: "Date", bold: true, alignment: "center", fontSize: 10, },
-            { text: "QTY", bold: true, alignment: "center", fontSize: 10, },
-            { text: "Discount", bold: true, alignment: "center", fontSize: 10, },
-            { text: "Total AMT", bold: true, alignment: "center", fontSize: 10, },
+            { text: "Sr No", bold: true, alignment: "center", fontSize: 10 },
+            { text: "Service Name", bold: true, alignment: "center", fontSize: 10 },
+            { text: "Description", bold: true, alignment: "center", fontSize: 10 },
+            { text: "Date", bold: true, alignment: "center", fontSize: 10 },
+            { text: "QTY", bold: true, alignment: "center", fontSize: 10 },
+            { text: "Discount", bold: true, alignment: "center", fontSize: 10 },
+            { text: "Total AMT", bold: true, alignment: "center", fontSize: 10 },
         ];
         
-        console.log("im here create_50_50_pdf")
         
-        const serviceRows = serviceitems.map((item, index) => [
-            { text: index + 1, alignment: "center", fontSize: 10, },
-            { text: `${item.name}/${item.subname}`, color: "red", alignment: "center", fontSize: 10, },
-            { text: item.detailed_description, alignment: "center", fontSize: 10, },
-            { text: item.date, alignment: "center", fontSize: 10, },
-            { text: item.quantity, alignment: "center", fontSize: 10, },
-            { text: params.discount ? `${params.discount}%` : "-", alignment: "center", fontSize: 10, },
-            { text: item.quantity * item.retail_price, alignment: "right", fontSize: 10, }, // Calculate total for each row
-        ]);
+       const grossTotal = serviceitems.reduce((sum, item) => {
+    const retailPrice = parseFloat(item.retail_price) || 0; // Convert to number or default to 0
+    return sum + retailPrice;
+}, 0);
+        const serviceRows = serviceitems.flatMap((item, index) => {
+            // Format subname if it includes "PACKAGE"
+            let formattedSubname = item.subname.includes("PACKAGE")
+                ? item.detailed_description.split(",").map((sentence, i) => `${sentence.trim()}`).join(",\n")
+                : item.detailed_description;
+            // Create the main row for the item
+            const row = [
+                { text: index + 1, alignment: "center", fontSize: 10 },
+                { text: `${item.name}/${item.subname}`, color: "red", alignment: "center", fontSize: 10 },
+                { text: `${formattedSubname}`, alignment: "center", fontSize: 10 },
+                { text: item.date, alignment: "center", fontSize: 10 },
+                { text: item.quantity, alignment: "center", fontSize: 10 },
+                { text: item.discount ? `${item.discount}%` : "-", alignment: "center", fontSize: 10 },
+                { text: item.finalAmount, alignment: "right", fontSize: 10 } // Calculate total for each row
+            ];
         
+            // Add a horizontal line (empty row with a bottom border)
+            
+        
+            return [row,];
+        });
+        
+        // Combine headers and rows into the table body
         const serviceTableBody = [tableHeaders, ...serviceRows];
 
         let dd = {
@@ -159,12 +177,12 @@ exports.create_50_50_pdf = async (pdfdata) => {
                         body: [
                             [
                                 { text: "Gross Cost", alignment: "right", bold: true, fontSize: 10, },
-                                { text: params.subtotal, alignment: "right", fontSize: 10, },
+                                { text: grossTotal, alignment: "right", fontSize: 10, },
                             ],
                             [
                                 { text: "Discount", alignment: "right", bold: true, fontSize: 10, },
                                 {
-                                    text: `(${params.discount}%)    -${params.discountamnt}`,
+                                    text: `(${(((grossTotal - params.finalTotal) / grossTotal) * 100).toFixed(2)}%)    -${grossTotal-params.finalTotal}`,
                                     alignment: "right", fontSize: 10,
                                 },
                             ],
@@ -202,14 +220,14 @@ exports.create_50_50_pdf = async (pdfdata) => {
                             [
                                 { text: '1)', alignment: 'left', fontSize: 10 },
                                 { text: '   50% ADVANCE PAYMENT OF TOTAL NET SERVICE COST', alignment: 'left', fontSize: 10 },
-                                { text: `${part1_50_50}`, alignment: 'right', fontSize: 10 },
-                                { text: paidText1, alignment: 'right', fontSize: 10 },
+                                { text: `${part1_50_50}`, alignment: 'center', fontSize: 10 },
+                                { text: paidText1, alignment: 'center', fontSize: 10 },
                             ],
                             [
                                 { text: '2)', alignment: 'left', fontSize: 10 },
                                 { text: '50% OF TOTAL NET SERVICE COST ON EVENT DAY', alignment: 'left', fontSize: 10 },
-                                { text: `${part1_50_50}`, alignment: 'right', fontSize: 10 },
-                                { text: paidText2, alignment: 'right', fontSize: 10 },
+                                { text: `${part1_50_50}`, alignment: 'center', fontSize: 10 },
+                                { text: paidText2, alignment: 'center', fontSize: 10 },
                             ],
                         ]
                     }
@@ -286,15 +304,18 @@ exports.create_10_40_50_pdf = async (pdfdata) => {
             { text: "Total AMT", bold: true, alignment: "center", fontSize: 10, },
         ];
 
-
+       const grossTotal = serviceitems.reduce((sum, item) => {
+    const retailPrice = parseFloat(item.retail_price) || 0; // Convert to number or default to 0
+    return sum + retailPrice;
+}, 0);
         const serviceRows = serviceitems.map((item, index) => [
             { text: index + 1, alignment: "center", fontSize: 10, },
             { text: `${item.name}/${item.subname}`, color: "red", alignment: "center", fontSize: 10, },
             { text: item.detailed_description, alignment: "center", fontSize: 10, },
             { text: item.date, alignment: "center", fontSize: 10, },
             { text: item.quantity, alignment: "center", fontSize: 10, },
-            { text: params.discount ? `${params.discount}%` : "-", alignment: "center", fontSize: 10, },
-            { text: item.quantity * item.retail_price, alignment: "right", fontSize: 10, }, // Calculate total for each row
+            { text: (((grossTotal - params.finalTotal) / grossTotal) * 100).toFixed(2) ? `${(((grossTotal - params.finalTotal) / grossTotal) * 100).toFixed(2)}%` : "-", alignment: "center", fontSize: 10, },
+            { text: item.quantity * item.finalAmount, alignment: "right", fontSize: 10, }, // Calculate total for each row
         ]);
 
         const serviceTableBody = [tableHeaders, ...serviceRows];
@@ -402,12 +423,12 @@ exports.create_10_40_50_pdf = async (pdfdata) => {
                         body: [
                             [
                                 { text: "Gross Cost", alignment: "right", bold: true, fontSize: 10, },
-                                { text: params.subtotal, alignment: "right", fontSize: 10, },
+                                { text: grossTotal, alignment: "right", fontSize: 10, },
                             ],
                             [
                                 { text: "Discount", alignment: "right", bold: true, fontSize: 10, },
                                 {
-                                    text: `(${params.discount}%)    -${params.discountamnt}`,
+                                    text: `(${(((grossTotal - params.finalTotal) / grossTotal) * 100).toFixed(2)}%)    -${grossTotal-params.finalTotal}`,
                                     alignment: "right", fontSize: 10,
                                 },
                             ],
@@ -445,20 +466,20 @@ exports.create_10_40_50_pdf = async (pdfdata) => {
                             [
                                 { text: '1)', alignment: 'left', fontSize: 10 },
                                 { text: '10% ADVANCE PAYMENT OF TOTAL NET SERVICE COST', alignment: 'left', fontSize: 10 },
-                                { text: `${part1_10}`, alignment: 'right', fontSize: 10 },
-                                { text: paidText1, alignment: 'right', fontSize: 10 },
+                                { text: `${part1_10}`, alignment: 'center', fontSize: 10 },
+                                { text: paidText1, alignment: 'center', fontSize: 10 },
                             ],
                             [
                                 { text: '2)', alignment: 'left', fontSize: 10 },
                                 { text: '40% OF TOTAL NET SERVICE COST ON EVENT DAY', alignment: 'left', fontSize: 10 },
-                                { text: `${part2_40}`, alignment: 'right', fontSize: 10 },
-                                { text: paidText2, alignment: 'right', fontSize: 10 },
+                                { text: `${part2_40}`, alignment: 'center', fontSize: 10 },
+                                { text: paidText2, alignment: 'center', fontSize: 10 },
                             ],
                             [
                                 { text: '2)', alignment: 'left', fontSize: 10 },
                                 { text: '50% OF TOTAL NET SERVICE COST ON EVENT DAY', alignment: 'left', fontSize: 10 },
-                                { text: `${part3_50}`, alignment: 'right', fontSize: 10 },
-                                { text: paidText2, alignment: 'right', fontSize: 10 },
+                                { text: `${part3_50}`, alignment: 'center', fontSize: 10 },
+                                { text: paidText2, alignment: 'center', fontSize: 10 },
                             ],
                         ]
                     }
@@ -522,16 +543,18 @@ exports.create_50_50_packagepdf = async (pdfdata) => {
             { text: "Total AMT", bold: true, alignment: "center", fontSize: 10, },
         ];
         
-        console.log("im here create_50_50_pdf package")
-        
+       const grossTotal = serviceitems.reduce((sum, item) => {
+    const retailPrice = parseFloat(item.retail_price) || 0; // Convert to number or default to 0
+    return sum + retailPrice;
+}, 0);
         const serviceRows = serviceitems.map((item, index) => [
             { text: index + 1, alignment: "center", fontSize: 10, },
             { text: `${item.name}/${item.subname}`, color: "red", alignment: "center", fontSize: 10, },
             { text: item.detailed_description, alignment: "center", fontSize: 10, },
             { text: item.date, alignment: "center", fontSize: 10, },
             { text: item.quantity, alignment: "center", fontSize: 10, },
-            { text: params.discount ? `${params.discount}%` : "-", alignment: "center", fontSize: 10, },
-            { text: item.quantity * item.retail_price, alignment: "right", fontSize: 10, }, // Calculate total for each row
+            { text: (((grossTotal - params.finalTotal) / grossTotal) * 100).toFixed(2) ? `${(((grossTotal - params.finalTotal) / grossTotal) * 100).toFixed(2)}%` : "-", alignment: "center", fontSize: 10, },
+            { text: item.quantity * item.finalAmount, alignment: "right", fontSize: 10, }, // Calculate total for each row
         ]);
         
         const serviceTableBody = [tableHeaders, ...serviceRows];
@@ -639,12 +662,12 @@ exports.create_50_50_packagepdf = async (pdfdata) => {
                         body: [
                             [
                                 { text: "Gross Cost", alignment: "right", bold: true, fontSize: 10, },
-                                { text: params.subtotal, alignment: "right", fontSize: 10, },
+                                { text: grossTotal, alignment: "right", fontSize: 10, },
                             ],
                             [
                                 { text: "Discount", alignment: "right", bold: true, fontSize: 10, },
                                 {
-                                    text: `(${params.discount}%)    -${params.discountamnt}`,
+                                    text: `(${(((grossTotal - params.finalTotal) / grossTotal) * 100).toFixed(2)}%)    -${grossTotal-params.finalTotal}`,
                                     alignment: "right", fontSize: 10,
                                 },
                             ],
@@ -682,14 +705,14 @@ exports.create_50_50_packagepdf = async (pdfdata) => {
                             [
                                 { text: '1)', alignment: 'left', fontSize: 10 },
                                 { text: '   50% ADVANCE PAYMENT OF TOTAL NET SERVICE COST', alignment: 'left', fontSize: 10 },
-                                { text: `${part1_50_50}`, alignment: 'right', fontSize: 10 },
-                                { text: paidText1, alignment: 'right', fontSize: 10 },
+                                { text: `${part1_50_50}`, alignment: 'center', fontSize: 10 },
+                                { text: paidText1, alignment: 'center', fontSize: 10 },
                             ],
                             [
                                 { text: '2)', alignment: 'left', fontSize: 10 },
                                 { text: '50% OF TOTAL NET SERVICE COST ON EVENT DAY', alignment: 'left', fontSize: 10 },
-                                { text: `${part1_50_50}`, alignment: 'right', fontSize: 10 },
-                                { text: paidText2, alignment: 'right', fontSize: 10 },
+                                { text: `${part1_50_50}`, alignment: 'center', fontSize: 10 },
+                                { text: paidText2, alignment: 'center', fontSize: 10 },
                             ],
                         ]
                     }
@@ -766,15 +789,18 @@ exports.create_10_40_50_Packagepdf = async (pdfdata) => {
             { text: "Total AMT", bold: true, alignment: "center", fontSize: 10, },
         ];
 
-
+       const grossTotal = serviceitems.reduce((sum, item) => {
+    const retailPrice = parseFloat(item.retail_price) || 0; // Convert to number or default to 0
+    return sum + retailPrice;
+}, 0);
         const serviceRows = serviceitems.map((item, index) => [
             { text: index + 1, alignment: "center", fontSize: 10, },
             { text: `${item.name}/${item.subname}`, color: "red", alignment: "center", fontSize: 10, },
             { text: item.detailed_description, alignment: "center", fontSize: 10, },
             { text: item.date, alignment: "center", fontSize: 10, },
             { text: item.quantity, alignment: "center", fontSize: 10, },
-            { text: params.discount ? `${params.discount}%` : "-", alignment: "center", fontSize: 10, },
-            { text: item.quantity * item.retail_price, alignment: "right", fontSize: 10, }, // Calculate total for each row
+            { text: (((grossTotal - params.finalTotal) / grossTotal) * 100).toFixed(2) ? `${(((grossTotal - params.finalTotal) / grossTotal) * 100).toFixed(2)}%` : "-", alignment: "center", fontSize: 10, },
+            { text: item.quantity * item.finalAmount, alignment: "right", fontSize: 10, }, // Calculate total for each row
         ]);
 
         const serviceTableBody = [tableHeaders, ...serviceRows];
@@ -882,12 +908,12 @@ exports.create_10_40_50_Packagepdf = async (pdfdata) => {
                         body: [
                             [
                                 { text: "Gross Cost", alignment: "right", bold: true, fontSize: 10, },
-                                { text: params.subtotal, alignment: "right", fontSize: 10, },
+                                { text: grossTotal, alignment: "right", fontSize: 10, },
                             ],
                             [
                                 { text: "Discount", alignment: "right", bold: true, fontSize: 10, },
                                 {
-                                    text: `(${params.discount}%)    -${params.discountamnt}`,
+                                    text: `(${(((grossTotal - params.finalTotal) / grossTotal) * 100).toFixed(2)}%)    -${grossTotal-params.finalTotal}`,
                                     alignment: "right", fontSize: 10,
                                 },
                             ],
@@ -925,14 +951,14 @@ exports.create_10_40_50_Packagepdf = async (pdfdata) => {
                             [
                                 { text: '1)', alignment: 'left', fontSize: 10 },
                                 { text: '10% ADVANCE PAYMENT OF TOTAL NET SERVICE COST', alignment: 'left', fontSize: 10 },
-                                { text: `${part1_10}`, alignment: 'right', fontSize: 10 },
-                                { text: paidText1, alignment: 'right', fontSize: 10 },
+                                { text: `${part1_10}`, alignment: 'center', fontSize: 10 },
+                                { text: paidText1, alignment: 'center', fontSize: 10 },
                             ],
                             [
                                 { text: '2)', alignment: 'left', fontSize: 10 },
                                 { text: '40% OF TOTAL NET SERVICE COST ON EVENT DAY', alignment: 'left', fontSize: 10 },
-                                { text: `${part2_40}`, alignment: 'right', fontSize: 10 },
-                                { text: paidText2, alignment: 'right', fontSize: 10 },
+                                { text: `${part2_40}`, alignment: 'center', fontSize: 10 },
+                                { text: paidText2, alignment: 'center', fontSize: 10 },
                             ],
                             [
                                 { text: '2)', alignment: 'left', fontSize: 10 },
@@ -997,15 +1023,18 @@ exports.create_100_Corporatepdf = async (pdfdata) => {
             { text: "Total AMT", bold: true, alignment: "center", fontSize: 10, },
         ];
         
-        
+       const grossTotal = serviceitems.reduce((sum, item) => {
+    const retailPrice = parseFloat(item.retail_price) || 0; // Convert to number or default to 0
+    return sum + retailPrice;
+}, 0);
         const serviceRows = serviceitems.map((item, index) => [
             { text: index + 1, alignment: "center", fontSize: 10, },
             { text: `${item.name}/${item.subname}`, color: "red", alignment: "center", fontSize: 10, },
             { text: item.detailed_description, alignment: "center", fontSize: 10, },
             { text: item.date, alignment: "center", fontSize: 10, },
             { text: item.quantity, alignment: "center", fontSize: 10, },
-            { text: params.discount ? `${params.discount}%` : "-", alignment: "center", fontSize: 10, },
-            { text: item.quantity * item.retail_price, alignment: "right", fontSize: 10, }, // Calculate total for each row
+            { text: (((grossTotal - params.finalTotal) / grossTotal) * 100).toFixed(2) ? `${(((grossTotal - params.finalTotal) / grossTotal) * 100).toFixed(2)}%` : "-", alignment: "center", fontSize: 10, },
+            { text: item.quantity * item.finalAmount, alignment: "right", fontSize: 10, }, // Calculate total for each row
         ]);
         
         const serviceTableBody = [tableHeaders, ...serviceRows];
@@ -1105,12 +1134,12 @@ exports.create_100_Corporatepdf = async (pdfdata) => {
                         body: [
                             [
                                 { text: "Gross Cost", alignment: "left", bold: true,color: 'red', fontSize: 10 },
-                                { text: params.subtotal, alignment: "right",bold: true, fontSize: 10, },
+                                { text: grossTotal, alignment: "right",bold: true, fontSize: 10, },
                             ],
                             [
                                 { text: "Discount", alignment: "left", bold: true, color: 'green', fontSize: 10 },
                                 {
-                                    text: `(${params.discount}%)    -${params.discountamnt}`,
+                                    text: `(${(((grossTotal - params.finalTotal) / grossTotal) * 100).toFixed(2)}%)    -${grossTotal-params.finalTotal}`,
                                     alignment: "right",bold: true, fontSize: 10,
                                 },
                             ],
@@ -1148,8 +1177,8 @@ exports.create_100_Corporatepdf = async (pdfdata) => {
                             [
                                 { text: '1)', alignment: 'left', fontSize: 10 ,bold: true },
                                 { text: '100% ADVANCE PAYMENT OF TOTAL NET SERVICE COST', alignment: 'left',bold: true, fontSize: 10 },
-                                { text: `${params.finalTotal}`, alignment: 'right', fontSize: 10 ,bold: true},
-                                { text: paidText1, alignment: 'right', fontSize: 10 ,bold: true},
+                                { text: `${params.finalTotal}`, alignment: 'center', fontSize: 10 ,bold: true},
+                                { text: paidText1, alignment: 'center', fontSize: 10 ,bold: true},
                             ],
                             
                         ]
@@ -1185,6 +1214,7 @@ exports.create_100_Corporatepdf = async (pdfdata) => {
         throw new Error('Error generating PDF');
     }
 };
+
 exports.create_50_50_Corporatepdf = async (pdfdata) => {
     try {
         const printer = new PdfPrinter(fonts);
@@ -1212,8 +1242,10 @@ exports.create_50_50_Corporatepdf = async (pdfdata) => {
             { text: "Discount", bold: true, alignment: "center", fontSize: 10, },
             { text: "Total AMT", bold: true, alignment: "center", fontSize: 10, },
         ];
-        
-        console.log("im here create_50_50_pdf Corporatepdf")
+       const grossTotal = serviceitems.reduce((sum, item) => {
+    const retailPrice = parseFloat(item.retail_price) || 0; // Convert to number or default to 0
+    return sum + retailPrice;
+}, 0);
         
         const serviceRows = serviceitems.map((item, index) => [
             { text: index + 1, alignment: "center", fontSize: 10, },
@@ -1221,8 +1253,8 @@ exports.create_50_50_Corporatepdf = async (pdfdata) => {
             { text: item.detailed_description, alignment: "center", fontSize: 10, },
             { text: item.date, alignment: "center", fontSize: 10, },
             { text: item.quantity, alignment: "center", fontSize: 10, },
-            { text: params.discount ? `${params.discount}%` : "-", alignment: "center", fontSize: 10, },
-            { text: item.quantity * item.retail_price, alignment: "right", fontSize: 10, }, // Calculate total for each row
+            { text: (((grossTotal - params.finalTotal) / grossTotal) * 100).toFixed(2) ? `${(((grossTotal - params.finalTotal) / grossTotal) * 100).toFixed(2)}%` : "-", alignment: "center", fontSize: 10, },
+            { text: item.quantity * item.finalAmount, alignment: "right", fontSize: 10, }, // Calculate total for each row
         ]);
         
         const serviceTableBody = [tableHeaders, ...serviceRows];
@@ -1323,12 +1355,12 @@ exports.create_50_50_Corporatepdf = async (pdfdata) => {
                         body: [
                             [
                                 { text: "Gross Cost", alignment: "right", bold: true, fontSize: 10, },
-                                { text: params.subtotal, alignment: "right", fontSize: 10, },
+                                { text: grossTotal, alignment: "right", fontSize: 10, },
                             ],
                             [
                                 { text: "Discount", alignment: "right", bold: true, fontSize: 10, },
                                 {
-                                    text: `(${params.discount}%)    -${params.discountamnt}`,
+                                    text: `(${(((grossTotal - params.finalTotal) / grossTotal) * 100).toFixed(2)}%)    -${grossTotal-params.finalTotal}`,
                                     alignment: "right", fontSize: 10,
                                 },
                             ],
@@ -1366,14 +1398,14 @@ exports.create_50_50_Corporatepdf = async (pdfdata) => {
                             [
                                 { text: '1)', alignment: 'left', fontSize: 10 },
                                 { text: '   50% ADVANCE PAYMENT OF TOTAL NET SERVICE COST', alignment: 'left', fontSize: 10 },
-                                { text: `${part1_50_50}`, alignment: 'right', fontSize: 10 },
-                                { text: paidText1, alignment: 'right', fontSize: 10 },
+                                { text: `${part1_50_50}`, alignment: 'center', fontSize: 10 },
+                                { text: paidText1, alignment: 'center', fontSize: 10 },
                             ],
                             [
                                 { text: '2)', alignment: 'left', fontSize: 10 },
                                 { text: '50% OF TOTAL NET SERVICE COST ON EVENT DAY', alignment: 'left', fontSize: 10 },
-                                { text: `${part1_50_50}`, alignment: 'right', fontSize: 10 },
-                                { text: paidText2, alignment: 'right', fontSize: 10 },
+                                { text: `${part1_50_50}`, alignment: 'center', fontSize: 10 },
+                                { text: paidText2, alignment: 'center', fontSize: 10 },
                             ],
                         ]
                     }

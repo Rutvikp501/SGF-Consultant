@@ -9,7 +9,7 @@ const consultantModel = require("../models/consultant.model.js");
 const LeadModel = require("../models/lead.models.js");
 const ConvertedLeadModel = require("../models/convertedLead.model.js");
 const JunkLeadModel = require("../models/junkLead.model.js");
-const { calculateCycle, } = require("../helpers/sample.js");
+const { calculateCycle, } = require("../helpers/common.js");
 const { Consultant_Wellcome } = require("../utility/email.util.js");
 const { addLead } = require("../controllers/lead.controller.js");
 const packagesModel = require("../models/packages.model.js");
@@ -18,6 +18,7 @@ const { adminregistationquery, consultantregistationquery, updateUserPhotos, add
 const inventorysModel = require("../models/inventory.model.js");
 const { create_proforma, create_Package_proforma ,create_corporate_proforma} = require("../utility/pdf.js");
 const { sendEmailWithPdf } = require("../helpers/email.js");
+const { generateRoadmap } = require("../utility/event_roadmap_budget.js");
 
 router.get("/admin/dashboard", middleware.ensureAdminLoggedIn, async (req, res) => {
 	const { department } = req.user;
@@ -649,7 +650,6 @@ router.get("/admin/createproforma", middleware.ensureAdminLoggedIn, async (req, 
 });
 
 router.post("/admin/createproforma", middleware.ensureAdminLoggedIn, async (req, res) => {
-	//console.log(req.body);
 	
     const { items, subtotal, finalTotal } = req.body;
     const params = req.body;
@@ -684,7 +684,7 @@ router.post("/admin/createproforma", middleware.ensureAdminLoggedIn, async (req,
         res.setHeader('Content-Length', pdfBuffer.length);
         res.end(pdfBuffer); // Use end to send raw data
 		//const saveproforma = await createOrUpdateProforma(data);
-		sendEmailWithPdf(params.lead_Id,params.booking_name,pdfBuffer)
+		//sendEmailWithPdf(params.lead_Id,params.booking_name,pdfBuffer)
 		
     } catch (err) {
         console.error(err);
@@ -692,6 +692,43 @@ router.post("/admin/createproforma", middleware.ensureAdminLoggedIn, async (req,
     }
 });
 
+router.get("/admin/eventroadmap", middleware.ensureAdminLoggedIn, async (req, res) => {
+	const { department } = req.user;
+	try {
+
+		res.render("admin/eventroadmap", { title: "List of Events",});
+	}
+	catch (err) {
+		console.log(err);
+		req.flash("error", "Some error occurred on the server.")
+		res.redirect("back");
+	}
+});
+
+router.post("/admin/eventroadmap", middleware.ensureAdminLoggedIn, async (req, res) => {
+	//console.log(req.body);
+	
+    const params = req.body;
+
+	
+     let pdfBuffer;
+    try {
+		const roadmap = await generateRoadmap(params.startDate,params.eventDate);
+        const pdfBuffer = await create_Package_proforma(roadmap);
+
+        // Send raw binary data with appropriate headers
+        res.setHeader('Content-Disposition', 'attachment; filename=Proforma_with_Terms.pdf');
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Length', pdfBuffer.length);
+        res.end(pdfBuffer); // Use end to send raw data
+		//const saveproforma = await createOrUpdateProforma(data);
+		//sendEmailWithPdf(params.lead_Id,params.booking_name,pdfBuffer)
+		
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ success: false, message: "Internal server error" });
+    }
+});
 
 // router.post("/admin/createproforma", middleware.ensureAdminLoggedIn, async (req, res) => {
 // 	const { items, subtotal, finalTotal  } = req.body;

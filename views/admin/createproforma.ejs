@@ -73,9 +73,6 @@
         <option value="100">100</option>
       </select>
       <br />
-      <label for="discount" style="color: aliceblue;">Discount (%):</label>
-      <input type="number" id="discount" value="0" step="0.1" style="width: 60px;" />
-      <br />
       <label for="itemSelect" style="color: aliceblue;">Select Item:</label>
       <select id="itemSelect">
         <option value="">-- Select an Item --</option>
@@ -85,6 +82,10 @@
           </option>
         <% }); %>
       </select>
+      <label for="itemdiscount" style="color: aliceblue;">Discount:</label>
+        <input type="number" class="itemdiscount" value="0" min="0" id="itemdiscount" step="0.01" style="width: 80px;" placeholder="Discount %" />
+        <label for="itemeventDate" style="color: aliceblue;">Event date:</label>
+        <input type="date" class="itemeventDate" id="itemeventDate" style="width: 130px;" />
       <button type="button" id="addItem">Add Item</button>
 
       <table>
@@ -94,6 +95,8 @@
             <th>Subname</th>
             <th>Price</th>
             <th>Quantity</th>
+            <th>Discount</th>
+            <th>Date</th>
             <th>Total</th>
             <th>Action</th>
           </tr>
@@ -118,18 +121,24 @@
   const addItemButton = document.getElementById('addItem');
   const itemSelect = document.getElementById('itemSelect');
   const itemTableBody = document.getElementById('itemTableBody');
-  const discountInput = document.getElementById('discount');
   const gstInput = document.getElementById('gst');
   const subtotalElement = document.getElementById('subtotal');
   const finalTotalElement = document.getElementById('finalTotal');
+  const itemdiscount = document.getElementById('itemdiscount');
+  const itemeventDate =  document.getElementById('itemeventDate');
 
+  console.log(itemeventDate.value);
+  
   addItemButton.addEventListener('click', function() {
     const selectedOption = itemSelect.options[itemSelect.selectedIndex];
     const itemId = selectedOption.value;
     const itemName = selectedOption.getAttribute('data-name');
     const itemsubname = selectedOption.getAttribute('data-subname');
+    const item_discount = selectedOption.getAttribute('itemdiscount');    
     const itemPrice = parseFloat(selectedOption.getAttribute('data-price'));
 
+    const discountItemAmount = (itemPrice * itemdiscount.value) / 100;
+    const finalItemAmount = itemPrice - discountItemAmount;
     if (itemId === '') return;
 
     // Check if item already exists in the table
@@ -142,13 +151,17 @@
       const row = document.createElement('tr');
       row.dataset.id = itemId;
       row.innerHTML = `
-        <td>${itemName}</td>
-        <td>${itemsubname}</td>
-        <td>${itemPrice.toFixed(2)}</td>
-        <td><input type="number" class="quantity" value="1" min="1" style="width: 60px;" /></td>
-        <td class="total">₹${itemPrice.toFixed(2)}</td>
-        <td><button type="button" class="removeItem">Remove</button></td>
-      `;
+  <td>${itemName}</td>
+  <td>${itemsubname}</td>
+  <td>${itemPrice.toFixed(2)}</td>
+  <td><input type="number" class="quantity" value="1" min="1" style="width: 60px;" /></td>
+ <td>${itemdiscount.value}</td>
+  <td>
+   ${itemeventDate.value}
+  </td>
+  <td class="total">₹${finalItemAmount}</td>
+  <td><button type="button" class="removeItem">Remove</button></td>
+`;
       itemTableBody.appendChild(row);
 
       // Add event listener for quantity input
@@ -181,12 +194,9 @@
       subtotal += parseFloat(row.querySelector('.total').textContent.replace('₹', ''));
     });
 
-    const discount = parseFloat(discountInput.value) || 0;
     const gst = parseFloat(gstInput.value) || 0;
-
-    const discountAmount = (subtotal * discount) / 100;
     const gstAmount = (subtotal * gst) / 100;
-    const finalTotal = subtotal - discountAmount + gstAmount;
+    const finalTotal = subtotal - gstAmount;
 
     subtotalElement.textContent = subtotal.toFixed(2);
     finalTotalElement.textContent = finalTotal.toFixed(2);
@@ -204,7 +214,10 @@
       const subname = row.cells[1].textContent;
       const price = parseFloat(row.cells[2].textContent.replace('₹', ''));
       const quantity = parseInt(row.querySelector(".quantity").value);
-      items.push({ name,subname ,price, quantity });
+      const discount= row.cells[4].textContent;
+      const eventDate = row.cells[5].textContent;
+      const totalAmount = row.cells[6].textContent;
+      items.push({ name,subname ,price, quantity,discount,eventDate,totalAmount });
     });
 
     // formObject.qdata = {
@@ -213,7 +226,6 @@
     // };
     formObject.items = items;
     formObject.subtotal = subtotalElement.textContent;
-    formObject.discount = parseFloat(discountInput.value);
     formObject.gst = parseFloat(gstInput.value);
     formObject.finalTotal = parseFloat(finalTotalElement.textContent);
 

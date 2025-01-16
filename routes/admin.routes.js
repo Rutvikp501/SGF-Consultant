@@ -4,6 +4,7 @@
 
 const express = require('express');
 const admincontroller = require('../controllers/admin.controller');
+const eventcontroller = require('../controllers/event.controller');
 const router = express.Router();
 
 
@@ -32,5 +33,6 @@ router.get('/getinventorys', admincontroller.getInventory);
 router.get('/getpackages', admincontroller.getpackages);
 router.post('/addpackages', admincontroller.addpackages);
 
+router.post('/eventroadmap', eventcontroller.eventroadmap);
 
 module.exports = router;

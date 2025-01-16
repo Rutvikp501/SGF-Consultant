@@ -5,7 +5,7 @@ const bcrypt = require("bcryptjs");
 const { cloudinaryUpload } = require("../config/cloudinary.js");
 const { Consultant_Wellcome } = require("../utility/email.util.js");
 const inventorysModel = require("../models/inventory.model.js");
-const { calculateCycle } = require("../helpers/sample.js");
+const { calculateCycle, formatItemDate } = require("../helpers/common.js");
 const proformaModel = require("../models/proforma.model.js");
 const packagesModel = require("../models/packages.model.js");
 
@@ -344,8 +344,10 @@ exports.transformedData = async (params) => {
           detailed_description: inventory?.detailed_description,
           retail_price: inventory?.retail_price,
           PhotoUrl: inventory?.PhotoUrl,
+          finalAmount: item.totalAmount,
           quantity: item.quantity,
-          date: item.date,
+          discount: item.discount,
+          date: formatItemDate(item.eventDate),
         };
       })
     );
