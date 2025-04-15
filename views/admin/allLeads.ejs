@@ -10,7 +10,7 @@
 						<div class="col-md-4">
 							<input type="text" name="search" class="form-control" placeholder="Search by Lead ID, Consultant Code, Lead Type, Status" value="<%= search || '' %>">
 						</div>
-						<div class="col-md-3">
+						<!-- <div class="col-md-3">
 							<select name="sortBy" class="form-control">
 								<option value="">Sort By</option>
 								<option value="leadID" <%= sortBy === 'leadID' ? 'selected' : '' %>>Lead ID</option>
@@ -24,7 +24,7 @@
 								<option value="asc" <%= order === 'asc' ? 'selected' : '' %>>Ascending</option>
 								<option value="desc" <%= order === 'desc' ? 'selected' : '' %>>Descending</option>
 							</select>
-						</div>
+						</div> -->
 						<div class="col-md-3">
 							<button type="submit" class="btn btn-primary">Search</button>
 						</div>
@@ -57,7 +57,10 @@
 							<td> <%= allLeads[i].leadType %> </td>
 							<td> <%= allLeads[i].pincode%> </td>
 							<td class="fw-bold text-<%= allLeads[i].status %>"> <%= allLeads[i].status %> </td>
-							<td><a href="/admin/Leads/view/<%= allLeads[i]._id %>" class="custom-btn btn-2">View</a></td>
+							
+							<td>
+							    <button class="custom-btn btn-2 download-roadmap" data-id="<%= allLeads[i]._id %>">Roadmap</button>
+								<a href="/admin/Leads/view/<%= allLeads[i]._id %>" class="custom-btn btn-2">View</a></td>
 						</tr>
 					<% } %>
 				</tbody>
@@ -68,3 +71,39 @@
 		</div>
 	</div>
 </main>
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".download-roadmap").forEach(button => {
+    button.addEventListener("click", async () => {
+      const leadId = button.getAttribute("data-id");
+
+      try {
+        const response = await fetch("/admin/eventroadmap", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ leadId: leadId })
+        });
+
+        if (!response.ok) throw new Error("Failed to generate roadmap PDF");
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "Event_Roadmap.pdf";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      } catch (err) {
+        console.error("Error downloading PDF:", err);
+        alert("Something went wrong while downloading the roadmap.");
+      }
+    });
+  });
+});
+
+</script>

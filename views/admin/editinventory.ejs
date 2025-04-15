@@ -1,0 +1,33 @@
+<main>
+	<%- include('../partials/managementSidebar') %>
+
+	<div id="main-wrapper">
+		<p class="title">Edit Inventory</p>
+
+		<form action="/admin/editinventory/<%= inventory._id %>" method="POST" class="form-inline">
+			<div class="gridf">
+				<label>
+					<input type="text" name="type" class="input" value="<%= inventory.type %>" required>
+					<span>Type</span>
+				</label>
+				<label>
+					<input type="text" name="name" class="input" value="<%= inventory.name %>" required>
+					<span>Name</span>
+				</label>
+				<label>
+					<input type="text" name="subname" class="input" value="<%= inventory.subname %>">
+					<span>Subname</span>
+				</label>
+				<label>
+					<input type="text" name="detailed_description" class="input" value="<%= inventory.detailed_description %>">
+					<span>Description</span>
+				</label>
+				<label>
+					<input type="number" name="retail_price" class="input" value="<%= inventory.retail_price %>" required>
+					<span>Retail Price</span>
+				</label>
+				<button type="submit" class="submit">Update Inventory</button>
+			</div>
+		</form>
+	</div>
+</main>

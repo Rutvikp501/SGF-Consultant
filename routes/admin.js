@@ -19,6 +19,7 @@ const inventorysModel = require("../models/inventory.model.js");
 const { create_proforma, create_Package_proforma ,create_corporate_proforma} = require("../utility/pdf.js");
 const { sendEmailWithPdf } = require("../helpers/email.js");
 const { generateRoadmap } = require("../utility/event_roadmap_budget.js");
+const { eventroadmap } = require("../controllers/event.controller.js");
 
 router.get("/admin/dashboard", middleware.ensureAdminLoggedIn, async (req, res) => {
 	const { department } = req.user;
@@ -79,6 +80,7 @@ router.get("/admin/Leads/converted", middleware.ensureAdminLoggedIn, async (req,
 
 router.get("/admin/Leads/view/:LeadsId", middleware.ensureAdminLoggedIn, async (req, res) => {
 	try {
+		const { department } = req.user;
 		const LeadsId = req.params.LeadsId;
 		const Leads = await LeadModel.findById(LeadsId).populate("consultant");
 		const ConvertedLeads = await ConvertedLeadModel.find({ leadID: Leads.leadID });
@@ -578,6 +580,60 @@ router.get("/admin/showinventorys", middleware.ensureAdminLoggedIn, async (req, 
 		res.redirect("back");
 	}
 });
+// GET Edit Page
+// Route to show the edit form
+router.get('/admin/editinventory/:id', middleware.ensureAdminLoggedIn, async (req, res) => {
+	try {
+		const inventory = await inventorysModel.findById(req.params.id);
+		if (!inventory) {
+			req.flash("error", "Inventory not found.");
+			return res.redirect("back");
+		}
+
+		res.render('admin/editinventory', {
+			inventory,
+			department: req.user.department, // 👈 pass department from logged-in user
+			currentUser: req.user // 👈 in case the sidebar uses user data
+		});
+	} catch (err) {
+		console.log(err);
+		req.flash("error", "Something went wrong.");
+		res.redirect("back");
+	}
+});
+
+
+// Route to handle the update
+router.post('/admin/editinventory/:id', middleware.ensureAdminLoggedIn, async (req, res) => {
+	try {
+		const { type, name, subname, retail_price } = req.body;
+		await inventorysModel.findByIdAndUpdate(req.params.id, {
+			type,
+			name,
+			subname,
+			retail_price
+		});
+		req.flash("success", "Inventory updated successfully.");
+		res.redirect('/admin/showinventorys');
+	} catch (err) {
+		console.log(err);
+		req.flash("error", "Error updating inventory.");
+		res.redirect("back");
+	}
+});
+
+router.delete('/admin/deleteinventory/:id', middleware.ensureAdminLoggedIn, async (req, res) => {
+	try {
+	  await inventorysModel.findByIdAndDelete(req.params.id);
+	  res.json({ success: true });
+	} catch (err) {
+	  console.error(err);
+	  res.status(500).json({ success: false });
+	}
+  });
+  
+
+
 
 router.get("/admin/addpackages", middleware.ensureAdminLoggedIn, async (req, res) => {
 	
@@ -649,10 +705,15 @@ router.get("/admin/createproforma", middleware.ensureAdminLoggedIn, async (req, 
 	}
 });
 
-router.post("/admin/createproforma", middleware.ensureAdminLoggedIn, async (req, res) => {
+router.post("/admin/createproforma", async (req, res) => {
 	
+
     const { items, subtotal, finalTotal } = req.body;
+	
+	
     const params = req.body;
+	console.log(params);
+	
     params.discountamnt = subtotal - finalTotal;
 
     const result = await transformedData({ items });
@@ -706,29 +767,22 @@ router.get("/admin/eventroadmap", middleware.ensureAdminLoggedIn, async (req, re
 });
 
 router.post("/admin/eventroadmap", middleware.ensureAdminLoggedIn, async (req, res) => {
-	//console.log(req.body);
-	
-    const params = req.body;
-
-	
-     let pdfBuffer;
-    try {
-		const roadmap = await generateRoadmap(params.startDate,params.eventDate);
-        const pdfBuffer = await create_Package_proforma(roadmap);
-
-        // Send raw binary data with appropriate headers
-        res.setHeader('Content-Disposition', 'attachment; filename=Proforma_with_Terms.pdf');
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Length', pdfBuffer.length);
-        res.end(pdfBuffer); // Use end to send raw data
-		//const saveproforma = await createOrUpdateProforma(data);
-		//sendEmailWithPdf(params.lead_Id,params.booking_name,pdfBuffer)
-		
-    } catch (err) {
-        console.error(err);
-        res.status(500).send({ success: false, message: "Internal server error" });
-    }
-});
+	const params = req.body;
+  
+	try {
+	  const pdfBuffer = await eventroadmap(params); // gets buffer from controller
+  
+	  res.setHeader('Content-Disposition', 'attachment; filename=Event_Roadmap.pdf');
+	  res.setHeader('Content-Type', 'application/pdf');
+	  res.setHeader('Content-Length', pdfBuffer.length);
+	  res.end(pdfBuffer);
+  
+	} catch (err) {
+	  console.error(err);
+	  res.status(500).send({ success: false, message: "Internal server error" });
+	}
+  });
+  
 
 // router.post("/admin/createproforma", middleware.ensureAdminLoggedIn, async (req, res) => {
 // 	const { items, subtotal, finalTotal  } = req.body;

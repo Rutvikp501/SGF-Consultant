@@ -26,35 +26,36 @@
 			<table  cellpadding="0" cellspacing="0"  border="0">
 				<thead>
 					<tr>
-						<th scope="col">#</th>
-						<th scope="col">type</th>
-						<th scope="col">Name</th>
-						<th scope="col">subname</th>
-						<th scope="col">retail_price</th>
-						<!-- <th scope="col">Join date</th> -->
-						<!-- <th scope="col">Lifetime Cycle</th> -->
-						<!-- <th scope="col">Action</th> New column for Add/Update Photo -->
+					  <th scope="col">#</th>
+					  <th scope="col">type</th>
+					  <th scope="col">Name</th>
+					  <th scope="col">subname</th>
+					  <th scope="col">retail_price</th>
+					  <th scope="col">Action</th>
 					</tr>
-				</thead>
+				  </thead>
+				  
 			</table>
 		</div>
 		<div class="tbl-content">
 			<table cellpadding="0" cellspacing="0" border="0">
 				<tbody>
 					<% for(let i=0; i<inventorys.length; i++) { %>
-						<tr>
-							<th scope="row"> <%= i+1 %> </th>
-							<td> <%= inventorys[i].type  %> </td>
-							<td> <%= inventorys[i].name %> </td>
-							<td> <%= inventorys[i].subname %> </td>
-							<td> <%= inventorys[i].retail_price %> </td>
-							<td>
-								<!-- Add/Update Photo button -->
-								<!-- <a href="/admin/upload-multiple/<%= inventorys[i]._id %>" class="submit"> Photo</a> -->
-							</td>
-						</tr>
+					  <tr>
+						<th scope="row"> <%= i+1 %> </th>
+						<td> <%= inventorys[i].type %> </td>
+						<td> <%= inventorys[i].name %> </td>
+						<td> <%= inventorys[i].subname %> </td>
+						<td> <%= inventorys[i].retail_price %> </td>
+						<td>
+							<a href="/admin/editinventory/<%= inventorys[i]._id %>" class="submit">Edit</a>
+							<button class="submit delete-btn" data-id="<%= inventorys[i]._id %>">Delete</button>
+						</td>
+						
+					  </tr>
 					<% } %>
-				</tbody>
+				  </tbody>
+				  
 			</table>
 		</div>
 	</div>
@@ -101,4 +102,34 @@ document.getElementById('add-btn').addEventListener('click', function() {
 		// 	});
 		// });
 	</script>
+	<script>
+  // Handle delete button click
+
+  document.querySelectorAll('.delete-btn').forEach(button => {
+    button.addEventListener('click', function () {
+      const id = this.dataset.id;
+
+      if (confirm('Are you sure you want to delete this inventory item?')) {
+        fetch(`/admin/deleteinventory/${id}`, {
+          method: 'DELETE'
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            alert('Inventory deleted successfully');
+            window.location.reload(); // Reload to reflect changes
+          } else {
+            alert('Error deleting inventory');
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          alert('Server error');
+        });
+      }
+    });
+  });
+</script>
+
+	
 </main>

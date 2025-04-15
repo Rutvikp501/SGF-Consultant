@@ -1,10 +1,14 @@
 const path = require("path");
 const fs = require("fs");
+const { format } = require('date-fns');
 
 function formatItemDate(inputDate) {
   const trimmedDate = inputDate.trim();
   const [year, month, day] = trimmedDate.split('-');
   return `${day}/${month}/${year}`;
+}
+function formatDate(inputDate) {
+    return inputDate.toISOString().split('T')[0];
 }
 
 const convertToIST = (date) => {
@@ -96,7 +100,111 @@ const convertToIST = (date) => {
     
     return `${day}-${month}-${year}`;
   }
-  module.exports = { convertToIST, parseDate, generateLeadID, calculateCycle, calculateLeadCycle,formatDate,formatItemDate };
+  function discountBookingDates(eventDate) {
+    
+    const event = new Date(eventDate);
+    event.setHours(0, 0, 0, 0); // normalize
+  
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // remove time for accurate comparison
+  
+    const premiumDiscountSchedule = [
+      { daysBefore: 120, discount: "18%" },
+      { daysBefore: 105, discount: "16%" },
+      { daysBefore: 90,  discount: "14%" },
+      { daysBefore: 75,  discount: "12%" },
+      { daysBefore: 60,  discount: "10%" },
+      { daysBefore: 45,  discount: "8%" }
+    ];
+  
+    const classicDiscountSchedule = [
+      { daysBefore: 75, discount: "10%" },
+      { daysBefore: 60, discount: "8%" },
+      { daysBefore: 45, discount: "6%" }
+    ];
+  
+    const mapDiscountDates = (schedule) => {
+      return schedule.map(({ daysBefore, discount }) => {
+        const bookingDate = new Date(event);
+        bookingDate.setDate(bookingDate.getDate() - daysBefore);
+        bookingDate.setHours(0, 0, 0, 0);
+  
+        const isPast = bookingDate < today;
+  
+        return {
+          bookingDate: isPast
+            ? "Not Applicable"
+            : bookingDate.toISOString().split("T")[0], // YYYY-MM-DD
+          daysBefore,
+          discount
+        };
+      });
+    };
+    const premiumDates = mapDiscountDates(premiumDiscountSchedule);
+    const classicDates = mapDiscountDates(classicDiscountSchedule);
+  
+    return {
+      premium: premiumDates,
+      classic: classicDates
+    };
+  }
+
+
+  
+
+  function generateEventTimeline(eventDateStr) {
+    const eventDate = new Date(eventDateStr);
+  
+    // Util to get ordinal suffix
+    const getOrdinal = (n) => {
+      const s = ["th", "st", "nd", "rd"];
+      const v = n % 100;
+      return n + (s[(v - 20) % 10] || s[v] || s[0]);
+    };
+  
+    // Format to "7th Jan 26"
+    const adjustDate = (base, days) => {
+      const date = new Date(base);
+      date.setDate(date.getDate() + days);
+  
+      const day = getOrdinal(date.getDate());
+      const month = format(date, 'MMM'); // Jan, Feb, etc.
+      const year = format(date, 'yy');   // 26 for 2026
+  
+      return `${day} ${month} ${year}`;
+    };
+  
+    const milestones = [
+      { title: "Invitation Video Creation", offset: -114 },
+      { title: "Decor & Costume Consultation", offset: -30 },
+      { title: "Blueprint-based Planning", offset: -17 },
+      { title: "Event Schedule / Entry Audio Selection", offset: -17 },
+      { title: "Song Selection", offset: -17 },
+      { title: "Reminder Call", offset: -6 },
+      { title: "Timely Arrival (Main Event)", offset: 0 },
+      { title: "Soft Copy + Photo Selection", offset: 6 },
+      { title: "Traditional Film Raw Draft", offset: 11 },
+      { title: "Cinematic Reels - General", offset: 21 },
+      { title: "Highlights - First Draft", offset: 32 },
+      { title: "Traditional Film - First Draft", offset: 46 },
+      { title: "Highlights - Final Draft", offset: 57 },
+      { title: "Traditional Film - Final Delivery", offset: 57 },
+    ];
+  
+    const results = milestones.map(({ title, offset }) => {
+      return {
+        title,
+        date: adjustDate(eventDate, offset),
+        daysFromEvent: offset
+      };
+    });
+  
+    return results;
+  }
+  
+
+
+  module.exports = { generateEventTimeline,discountBookingDates,convertToIST, formatDate,parseDate, generateLeadID, calculateCycle, calculateLeadCycle,formatDate,formatItemDate };
 
 exports.read_image = (file_Path) => {
     const filePath = path.join(`${file_Path}`);
@@ -113,4 +221,5 @@ exports.addDaysToDate = (date, days) => {
 exports.formatDate = (date) => {
     return date.toISOString().split('T')[0];
 }
+
 

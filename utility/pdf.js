@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { PDFDocument } = require('pdf-lib');
 const { read_image } = require("../helpers/common");
-const {create_50_50_pdf ,create_10_40_50_pdf, create_50_50_packagepdf ,create_10_40_50_packagepdf, create_100_Corporatepdf, create_50_50_Corporatepdf,} = require('../helpers/pdfhelper');
+const {create_50_50_pdf ,create_10_40_50_pdf, create_50_50_packagepdf ,create_10_40_50_packagepdf, create_100_Corporatepdf, create_50_50_Corporatepdf, create_10_40_50_Packagepdf, create_100_Packagepdf,} = require('../helpers/pdfhelper');
 
 
 
@@ -22,9 +22,9 @@ exports.create_Package_proforma = async (pdfdata) => {
     const proformaPdfDoc = await PDFDocument.load(pdfBuffer);
     // Step 2: Load the T&C PDF from the filesystem
     if (pdfdata.params.service_type === 'film_service') {
-            t_c_PdfPath = path.join(__dirname, `../assets/pdf/PHOTOGRAPHY SERVICE’S T&C.pdf`);
+            t_c_PdfPath = path.join(__dirname, `../assets/pdf/T&C  1.1.pdf`);
     } else if (pdfdata.params.service_type === 'album_service') {
-        t_c_PdfPath = path.join(__dirname, `../assets/pdf/PHOTOGRAPHY SERVICE’S T&C.pdf`);
+        t_c_PdfPath = path.join(__dirname, `../assets/pdf/T&C  1.1.pdf`);
     } else {
         throw new Error('Unsupported Service Type');
     }
@@ -59,18 +59,21 @@ exports.create_proforma = async (pdfdata) => {
     let  t_c_PdfPath;
     // Step 1: Generate the dynamically created Proforma PDF
     if (pdfdata.params.format == '50-50') {
-      pdfBuffer = await create_50_50_pdf(pdfdata); // For 50-50 payment structure
+      pdfBuffer = await create_50_50_packagepdf(pdfdata); // For 50-50 payment structure
     } else if (pdfdata.params.format == '10-40-50') {
-        pdfBuffer = await create_10_40_50_pdf(pdfdata); // For 10-40-50 payment structure
+        pdfBuffer = await create_10_40_50_Packagepdf(pdfdata); // For 10-40-50 payment structure
+    } 
+    else if (pdfdata.params.format == '100') {
+        pdfBuffer = await create_100_Packagepdf(pdfdata); // For 10-40-50 payment structure
     } else {
         throw new Error('Unsupported payment structure');
     }
     const proformaPdfDoc = await PDFDocument.load(pdfBuffer);
     // Step 2: Load the T&C PDF from the filesystem
     if (pdfdata.params.service_type === 'film_service') {
-            t_c_PdfPath = path.join(__dirname, `../assets/pdf/PHOTOGRAPHY SERVICE’S T&C.pdf`);
+            t_c_PdfPath = path.join(__dirname, `../assets/pdf/T&C  1.1.pdf`);
     } else if (pdfdata.params.service_type === 'album_service') {
-        t_c_PdfPath = path.join(__dirname, `../assets/pdf/PHOTOGRAPHY SERVICE’S T&C.pdf`);
+        t_c_PdfPath = path.join(__dirname, `../assets/pdf/T&C  1.1.pdf`);
     } else {
         throw new Error('Unsupported Service Type');
     }
@@ -114,12 +117,12 @@ exports.create_corporate_proforma = async (pdfdata) => {
     const proformaPdfDoc = await PDFDocument.load(pdfBuffer);
     // Step 2: Load the T&C PDF from the filesystem
     if (pdfdata.params.service_type === 'film_service') {
-            t_c_PdfPath = path.join(__dirname, `../assets/pdf/PHOTOGRAPHY SERVICE’S T&C.pdf`);
+            t_c_PdfPath = path.join(__dirname, `../assets/pdf/T&C  1.1.pdf`);
     } else if (pdfdata.params.service_type === 'album_service') {
-        t_c_PdfPath = path.join(__dirname, `../assets/pdf/PHOTOGRAPHY SERVICE’S T&C.pdf`);
+        t_c_PdfPath = path.join(__dirname, `../assets/pdf/T&C  1.1.pdf`);
      
   } else if (pdfdata.params.service_type === 'corporate_service') {
-    t_c_PdfPath = path.join(__dirname, `../assets/pdf/Terms & Conditions for Half-Day (5 Hours) Cinematography Service.pdf`);
+    t_c_PdfPath = path.join(__dirname, `../assets/pdf/T&C  1.1.pdf`);
 } else {
         throw new Error('Unsupported Service Type');
     }

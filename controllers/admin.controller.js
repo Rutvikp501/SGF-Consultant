@@ -591,7 +591,6 @@ exports.createproforma = async (req, res) => {
       data.paymentstatus=paymentstatus;
     // Call the updated create_proforma function to generate the final PDF
     if (params.service_type=="corporate_service"){
-          console.log("corporate_service");
           
           pdfBuffer = await create_corporate_proforma(data);
         }

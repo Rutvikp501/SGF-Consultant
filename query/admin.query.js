@@ -8,7 +8,77 @@ const inventorysModel = require("../models/inventory.model.js");
 const { calculateCycle, formatItemDate } = require("../helpers/common.js");
 const proformaModel = require("../models/proforma.model.js");
 const packagesModel = require("../models/packages.model.js");
+const LeadModel = require("../models/lead.models.js");
 
+exports.fillterdleaddataquery = async (params) => {
+
+  try {
+    const leadId = params ;
+    console.log(leadId);
+    
+    const Lead = await LeadModel.findById(leadId);
+    const consultant = await consultantModel.findOne({ code: Lead.consultant_code });
+    console.log(Lead);
+
+  let leaddata = {
+    leadID: Lead.leadID,
+    name: Lead.name,
+    email: Lead.email,
+    phone: Lead.phone,
+    pincode: Lead.pincode,
+    leadType: Lead.leadType,
+    status: Lead.status,
+    createdAt: Lead.createdAt,
+    updatedAt: Lead.updatedAt,
+    
+    // Consultant details
+    consultant: {
+        code: consultant.code || " ",
+        name: consultant.name || " ",
+        email: consultant.email_id || " ",
+        mobile_no: consultant.mobile_no || " ",
+        city: consultant.city || " ",
+        profilePhotoUrl: consultant.profilePhotoUrl || " ",
+        dateOfJoining: consultant.dateOfJoining || " ",
+        status: consultant.status || " ",
+    },
+
+    // Package details
+    package: {
+        name: Lead.package.name || " ",
+        subname: Lead.package.subname || " ",
+        addOns: Lead.package.addonS || " ",
+        amount: Lead.package.amount || " ",
+    },
+
+    // Events details
+    events: Lead.events.map(event => ({
+        name: event.name || " ",
+        date: event.date || " ",
+        location: event.location|| " ",
+        timing: event.timing|| " "
+    })),
+
+    // Bitrix response
+    bitrixres: {
+        leadno: Lead.bitrixres.leadno|| " ",
+        message: Lead.bitrixres.message|| " ",
+    }
+};
+return  leaddata; 
+  } catch (error) {
+    console.error(error);
+        return {
+            success: false,
+            statusCode: 500,
+            message: "Some error occurred on the server.",
+        };
+  }
+ 
+  
+
+
+};
 exports.adminregistationquery = async (params) => {
     try {
         const existingAdmin = await adminModel.findOne({ email_id: params.email_id });
@@ -334,9 +404,13 @@ exports.addPackagesQuery = async (params) => {
 
 
 exports.transformedData = async (params) => {
+  //console.log(params);
+  
     const serviceitems = await Promise.all(
       params.items.map(async (item) => {
         const inventory = await inventorysModel.findOne({ name: item.name ,subname:item.subname});
+        console.log(inventory);
+        
         return {
           _id: inventory?._id,
           name: inventory?.name,
