@@ -4,6 +4,7 @@ const router = express.Router();
 const leadController = require('../controllers/lead.controller');
 const Auth  = require('../controllers/auth.controller');
 const bitrix = require('../utility/bitrix');
+const eventrodmap = require('../controllers/event.controller');
 
 
 router.post('/leadapi/addLead', leadController.addLead);
@@ -32,6 +33,7 @@ router.patch('/adminapi/update/:id', Auth.Update);
 router.delete('/adminapi/delete/:id', Auth.Delete);
 router.post('/adminapi/forgotPassword',Auth.forgotPassword)
 router.post('/adminapi/resetPassword',Auth.resetPassword)
+router.post('/adminapi/eventroadmap',eventrodmap.eventroadmapapi)
 
 router.get('/exceluserdata',Auth.getuserexcel)
 

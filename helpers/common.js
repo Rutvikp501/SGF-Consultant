@@ -133,7 +133,7 @@ const convertToIST = (date) => {
   
         return {
           bookingDate: isPast
-            ? "Not Applicable"
+            ? "N.A"
             : bookingDate.toISOString().split("T")[0], // YYYY-MM-DD
           daysBefore,
           discount
@@ -154,6 +154,7 @@ const convertToIST = (date) => {
 
   function generateEventTimeline(eventDateStr) {
     const eventDate = new Date(eventDateStr);
+    const bookingDate = new Date(); // Current date as booking date
   
     // Util to get ordinal suffix
     const getOrdinal = (n) => {
@@ -162,20 +163,29 @@ const convertToIST = (date) => {
       return n + (s[(v - 20) % 10] || s[v] || s[0]);
     };
   
-    // Format to "7th Jan 26"
-    const adjustDate = (base, days) => {
-      const date = new Date(base);
-      date.setDate(date.getDate() + days);
+    // Add N working days (skipping weekends)
+    const addWorkingDays = (date, daysToAdd) => {
+      let dateCopy = new Date(date);
+      while (daysToAdd > 0) {
+        dateCopy.setDate(dateCopy.getDate() + 1);
+        const day = dateCopy.getDay();
+        if (day !== 0 && day !== 6) { // 0 = Sunday, 6 = Saturday
+          daysToAdd--;
+        }
+      }
+      return dateCopy;
+    };
   
+    // Format a date as "7th Jan 26"
+    const formatDate = (date) => {
       const day = getOrdinal(date.getDate());
-      const month = format(date, 'MMM'); // Jan, Feb, etc.
-      const year = format(date, 'yy');   // 26 for 2026
-  
+      const month = format(date, 'MMM');
+      const year = format(date, 'yy');
       return `${day} ${month} ${year}`;
     };
   
     const milestones = [
-      { title: "Invitation Video Creation", offset: -114 },
+      { title: "Invitation Video Creation", useBookingDate: true },
       { title: "Decor & Costume Consultation", offset: -30 },
       { title: "Blueprint-based Planning", offset: -17 },
       { title: "Event Schedule / Entry Audio Selection", offset: -17 },
@@ -191,12 +201,21 @@ const convertToIST = (date) => {
       { title: "Traditional Film - Final Delivery", offset: 57 },
     ];
   
-    const results = milestones.map(({ title, offset }) => {
-      return {
-        title,
-        date: adjustDate(eventDate, offset),
-        daysFromEvent: offset
-      };
+    const results = milestones.map(({ title, offset = 0, useBookingDate = false }) => {
+      let date;
+      if (useBookingDate) {
+        const videoDate = addWorkingDays(bookingDate, 4);
+        date = formatDate(videoDate);
+        return { title, date, note: "within 4 working days of booking" };
+      } else {
+        const adjustedDate = new Date(eventDate);
+        adjustedDate.setDate(adjustedDate.getDate() + offset);
+        return {
+          title,
+          date: formatDate(adjustedDate),
+          daysFromEvent: offset,
+        };
+      }
     });
   
     return results;

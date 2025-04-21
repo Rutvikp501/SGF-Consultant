@@ -1,16 +1,18 @@
 <main>
 	<%- include('../partials/managementSidebar') %>
-	
-	<div id="main-wrapper">
-		<div class="lead-info py-4">
-			<div class="container">
-				<!-- Search and Sort Form -->
-				<form action="/admin/Leads/all" method="GET" class="mb-4">
-					<div class="row">
-						<div class="col-md-4">
-							<input type="text" name="search" class="form-control" placeholder="Search by Lead ID, Consultant Code, Lead Type, Status" value="<%= search || '' %>">
-						</div>
-						<!-- <div class="col-md-3">
+
+		<div id="main-wrapper">
+			<div class="lead-info py-4">
+				<div class="container">
+					<!-- Search and Sort Form -->
+					<form action="/admin/Leads/all" method="GET" class="mb-4">
+						<div class="row">
+							<div class="col-md-4">
+								<input type="text" name="search" class="form-control"
+									placeholder="Search by Lead ID, Consultant Code, Lead Type, Status"
+									value="<%= search || '' %>">
+							</div>
+							<!-- <div class="col-md-3">
 							<select name="sortBy" class="form-control">
 								<option value="">Sort By</option>
 								<option value="leadID" <%= sortBy === 'leadID' ? 'selected' : '' %>>Lead ID</option>
@@ -25,85 +27,100 @@
 								<option value="desc" <%= order === 'desc' ? 'selected' : '' %>>Descending</option>
 							</select>
 						</div> -->
-						<div class="col-md-3">
-							<button type="submit" class="btn btn-primary">Search</button>
+							<div class="col-md-3">
+								<button type="submit" class="btn btn-primary">Search</button>
+							</div>
 						</div>
+					</form>
+
+					<!-- Lead Information Table -->
+					<div class="tbl-header" style="max-height: 75%; overflow: auto;">
+						<table cellpadding="0" cellspacing="0" border="0">
+							<thead>
+								<tr>
+									<th scope="col">Lead ID</th>
+									<th scope="col">consultant code</th>
+									<th scope="col">Name</th>
+									<th scope="col">Type</th>
+									<th scope="col">Event Location</th>
+									<th scope="col">Status</th>
+									<th scope="col">Actions</th>
+								</tr>
+						</table>
 					</div>
-				</form>
-				
-				<!-- Lead Information Table -->
-				<div class="tbl-header" style="max-height: 75%; overflow: auto;">
-			<table  cellpadding="0" cellspacing="0"  border="0">
-				<thead>
-					<tr>
-						<th scope="col">Lead ID</th>
-						<th scope="col">consultant code</th>
-						<th scope="col">Name</th>
-						<th scope="col">Type</th>
-						<th scope="col">Event Location</th>
-						<th scope="col">Status</th>
-						<th scope="col">Actions</th>
-					</tr>
-				</table>
+					<div class="tbl-content">
+						<table cellpadding="0" cellspacing="0" border="0">
+							<tbody>
+								<% for(let i=0; i<allLeads.length; i++) { %>
+									<tr>
+										<th scope="row">
+											<%= allLeads[i].leadID %>
+										</th>
+										<td>
+											<%= allLeads[i].consultant_code %>
+										</td>
+										<td>
+											<%= allLeads[i].name %>
+										</td>
+										<td>
+											<%= allLeads[i].leadType %>
+										</td>
+										<td>
+											<%= allLeads[i].pincode%>
+										</td>
+										<td class="fw-bold text-<%= allLeads[i].status %>">
+											<%= allLeads[i].status %>
+										</td>
+
+										<td>
+											<button class="custom-btn btn-2 download-roadmap"
+												data-id="<%= allLeads[i]._id %>">Roadmap</button>
+											<a href="/admin/Leads/view/<%= allLeads[i]._id %>"
+												class="custom-btn btn-2">View</a>
+										</td>
+									</tr>
+									<% } %>
+							</tbody>
+						</table>
+					</div>
+					<!-- ... -->
+				</div>
 			</div>
-			<div class="tbl-content">
-				<table cellpadding="0" cellspacing="0" border="0">
-				<tbody>
-					<% for(let i=0; i<allLeads.length; i++) { %>
-						<tr>
-							<th scope="row"> <%= allLeads[i].leadID %> </th>
-							<td> <%= allLeads[i].consultant_code %> </td>
-							<td> <%= allLeads[i].name %> </td>
-							<td> <%= allLeads[i].leadType %> </td>
-							<td> <%= allLeads[i].pincode%> </td>
-							<td class="fw-bold text-<%= allLeads[i].status %>"> <%= allLeads[i].status %> </td>
-							
-							<td>
-							    <button class="custom-btn btn-2 download-roadmap" data-id="<%= allLeads[i]._id %>">Roadmap</button>
-								<a href="/admin/Leads/view/<%= allLeads[i]._id %>" class="custom-btn btn-2">View</a></td>
-						</tr>
-					<% } %>
-				</tbody>
-			</table>
 		</div>
-				<!-- ... -->
-			</div>
-		</div>
-	</div>
 </main>
 <script>
 	document.addEventListener("DOMContentLoaded", function () {
-  document.querySelectorAll(".download-roadmap").forEach(button => {
-    button.addEventListener("click", async () => {
-      const leadId = button.getAttribute("data-id");
+		document.querySelectorAll(".download-roadmap").forEach(button => {
+			button.addEventListener("click", async () => {
+				const leadId = button.getAttribute("data-id");
 
-      try {
-        const response = await fetch("/admin/eventroadmap", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ leadId: leadId })
-        });
+				try {
+					const response = await fetch("/admin/eventroadmap", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({ leadId: leadId })
+					});
 
-        if (!response.ok) throw new Error("Failed to generate roadmap PDF");
+					if (!response.ok) throw new Error("Failed to generate roadmap PDF");
 
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
+					const blob = await response.blob();
+					const url = window.URL.createObjectURL(blob);
+					const filename = response.headers.get("X-Filename") || "Event_Roadmap.pdf";
 
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "Event_Roadmap.pdf";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url);
-      } catch (err) {
-        console.error("Error downloading PDF:", err);
-        alert("Something went wrong while downloading the roadmap.");
-      }
-    });
-  });
-});
-
+					const a = document.createElement("a");
+					a.href = url;
+					a.download = filename;
+					document.body.appendChild(a);
+					a.click();
+					a.remove();
+					window.URL.revokeObjectURL(url);
+				} catch (err) {
+					console.error("Error downloading PDF:", err);
+					alert("Something went wrong while downloading the roadmap.");
+				}
+			});
+		});
+	});
 </script>

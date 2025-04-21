@@ -4,17 +4,22 @@ const { generateRoadmap } = require("../utility/event_roadmap_budget.js");
 const LeadModel = require("../models/lead.models.js");
 const { fillterdleaddataquery } = require("../query/admin.query.js");
 
-exports.eventroadmap = async (req, res) => {
+exports.eventroadmapapi = async (req, res) => {
   try {
     const leadId = req.body.leadId || "67f4ee9b312882bc9deb1239";
     
     const leadData = await fillterdleaddataquery(leadId);
     const pdfBuffer = await generateRoadmap(leadData);
+		const today = new Date().toISOString().split('T')[0];
 
-    res.setHeader('Content-Disposition', 'attachment; filename=Proforma_with_Terms.pdf');
-    res.setHeader('Content-Type', 'application/pdf');
-    res.end(pdfBuffer);
-   // sendEmailWithPdf(params.lead_Id,params.booking_name,pdfBuffer)
+		const fileName = `${customerName}_${customerId}_Event_Roadmap_${today}.pdf`;
+		
+		res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+		res.setHeader('Content-Type', 'application/pdf');
+		res.setHeader('Content-Length', pdfBuffer.length);
+		res.setHeader('X-Filename', fileName);
+		res.end(pdfBuffer);	
+
   } catch (err) {
     console.error(err);
     res.status(500).send({
@@ -29,14 +34,18 @@ exports.eventroadmap = async (req, res) => {
 exports.eventroadmap = async (params) => {
   try {
     const leadId = params.leadId || "67f4ee9b312882bc9deb1239";
-    
     const leadData = await fillterdleaddataquery(leadId);
     const pdfBuffer = await generateRoadmap(leadData);
 
-    return pdfBuffer; // just return the PDF buffer
+    return {
+      pdfBuffer,
+      customerName: leadData.name?.replace(/\s+/g, '_'), // remove spaces
+      customerId: leadData.leadID
+    };
 
   } catch (err) {
     console.error(err);
     throw new Error('Error generating Proforma PDF with Terms!');
   }
 };
+

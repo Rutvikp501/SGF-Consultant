@@ -770,12 +770,17 @@ router.post("/admin/eventroadmap", middleware.ensureAdminLoggedIn, async (req, r
 	const params = req.body;
   
 	try {
-	  const pdfBuffer = await eventroadmap(params); // gets buffer from controller
-  
-	  res.setHeader('Content-Disposition', 'attachment; filename=Event_Roadmap.pdf');
-	  res.setHeader('Content-Type', 'application/pdf');
-	  res.setHeader('Content-Length', pdfBuffer.length);
-	  res.end(pdfBuffer);
+		const { pdfBuffer, customerName, customerId } = await eventroadmap(params);// gets buffer from controller
+		const today = new Date().toISOString().split('T')[0];
+
+		const fileName = `${customerName}_${customerId}_Event_Roadmap_${today}.pdf`;
+		console.log(fileName);
+		
+		res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+		res.setHeader('Content-Type', 'application/pdf');
+		res.setHeader('Content-Length', pdfBuffer.length);
+		res.setHeader('X-Filename', fileName);
+		res.end(pdfBuffer);	
   
 	} catch (err) {
 	  console.error(err);

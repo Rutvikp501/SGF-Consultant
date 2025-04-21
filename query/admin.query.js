@@ -14,11 +14,8 @@ exports.fillterdleaddataquery = async (params) => {
 
   try {
     const leadId = params ;
-    console.log(leadId);
-    
     const Lead = await LeadModel.findById(leadId);
     const consultant = await consultantModel.findOne({ code: Lead.consultant_code });
-    console.log(Lead);
 
   let leaddata = {
     leadID: Lead.leadID,

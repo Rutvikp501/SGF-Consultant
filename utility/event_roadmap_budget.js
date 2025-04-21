@@ -131,20 +131,20 @@ exports.generateRoadmap = async (data) => {
         Page1.drawText(bookingDate, { x: targetX, y: targetY, size: 12, font: helveticaFont, color: rgb(1, 0, 0) });
     });
     const positions = [
-        { x: 480, y: 600 },
-        { x: 480, y: 540 },
-        { x: 480, y: 480 },
-        { x: 480, y: 420 },
-        { x: 480, y: 360 },
-        { x: 480, y: 300 },
-        { x: 480, y: 200 },
-        { x: 480, y: 600 },
-        { x: 480, y: 540 },
-        { x: 480, y: 480 },
-        { x: 480, y: 420 },
-        { x: 480, y: 360 },
-        { x: 480, y: 280 },
-        { x: 480, y: 220 }
+        { x: 485, y: 600 },
+        { x: 485, y: 545 },
+        { x: 485, y: 480 },
+        { x: 485, y: 420 },
+        { x: 485, y: 365 },
+        { x: 485, y: 320 },
+        { x: 485, y: 200 },
+        { x: 485, y: 590 },
+        { x: 485, y: 535 },
+        { x: 485, y: 475 },
+        { x: 485, y: 420 },
+        { x: 485, y: 360 },
+        { x: 485, y: 295 },
+        { x: 485, y: 235 }
       ];
       eventDateTable.forEach((item, i) => {
         const pos = positions[i];
