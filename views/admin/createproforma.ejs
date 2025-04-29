@@ -237,28 +237,52 @@
     formObject.finalTotal = parseFloat(finalTotalElement.textContent);
 
 
-    fetch("/admin/createproforma", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(formObject),
-})
-    .then((response) => {
-        if (!response.ok) {
-            throw new Error("Failed to generate PDF.");
-        }
-        return response.blob(); // Ensure it's treated as binary data
-    })
-    .then((blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'Proforma_with_Terms.pdf'; // Ensure correct filename
-        document.body.appendChild(a);
-        a.click();
-        a.remove(); // Clean up
-    })
-    .catch((error) => console.error("Error:", error));
+    try {
+                const response = await fetch("/admin/createproforma", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(formObject)
+                });
 
+                if (!response.ok) throw new Error("Failed to generate Proforma PDF");
+console.log(response)
+const contentDisposition = response.headers.get('Content-Disposition');
+
+let filename = "Proforma_with_Terms.pdf"; // fallback default
+
+if (contentDisposition) {
+    const match = contentDisposition.match(/filename="?(.+)"?/);
+    if (match && match[1]) {
+        filename = match[1];
+    }
+}
+
+const blob = await response.blob();
+const url = window.URL.createObjectURL(blob);
+
+const a = document.createElement('a');
+a.href = url;
+a.download = filename;
+document.body.appendChild(a);
+a.click();
+a.remove();
+window.URL.revokeObjectURL(url);
+
+
+            } catch (err) {
+                console.error("Error downloading Proforma PDF:", err);
+                alert("Something went wrong while downloading the Proforma.");
+            }
 
   });
+
+  $(document).ready(function() {
+    $('#itemSelect').select2({
+        placeholder: "-- Select an Item --",
+        allowClear: true,
+        width: 'resolve'  // makes it fit nicely
+    });
+});
 </script>

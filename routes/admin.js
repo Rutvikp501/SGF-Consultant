@@ -343,7 +343,6 @@ router.post("/admin/updateconsultant/:id", middleware.ensureAdminLoggedIn, async
     }
 });
 
-
 router.get("/admin/upload-multiple/:id", middleware.ensureAdminLoggedIn, async (req, res) => {
 	const { department } = req.user;
 	const userId = req.params.id; // Get the user ID from route params
@@ -707,15 +706,9 @@ router.get("/admin/createproforma", middleware.ensureAdminLoggedIn, async (req, 
 
 router.post("/admin/createproforma", async (req, res) => {
 	
-
     const { items, subtotal, finalTotal } = req.body;
-	
-	
     const params = req.body;
-	console.log(params);
-	
     params.discountamnt = subtotal - finalTotal;
-
     const result = await transformedData({ items });
     const serviceitems = result.serviceitems;
 	const packages = await packagesModel.findOne({ package_name: params.package_name });
@@ -724,7 +717,6 @@ router.post("/admin/createproforma", async (req, res) => {
         { isPaid: false, paymentDate: "" },
         { isPaid: false, paymentDate: "" }
     ];
-
     let data = { params, serviceitems, paymentstatus };
 	
      let pdfBuffer;
@@ -736,16 +728,14 @@ router.post("/admin/createproforma", async (req, res) => {
 		else{
 			pdfBuffer = await create_proforma(data);
 		}
-         
-        // const pdfBuffer = await create_Package_proforma(packages);
-
-        // Send raw binary data with appropriate headers
-        res.setHeader('Content-Disposition', 'attachment; filename=Proforma_with_Terms.pdf');
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Length', pdfBuffer.length);
-        res.end(pdfBuffer); // Use end to send raw data
-		//const saveproforma = await createOrUpdateProforma(data);
-		//sendEmailWithPdf(params.lead_Id,params.booking_name,pdfBuffer)
+		const today = new Date().toISOString().slice(0, 10); // Example: 2025-04-27
+		const fileName = `${params.booking_name}_${params.quotation_no}_Proforma_${today}`;
+		
+		res.setHeader('Content-Disposition', `attachment; filename=${fileName}.pdf`);
+		res.setHeader('Content-Type', 'application/pdf');
+		res.setHeader('Content-Length', pdfBuffer.length);
+		res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
+		res.end(pdfBuffer);
 		
     } catch (err) {
         console.error(err);

@@ -302,7 +302,7 @@ exports.create_10_40_50_Packagepdf = async (pdfdata) => {
             { text: item.date, alignment: "center", fontSize: 10, },
             { text: item.quantity, alignment: "center", fontSize: 10, },
             { text: (((grossTotal - params.finalTotal) / grossTotal) * 100).toFixed(2) ? `${(((grossTotal - params.finalTotal) / grossTotal) * 100).toFixed(2)}%` : "-", alignment: "center", fontSize: 10, },
-            { text: item.quantity * item.finalAmount, alignment: "right", fontSize: 10, }, // Calculate total for each row
+            { text: item.finalAmount.toLocaleString('en-IN'), alignment: "right", fontSize: 10, }, // Calculate total for each row
         ]);
 
         const serviceTableBody = [tableHeaders, ...serviceRows];
@@ -421,7 +421,7 @@ exports.create_10_40_50_Packagepdf = async (pdfdata) => {
                             ],
                             [
                                 { text: "GST", alignment: "right", bold: true, fontSize: 10, },
-                                { text: params.gst, alignment: "right", fontSize: 10, },
+                                { text: "All Inclusive", alignment: "right", fontSize: 10,color: 'green',bold: true, },
                             ],
                             [
                                 { text: "Net Cost", alignment: "right", bold: true, fontSize: 10, },
@@ -465,8 +465,8 @@ exports.create_10_40_50_Packagepdf = async (pdfdata) => {
                             [
                                 { text: '2)', alignment: 'left', fontSize: 10 },
                                 { text: '50% OF TOTAL NET SERVICE COST ON EVENT DAY', alignment: 'left', fontSize: 10 },
-                                { text: `${part3_50}`, alignment: 'right', fontSize: 10 },
-                                { text: paidText2, alignment: 'right', fontSize: 10 },
+                                { text: `${part3_50}`, alignment: 'center', fontSize: 10 },
+                                { text: paidText2, alignment: 'center', fontSize: 10 },
                             ],
                         ]
                     }

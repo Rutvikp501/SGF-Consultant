@@ -566,6 +566,7 @@ exports.addUser = async (req, res) => {
 
 exports.createproforma = async (req, res) => {
   try {
+    const today = new Date().toISOString().split('T')[0];
     const { items,subtotal, finalTotal   } = req.body;
     const params = req.body
     params.discountamnt=(subtotal-finalTotal)
@@ -597,9 +598,10 @@ exports.createproforma = async (req, res) => {
         else{
           pdfBuffer = await create_proforma(data);
         }
+        const fileName = `${params.booking_name}_${params.quotation_no}_Proforma_${today}.pdf`;
     //const saveproforma = await createOrUpdateProforma(data);
     // Send the PDF in the response
-    res.setHeader('Content-Disposition', 'attachment; filename=Proforma_with_Terms.pdf');
+    res.setHeader(`Content-Disposition', 'attachment; filename=${fileName}`);
     res.setHeader('Content-Type', 'application/pdf');
     res.end(pdfBuffer);
    // sendEmailWithPdf(params.lead_Id,params.booking_name,pdfBuffer)

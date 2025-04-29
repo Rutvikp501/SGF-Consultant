@@ -7,11 +7,6 @@ const { calculateLeadCycle } = require('../helpers/sample');
 const { calculateCycleAndLeadNumber, calculateCommissionPercentage, processLeadConversion, getLeadstage } = require('./querys');
 
 exports.bitrixaddLead = async (LeadData) => {
-    return {
-        status: true,
-        statusCode: 200,
-        message: 'Successfully added on bitrix',
-    }; 
     try {
         const apiUrl = process.env.BITRIX_ADD_LEAD;
 

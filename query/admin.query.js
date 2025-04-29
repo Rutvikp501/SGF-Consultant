@@ -422,6 +422,7 @@ exports.transformedData = async (params) => {
         };
       })
     );
+    console.log(serviceitems)
     return {
         serviceitems,
     };

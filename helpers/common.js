@@ -130,11 +130,11 @@ const convertToIST = (date) => {
         bookingDate.setHours(0, 0, 0, 0);
   
         const isPast = bookingDate < today;
-  
+
         return {
           bookingDate: isPast
             ? "N.A"
-            : bookingDate.toISOString().split("T")[0], // YYYY-MM-DD
+            : `${String(bookingDate.getDate()).padStart(2, '0')}-${String(bookingDate.getMonth() + 1).padStart(2, '0')}-${bookingDate.getFullYear()}`,
           daysBefore,
           discount
         };
@@ -195,10 +195,10 @@ const convertToIST = (date) => {
       { title: "Soft Copy + Photo Selection", offset: 6 },
       { title: "Traditional Film Raw Draft", offset: 11 },
       { title: "Cinematic Reels - General", offset: 21 },
-      { title: "Highlights - First Draft", offset: 32 },
+      { title: "Highlights - First Draft", offset: 21 },
       { title: "Traditional Film - First Draft", offset: 46 },
       { title: "Highlights - Final Draft", offset: 57 },
-      { title: "Traditional Film - Final Delivery", offset: 57 },
+      { title: "Traditional Film - Final Delivery", offset: 60 },
     ];
   
     const results = milestones.map(({ title, offset = 0, useBookingDate = false }) => {
@@ -222,8 +222,7 @@ const convertToIST = (date) => {
   }
   
 
-
-  module.exports = { generateEventTimeline,discountBookingDates,convertToIST, formatDate,parseDate, generateLeadID, calculateCycle, calculateLeadCycle,formatDate,formatItemDate };
+module.exports = { generateEventTimeline,discountBookingDates,convertToIST, formatDate,parseDate, generateLeadID, calculateCycle, calculateLeadCycle,formatDate,formatItemDate };
 
 exports.read_image = (file_Path) => {
     const filePath = path.join(`${file_Path}`);
